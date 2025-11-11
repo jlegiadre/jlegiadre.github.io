@@ -15,33 +15,73 @@
 		});
 	</script>
 	<script>
-		function myFunction(){ 
-			const hamburger = document.getElementById('hamburger');
-			const megaMenu = document.getElementById('mega-menu');
+	(function () {
+	  const hamburger = document.getElementById('hamburger');
+	  const megaMenu = document.getElementById('mega-menu');
 
-			hamburger.classList.toggle('is-active');
-			if (megaMenu.classList.contains('is-active')) {
-				megaMenu.classList.replace('is-active', 'not-active');
-			} else {
-				megaMenu.classList.replace('not-active', 'is-active');
-			}
+	  // Ensure baseline state and ARIA
+	  function ensureBaseline() {
+		if (
+		  !megaMenu.classList.contains('is-active') &&
+		  !megaMenu.classList.contains('not-active')
+		) {
+		  megaMenu.classList.add('not-active');
 		}
+		hamburger.setAttribute(
+		  'aria-expanded',
+		  megaMenu.classList.contains('is-active') ? 'true' : 'false'
+		);
+		hamburger.setAttribute('aria-controls', 'mega-menu');
+		hamburger.setAttribute('role', 'button');
+		hamburger.setAttribute('tabindex', '0');
+	  }
 
-		// Close the menu when a link is clicked
-		document.addEventListener('DOMContentLoaded', () => {
-			const menuLinks = document.querySelectorAll('#mega-menu a');
-			const hamburger = document.getElementById('hamburger');
-			const megaMenu = document.getElementById('mega-menu');
+	  function openMenu() {
+		megaMenu.classList.remove('not-active');
+		megaMenu.classList.add('is-active');
+		hamburger.classList.add('is-active');
+		hamburger.setAttribute('aria-expanded', 'true');
+	  }
 
-			menuLinks.forEach(link => {
-				link.addEventListener('click', () => {
-					hamburger.classList.remove('is-active');
-					megaMenu.classList.remove('is-active');
-					megaMenu.classList.add('not-active');
-				});
-			});
+	  function closeMenu() {
+		megaMenu.classList.remove('is-active');
+		megaMenu.classList.add('not-active');
+		hamburger.classList.remove('is-active');
+		hamburger.setAttribute('aria-expanded', 'false');
+	  }
+
+	  function toggleMenu() {
+		if (megaMenu.classList.contains('is-active')) {
+		  closeMenu();
+		} else {
+		  openMenu();
+		}
+	  }
+
+	  // Keep your inline onClick="myFunction()" working
+	  window.myFunction = toggleMenu;
+
+	  document.addEventListener('DOMContentLoaded', function () {
+		ensureBaseline();
+
+		// Keyboard support on the hamburger
+		hamburger.addEventListener('keydown', (e) => {
+		  if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			toggleMenu();
+		  }
 		});
+
+		// Close when clicking a menu link
+		document.querySelectorAll('#mega-menu a').forEach((link) => {
+		  link.addEventListener('click', () => {
+			closeMenu();
+		  });
+		});
+	  });
+	})();
 	</script>
+
 	<script>
 		$(window).scroll(function(){
 			$(".arrow-fade").css("opacity", 1 - $(window).scrollTop() / 300); 
