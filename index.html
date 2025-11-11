@@ -193,77 +193,7 @@
 		-moz-animation: addborder 1s ease-in 4s forwards;
 		animation: addborder 1s ease-in 4s forwards;
 	}
-	@-webkit-keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
-	@-ms-keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
-	@keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
 	
-	.patha, .pathb, .pathc {
-		stroke-width: 20px;
-		stroke-dasharray: 1200;
-		stroke-dashoffset: 1200;
-		fill: none;
-		stroke-miterlimit: 10;
-	}
-	.patha {
-		-webkit-animation: dash 2.5s ease-in-out forwards;
-		-ms-animation: dash 2.5s ease-in-out forwards;
-		animation: dash 2.5s ease-in-out forwards;
-		stroke: #5A91BF;
-	}
-	.pathb, .pathc {stroke: #f3f1f1;}
-	.pathb {
-		-webkit-animation: dash 2.5s ease-in-out 0.85s forwards;
-		-ms-animation: dash 2.5s ease-in-out 0.85s forwards;
-		animation: dash 2.5s ease-in-out 0.85s forwards;
-	}
-	.pathc {
-		-webkit-animation: dash 2.5s ease-in-out 1.3s forwards;
-		-ms-animation: dash 2.5s ease-in-out 1.3s forwards;
-		animation: dash 2.5s ease-in-out 1.3s forwards;
-	}
-	.box-outline {
-		-webkit-animation: dash 2s ease-in-out 2s forwards;
-		-ms-animation: dash 2s ease-in-out 2s forwards;
-		animation: dash 2s ease-in-out 2s forwards;
-		stroke-width: 14px;
-		stroke-dasharray: 1200;
-		stroke-dashoffset: 1200;
-		fill: none;
-		stroke-miterlimit: 10;
-		stroke: #dcb24c;
-	}
-	@-webkit-keyframes dash {to {stroke-dashoffset: 0;}}
-	@-ms-keyframes dash {to {stroke-dashoffset: 0;}}
-	@keyframes dash {to {stroke-dashoffset: 0;}}
-	
-	.logo-rotate {
-		display: inline-block;
-		text-align: center;
-		width: 100%;
- 		-webkit-animation: rotation 1s ease 3.25s forwards;
-		-ms-animation: rotation 1s ease 3.25s forwards;
-		animation: rotation 1s ease 3.25s forwards;
-	}
-	@-webkit-keyframes rotation {
-		to {
-			-webkit-transform: rotate(180deg);
-			transform: rotate(180deg);
-		}
-	}
-	@-ms-keyframes rotation {
-		to {
-			-ms-transform: rotate(180deg);
-			transform: rotate(180deg);
-		}
-	}	
-	@keyframes rotation {
- 		to {
-			-webkit-transform: rotate(180deg);
-			transform: rotate(180deg);
-		}
-	}
-	
-	.logo-scale {max-width: 320px; width: 20%; margin: auto;}
 
 	.logo-name {font-size: 5.3125vw; letter-spacing: 1; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; margin: 0.5% auto;}
 	.grey {color: #f3f1f1;}
@@ -438,6 +368,134 @@
 		.project-role {font-size: 2.5vw;;}
 	}
 </style>
+<style>
+body {background-color: #0f273f;}
+.header-promo-bottom, #header, #footercontent {display: none;}
+/* container (unchanged) */
+.logo { display:inline-block; width: 360px; }
+.logo svg { width: 100%; height: auto; display:block; }
+
+/* ================= knobs ================= */
+/* Defaults preserve your current animation exactly */
+:root{
+/* original start times (unchanged) */
+--seg1-start: 0s;
+--seg2-start: 0.7s;
+--seg3-start: 1.6s;
+--seg4-start: 2.4s;
+
+--stroke-w: 47;
+--c12: #f3f1f1;   /* seg1 + seg2 */
+--c34: #5A91BF;   /* seg3 + seg4 */
+
+/* FINAL (permanent) draw durations — same as your old 1.8s */
+--seg1-final-dur: 1.8s;
+--seg2-final-dur: 1.8s;
+--seg3-final-dur: 1.8s;
+--seg4-final-dur: 1.8s;
+
+/* COMET (draw→erase) — disabled by default so visuals do NOT change */
+--comet-len: 0;        /* 0 means no visible comet segment */
+--seg1-comet-dur: 0s;  /* 0s = effectively off */
+--seg2-comet-dur: 0s;
+--seg3-comet-dur: 0s;
+--seg4-comet-dur: 0s;
+
+/* gap between comet and final (per segment) — 0 keeps timing identical */
+--seg1-gap: 0s;
+--seg2-gap: 0s;
+--seg3-gap: 0s;
+--seg4-gap: 0s;
+}
+
+/* base stroke */
+.draw{
+fill: none;
+stroke-width: var(--stroke-w);
+stroke-linecap: round;
+stroke-linejoin: round;
+vector-effect: non-scaling-stroke;
+
+/* start hidden; both passes drive dash/opacity */
+stroke-opacity: 0;
+stroke-dasharray: 0 1;
+stroke-dashoffset: 1;
+
+animation-name: comet-move, final-grow;
+animation-timing-function: cubic-bezier(.2,.6,.2,1), ease-in-out;
+animation-fill-mode: forwards, forwards;
+}
+
+/* colors */
+.seg1, .seg2 { stroke: var(--c12); }
+.seg3, .seg4 { stroke: var(--c34); }
+
+/* ================= schedules ================= */
+/* seg1 */
+.seg1{
+animation-duration: var(--seg1-comet-dur), var(--seg1-final-dur);
+animation-delay:
+var(--seg1-start),
+calc(var(--seg1-start) + var(--seg1-comet-dur) + var(--seg1-gap));
+}
+/* seg2 */
+.seg2{
+animation-duration: var(--seg2-comet-dur), var(--seg2-final-dur);
+animation-delay:
+var(--seg2-start),
+calc(var(--seg2-start) + var(--seg2-comet-dur) + var(--seg2-gap));
+}
+/* seg3 */
+.seg3{
+animation-duration: var(--seg3-comet-dur), var(--seg3-final-dur);
+animation-delay:
+var(--seg3-start),
+calc(var(--seg3-start) + var(--seg3-comet-dur) + var(--seg3-gap));
+}
+/* seg4 */
+.seg4{
+animation-duration: var(--seg4-comet-dur), var(--seg4-final-dur);
+animation-delay:
+var(--seg4-start),
+calc(var(--seg4-start) + var(--seg4-comet-dur) + var(--seg4-gap));
+}
+
+/* ================= keyframes ================= */
+/* 1) comet: short moving dash (NO visible effect with defaults)
+To enable later: set --comet-len (e.g., .22) and give segN a non-zero comet-dur */
+@keyframes comet-move{
+0%{
+stroke-opacity: 0;
+stroke-dasharray: var(--comet-len) 1;
+stroke-dashoffset: 1;
+stroke-linecap: butt;
+}
+1%{ stroke-opacity: 0.95; }
+100%{
+stroke-opacity: 0;
+stroke-dasharray: var(--comet-len) 1;
+stroke-dashoffset: 0;
+stroke-linecap: butt;
+}
+}
+
+/* 2) final: your original single smooth draw */
+@keyframes final-grow{
+0%{
+stroke-opacity: 1;
+stroke-dasharray: 0 1;
+stroke-dashoffset: 1;
+stroke-linecap: round;
+}
+100%{
+stroke-opacity: 1;
+stroke-dasharray: 1 1;
+stroke-dashoffset: 0;
+stroke-linecap: round;
+}
+}
+
+</style>
 	
 <div class="page">
 	<div id="header-wrapper">
@@ -449,17 +507,41 @@
 		</div>
 	</div>
 	<div class="nav-center-screen">
-		<div class="logo-rotate">
-			<div class="logo-scale">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
-					<path class="box-outline" d="M159.5,16.036 H304.059 V303.964 H159.5"/>
-					<path class="box-outline" d="M160.5,16.036 H16.131 V303.964 H160.5"/>
-					<path class="patha" d="M64.7,85.9c0-21.5,17.5-39,39-39l112.7,0c-40.7,0-73.6,33-73.6,73.6l0,78c0,21.5-17.5,39-39,39s-39-17.5-39-39 s17.5-39,39-39l23,0"/>
-					<path class="pathc" d="M177.3,159.5l0,39c0,40.7-33,73.6-73.6,73.6l112.7,0c21.6,0,39-17.5,39-39"/>
-					<path class="pathb" d="M158.3,159.5l58,0l0,0c21.6,0,39-17.5,39-39s-17.5-39-39-39s-39,17.5-39,39l0,23"/>
-				</svg>
+		
+		<div class="w-100 text-center">
+			<div class="logo">
+			  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
+				<defs>
+				  <!-- ===== CENTERLINE STROKES (pathLength=1 normalizes dash units 0..1) ===== -->
+				  <path id="p1" pathLength="1" d="M161.7,181.1c0,0,40.3-38.4,40.3-38.4c61.9,271-33.8,339.2-93.3,317c-2.4-0.9-4.8-2-7.1-3.2  c-2.2-1.2-4.3-2.4-6.4-3.8" />
+				  <path id="p2" pathLength="1" d="M108.6,459.7c-2.4-0.9-4.8-2-7.1-3.2c-2.2-1.2-4.3-2.4-6.4-3.8c-56-38.3-52.9-169.2,245-255.7" />
+				  <path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
+				  <path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
+
+				  <!-- ===== OUTLINED (TAPERED) FILLS — non-overlapping where possible ===== -->
+				  <path id="op1" d="M233.4,247c-0.2-1.4-0.4-2.7-0.6-4.1c-1-6.1-2-12.1-3.2-18.2c-6.1-32.1-14.9-63.3-25.2-94  c-14.1,16.2-29.2,33.6-42.7,50.3c11.6-8.5,24-18,35.7-27.2c3.4,26.8,6.1,53.6,7.6,80.2c0.2,3.9,0.4,7.7,0.6,11.6  c0.2,5.5,0.4,11.1,0.5,16.6c0.5,27.6-0.8,55.5-5.4,82.4c-6.4,37.3-24.5,92.9-67.2,97.3c-7.3,0.5-14.2-0.9-20.3-3.8  c-2-0.9-3.9-2.1-5.7-3.3l-23,36.4c1.9,1.2,3.8,2.4,5.8,3.5c3.9,2.2,8.1,4,12.4,5.5c39,14,79.8-4.1,102.7-36.6  C244.1,388.9,242.8,311,233.4,247z" />
+				  <path id="op2" d="M251.3,217.6c-7.3,2.3-14.6,4.6-21.8,7.2c-8.3,2.9-16.5,6-24.6,9.3c-21.6,8.8-42.6,19-62.5,31.2  c-34.4,21.2-67.6,49.3-85.3,86.7c-7.3,15.4-11.4,32.5-10.9,49.8c0.5,29.9,17.7,58.6,43.8,73c2,1.1,4,2.1,6.1,3l23.1-37.3  c-2.2-0.6-4.3-1.4-6.3-2.3c-14.3-6.7-24.2-21.5-25-38.3c-1.8-27.7,17.1-55.8,36.2-75.7c23.7-24.5,52-44.5,81.7-61.9  c9-5.3,18.2-10.4,27.4-15.2c8.2-4.3,16.4-8.5,24.6-12.6c11.3-5.6,23.3-11.3,34.8-16.5c15.6-7.1,31.4-14,47.3-20.9  C310.1,201.7,280.4,208.7,251.3,217.6z" />
+				  <path id="op3" d="M255.3,206.5c-20.8-15.1-19.1-50.7-15.4-73.4c6.5-40.9,35.1-108.9,76.3-124.7c18-6.7,39.2,2,48.1,18.8  c1.9,3.4,3.3,7.2,4.1,11.1c9.4,42.8-12.8,91.6-30.7,129.3c-21.7,44.9-47.4,86.3-66.7,132c-9.2,22.6-16.8,45.8-15.2,70.7  c-2.5-5.8-4.1-12-5.2-18.4c-1-6.3-1.5-12.8-1.5-19.3c0.2-25.8,6.7-51,14.6-75.4c13.6-41.6,32.7-81.1,49-121.1  c10.1-25.6,24.5-61,20.6-88.4c0,0-0.3-1.7-0.3-1.7l-0.1-0.8c-0.1-0.2-0.1-0.3-0.1-0.5c0-0.1-0.1-0.2-0.1-0.2c-0.6-2.3-3.2-4-5.6-3.5  c-5.3,1.6-9.4,4.8-14.4,9c-4,3.5-7.9,7.5-11.5,11.6C276.8,88.5,230.3,172.6,255.3,206.5L255.3,206.5z" />
+				  <path id="op4" d="M189.7,367c-21.9-6.3-39.5-25.3-30.6-49.3c8.8-22,32.6-33.2,54.8-35.9c24.3-2.9,48.9,3.4,70,15.1  c13.9,7.7,28.7,16.8,42.4,24.6c33.5,18.6,78.3,45.4,115.8,26.8c6.2-3,12.2-6.9,15.1-12.9c4.5-10.8-3.3-23.3-10.5-31.7  c-3.1-3.5-6.4-6.7-10.4-9.1c9.9,1.4,18.7,6.9,26,13.7c8.2,7.7,14.1,19,12.4,31.2c-1.8,12.5-10.2,22.1-19.7,29.3  c-17.5,13.7-41.1,18.6-62.7,16.2c-40.2-4.4-75.7-25.5-108.9-46c-5.3-3.3-14.9-9.5-20.1-12.6c-7.8-4.6-16.1-8.4-24.6-11.1  c-13.1-4-26.9-5.4-40.3-2.4c-11.8,2.8-24.7,9.5-26.5,22.1C170.6,347.9,180.6,358.6,189.7,367L189.7,367z" />
+
+				  <!-- ===== CLIP PATHS (force strokes to render strictly inside outlines) ===== -->
+				  <clippath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clippath>
+				  <clippath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clippath>
+				  <clippath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clippath>
+				  <clippath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clippath>
+				</defs>
+
+				<!-- Render: each centerline drawn with 30px stroke, clipped by its outline -->
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw seg1"/></g>
+				<g clip-path="url(#clip2)"><use href="#p2" class="draw seg2"/></g>
+				<g clip-path="url(#clip3)"><use href="#p3" class="draw seg3"/></g>
+				<g clip-path="url(#clip4)"><use href="#p4" class="draw seg4"/></g>
+			  </svg>
 			</div>
 		</div>
+		
+		
+		
 		<div class="logo-name"><span class="grey">Jonathan</span> <span class="blue">Legiadre</span></div>
 		<div class="logo-title">Graphic Designer + Front-End Developer</div>
 		<div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
