@@ -1,0 +1,518 @@
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+	<script src="js/jquery-3.4.1.min.js"></script>
+	
+	<script>
+		let vh = window.innerHeight * 0.01;
+		document.documentElement.style.setProperty('--vh', `${vh}px`);
+	</script>
+	<script>
+		window.addEventListener('resize', () => {
+			let vh = window.innerHeight * 0.01;
+			document.documentElement.style.setProperty('--vh', `${vh}px`);
+		});
+	</script>
+	<script> 
+		function myFunction(){ 
+			document.getElementById('hamburger').classList.toggle('is-active'); 
+			if(document.getElementById("mega-menu").className == "is-active") 
+				document.getElementById("mega-menu").className = "not-active"; 
+			else document.getElementById("mega-menu").className = "is-active"; 
+		} 
+	</script>
+	<script>
+		$(window).scroll(function(){
+			$(".arrow-fade").css("opacity", 1 - $(window).scrollTop() / 300); 
+		  });
+	</script>
+</head>
+<style>
+	a, a:visited, a:active, a:hover {text-decoration:none;}
+	*, *:after, *:before {box-sizing: border-box;}
+	body::-webkit-scrollbar { width: 0 !important }
+	body { overflow: -moz-scrollbars-none; }
+	body { -ms-overflow-style: none; }
+</style>
+<style>
+	#header-wrapper {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 4;
+	}
+	
+	#hamburger {
+		padding: 15px 15px;
+		display: inline-block;
+		cursor: pointer;
+		float: right;
+		transition-property: opacity, filter;
+		transition-duration: 0.15s;
+		transition-timing-function: linear;
+		font: inherit;
+		color: inherit;
+		text-transform: none;
+		background-color: transparent;
+		border: 0;
+		margin: 0;
+		overflow: visible; 
+		opacity: 0;
+		-webkit-animation: appear 1s ease-in-out 4s forwards;
+		-moz-animation: appear 1s ease-in-out 4s forwards;
+		animation: appear 1s ease-in-out 4s forwards;
+	}
+		#hamburger:hover {opacity: 0.7;}
+		#hamburger.is-active:hover {opacity: 0.7;}
+		#hamburger.is-active .hamburger-inner,
+		#hamburger.is-active .hamburger-inner::before,
+		#hamburger.is-active .hamburger-inner::after {background-color: #f3f1f1; }
+	.hamburger-box {
+	  width: 40px;
+	  height: 24px;
+	  display: inline-block;
+	  position: relative; }
+	.hamburger-inner {
+	  display: block;
+	  top: 50%;
+	  margin-top: -2px; }
+	  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+		width: 40px;
+		height: 4px;
+		background-color: #dcb24c;
+		border-radius: 4px;
+		position: absolute;
+		transition-property: transform;
+		transition-duration: 0.15s;
+		transition-timing-function: ease; }
+	  .hamburger-inner::before, .hamburger-inner::after {
+		content: "";
+		display: block; }
+	  .hamburger-inner::before {top: -10px; }
+	  .hamburger-inner::after { bottom: -10px; }
+	.hamburger--spin .hamburger-inner {
+	  transition-duration: 0.22s;
+	  transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); 
+	}
+	  .hamburger--spin .hamburger-inner::before {transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in; }
+	  .hamburger--spin .hamburger-inner::after {transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+	.hamburger--spin.is-active .hamburger-inner {
+	  transform: rotate(225deg);
+	  transition-delay: 0.12s;
+	  transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+	  .hamburger--spin.is-active .hamburger-inner::before {
+		top: 0;
+		opacity: 0;
+		transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
+	  .hamburger--spin.is-active .hamburger-inner::after {
+		bottom: 0;
+		transform: rotate(-90deg);
+		transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1); }
+	.hamburger-label {
+		font-family: 'Montserrat', sans-serif; 
+		font-weight: 700; 
+		text-transform: uppercase; 
+		font-size: 12px;
+		color: #dcb24c;
+		padding-top: 7px;
+	}
+	#hamburger.is-active .hamburger-label {
+		color: #f3f1f1;
+	}
+
+	#mega-menu {
+		position: fixed;
+		top: -12.5%;
+		left: -12.5%;
+		opacity: 0;
+		z-index: -1;
+		width: 125%;
+		height: 125vh;
+		height: calc(var(--vh, 1vh) * 125);
+		background-color: #0f273f;
+		padding: 76px;
+		-webkit-transition: all 0.5s ease-in-out;
+		transition: all 0.5s ease-in-out;
+	}
+	#mega-menu.is-active {
+		top: 0;
+		left: 0;
+		z-index: 1;
+		opacity: 1;
+		width: 100%;
+		height: 100vh;
+		height: calc(var(--vh, 1vh) * 100);
+	}
+	#mega-menu.not-active {
+		top: -12.5%;
+		left: -12.5%;
+		width: 125%;
+		height: 125vh;
+		z-index: -1;
+		opacity: 0;
+		height: calc(var(--vh, 1vh) * 125);
+	}
+	
+	.menu-item {
+		text-transform: capitalize;
+		font-family: 'Bitter', serif; 
+		font-weight: 400;
+		font-style: italic;
+		color: #dcb24c;
+		font-size: 4vw;
+		margin-bottom: 6%;
+		text-align: left;
+		width: 100%;
+		border-bottom: 2px solid #f3f1f1;
+	}
+</style>
+<style>
+	body {margin: 0; padding: 0; background-color: #f3f1f1; text-align: center;}
+	.desktop {display: block;}
+	.mobile {display: none;}
+	.nav-center-screen {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		height: 100vh; 
+		height: calc(var(--vh, 1vh) * 100);
+		background-color: #0f273f;
+		overflow: hidden;
+		position: relative;
+		margin: 0 auto;
+		/*z-index: 2;*/
+		border-bottom: 10px solid rgba(90,145,191, 0);
+		box-sizing: border-box;
+		-webkit-animation: addborder 1s ease-in 4s forwards;
+		-moz-animation: addborder 1s ease-in 4s forwards;
+		animation: addborder 1s ease-in 4s forwards;
+	}
+	@-webkit-keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
+	@-ms-keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
+	@keyframes addborder {100% {border-bottom: 10px solid rgba(90,145,191, 1);}}
+	
+	.patha, .pathb, .pathc {
+		stroke-width: 20px;
+		stroke-dasharray: 1200;
+		stroke-dashoffset: 1200;
+		fill: none;
+		stroke-miterlimit: 10;
+	}
+	.patha {
+		-webkit-animation: dash 2.5s ease-in-out forwards;
+		-ms-animation: dash 2.5s ease-in-out forwards;
+		animation: dash 2.5s ease-in-out forwards;
+		stroke: #5A91BF;
+	}
+	.pathb, .pathc {stroke: #f3f1f1;}
+	.pathb {
+		-webkit-animation: dash 2.5s ease-in-out 0.85s forwards;
+		-ms-animation: dash 2.5s ease-in-out 0.85s forwards;
+		animation: dash 2.5s ease-in-out 0.85s forwards;
+	}
+	.pathc {
+		-webkit-animation: dash 2.5s ease-in-out 1.3s forwards;
+		-ms-animation: dash 2.5s ease-in-out 1.3s forwards;
+		animation: dash 2.5s ease-in-out 1.3s forwards;
+	}
+	.box-outline {
+		-webkit-animation: dash 2s ease-in-out 2s forwards;
+		-ms-animation: dash 2s ease-in-out 2s forwards;
+		animation: dash 2s ease-in-out 2s forwards;
+		stroke-width: 14px;
+		stroke-dasharray: 1200;
+		stroke-dashoffset: 1200;
+		fill: none;
+		stroke-miterlimit: 10;
+		stroke: #dcb24c;
+	}
+	@-webkit-keyframes dash {to {stroke-dashoffset: 0;}}
+	@-ms-keyframes dash {to {stroke-dashoffset: 0;}}
+	@keyframes dash {to {stroke-dashoffset: 0;}}
+	
+	.logo-rotate {
+		display: inline-block;
+		text-align: center;
+		width: 100%;
+ 		-webkit-animation: rotation 1s ease 3.25s forwards;
+		-ms-animation: rotation 1s ease 3.25s forwards;
+		animation: rotation 1s ease 3.25s forwards;
+	}
+	@-webkit-keyframes rotation {
+		to {
+			-webkit-transform: rotate(180deg);
+			transform: rotate(180deg);
+		}
+	}
+	@-ms-keyframes rotation {
+		to {
+			-ms-transform: rotate(180deg);
+			transform: rotate(180deg);
+		}
+	}	
+	@keyframes rotation {
+ 		to {
+			-webkit-transform: rotate(180deg);
+			transform: rotate(180deg);
+		}
+	}
+	
+	.logo-scale {max-width: 320px; width: 20%; margin: auto;}
+
+	.logo-name {font-size: 5.3125vw; letter-spacing: 1; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; margin: 0.5% auto;}
+	.grey {color: #f3f1f1;}
+	.blue {color: #5A91BF;}
+	.logo-title {font-size: 1.5625vw; color: #dcb24c; line-height: 1; letter-spacing: 2; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; text-transform: capitalize;}
+	.logo-name, .logo-title {
+		text-align: center;  
+		opacity: 0; 
+		-webkit-animation: appear 1s ease-in 4s forwards;
+		-moz-animation: appear 1s ease-in 4s forwards;
+		animation: appear 1s ease-in 4s forwards;
+	}
+	@-webkit-keyframes appear {
+		0% {opacity: 0;}
+		100% {opacity: 1;}
+	}
+	@-moz-keyframes appear {
+		0% {opacity: 0;}
+		100% {opacity: 1;}
+	}
+	@keyframes appear {
+		0% {opacity: 0;}
+		100% {opacity: 1;}
+	}
+	
+	i {display: block;color: #f3f1f1;}
+	
+	.arrow {
+		position: absolute;
+		bottom: 0px;
+		left: 50%;
+		margin-left: -20px;
+		width: 40px;
+		height: 40px;
+		opacity: 0;
+		-webkit-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+		-moz-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+		animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+	}
+	@-webkit-keyframes bounce {
+		0%, 20%, 50%, 80%, 100% {
+			-webkit-transform: translateY(0);
+			transform: translateY(0);
+		}
+		40% {
+			-webkit-transform: translateY(-30px);
+			transform: translateY(-30px);
+		}
+		60% {
+			-webkit-transform: translateY(-15px);
+			transform: translateY(-15px);
+		}
+	}
+	@-moz-keyframes bounce {
+		0%, 20%, 50%, 80%, 100% {
+			-moz-transform: translateY(0);
+			transform: translateY(0);
+		}
+		40% {
+			-moz-transform: translateY(-30px);
+			transform: translateY(-30px);
+		}
+		60% {
+			-moz-transform: translateY(-15px);
+			transform: translateY(-15px);
+		}
+	}
+	@keyframes bounce {
+		0%, 20%, 50%, 80%, 100% {
+			-moz-transform: translateY(0);
+			-ms-transform: translateY(0);
+			-webkit-transform: translateY(0);
+			transform: translateY(0);
+		}
+		40% {
+			-moz-transform: translateY(-25px);
+			-ms-transform: translateY(-25px);
+			-webkit-transform: translateY(-25px);
+			transform: translateY(-25px);
+		}
+		60% {
+			-moz-transform: translateY(-15px);
+			-ms-transform: translateY(-15px);
+			-webkit-transform: translateY(-15px);
+			transform: translateY(-15px);
+		}
+	}
+		
+	.below { 
+		height: 0;
+		overflow: hidden;
+		background-color: #f3f1f1;
+		-webkit-animation: showcontent 1s ease-in 4s forwards;
+		-moz-animation: showcontent 1s ease-in 4s forwards;
+		animation: showcontent 1s ease-in 4s forwards;
+	}
+	@-webkit-keyframes showcontent {100% {height: auto;}}
+	@-moz-keyframes showcontent {100% {height: auto;}}
+	@keyframes showcontent {100% {height: auto;}}
+		
+	.work-wrapper {
+		width: 100%; 
+		margin: 0 auto; 
+		display: flex; 
+		flex-direction: row; 
+		flex-wrap: wrap; 
+		justify-content: space-evenly; 
+		margin-top: 5%;
+	}
+	.work-item {
+		width: 28%; 
+		margin-bottom: 3%;
+	}
+	.portfolio-info {
+		width: 100%; 
+		text-align: left; 
+		padding: 2% 0% 4%;
+	}
+	.portfolio-info::before {
+		content: "";
+		display: block;
+		position: relative;
+		top: 0;
+		right: 0;
+		height: 2px;
+		background: #dcb24c;
+		width: 50%;
+	}
+	.project-name {
+		font-family: 'Montserrat', sans-serif; 
+		font-weight: 600; 
+		text-transform: uppercase;
+		letter-spacing: 1;
+		color: #4682b4;
+		font-size: 1.5vw;
+		margin-top: 2%;
+	}
+	.project-role {
+		text-transform: capitalize;
+		font-family: 'Bitter', serif; 
+		font-weight: 400;
+		font-style: italic;
+		color: #0f273f;
+		font-size: 1vw;
+		letter-spacing: 2;
+	}
+	
+	@media screen and (min-width: 1466px) {
+		.project-name {font-size: 22px;}
+		.project-role {font-size: 14.66px}
+	}
+	@media screen and (min-width: 767px) and (max-width: 980px){
+		.work-item {width: 38%;}
+		.project-role {font-size: 1.25vw; letter-spacing: 1.5;}
+		.project-name {font-size: 1.75vw;}
+	}
+	@media screen and (min-width: 1600px) {
+		.logo-name {font-size: 85px;} 
+		.logo-title {font-size: 25px;}
+		.menu-item {font-size: 64px;}
+	}
+	@media screen and (max-width: 767px) {
+		.desktop {display: none;}
+		.mobile {display: block;}
+		.logo-scale {width: 50%;}
+		.logo-name {font-size: 7.5vw;} 
+		.logo-title {font-size: 3.25vw;}
+		#mega-menu {padding: 76px 30px;}
+		.menu-item {font-size: 8vw; margin-bottom: 12%}
+		.work-item {width: 80%; margin-bottom: 9%;}
+		.project-name {font-size: 3.75vw;}
+		.project-role {font-size: 2.5vw;;}
+	}
+</style>
+	
+<div class="page">
+	<div id="header-wrapper">
+		<div id="hamburger" class="hamburger--spin js-hamburger" onClick="myFunction()">
+			<div class="hamburger-box">
+				<div class="hamburger-inner"></div>
+			</div>
+			<div class="hamburger-label">Menu</div>
+		</div>
+	</div>
+	<div class="nav-center-screen">
+		<div class="logo-rotate">
+			<div class="logo-scale">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+					<path class="box-outline" d="M159.5,16.036 H304.059 V303.964 H159.5"/>
+					<path class="box-outline" d="M160.5,16.036 H16.131 V303.964 H160.5"/>
+					<path class="patha" d="M64.7,85.9c0-21.5,17.5-39,39-39l112.7,0c-40.7,0-73.6,33-73.6,73.6l0,78c0,21.5-17.5,39-39,39s-39-17.5-39-39 s17.5-39,39-39l23,0"/>
+					<path class="pathc" d="M177.3,159.5l0,39c0,40.7-33,73.6-73.6,73.6l112.7,0c21.6,0,39-17.5,39-39"/>
+					<path class="pathb" d="M158.3,159.5l58,0l0,0c21.6,0,39-17.5,39-39s-17.5-39-39-39s-39,17.5-39,39l0,23"/>
+				</svg>
+			</div>
+		</div>
+		<div class="logo-name"><span class="grey">Jonathan</span> <span class="blue">Legiadre</span></div>
+		<div class="logo-title">Graphic Designer + Front-End Developer</div>
+		<div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
+	</div>
+	<div id="mega-menu">
+		<div class="menu-item">Work</div>
+		<div class="menu-item">About</div>
+		<div class="menu-item">Contact</div>	
+	</div>
+	<div class="below">
+		<div class="work-wrapper">
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>	
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>
+			<div class="work-item">
+				<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+				<div class="portfolio-info">
+					<div class="project-name">typezero</div>
+					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+				</div>
+			</div>		
+		</div>
+	</div>
+</div>
