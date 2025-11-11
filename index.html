@@ -15,72 +15,70 @@
 		});
 	</script>
 	<script>
-	(function () {
-	  const hamburger = document.getElementById('hamburger');
-	  const megaMenu = document.getElementById('mega-menu');
+  // Toggle handler used by your inline onClick="myFunction()"
+  function myFunction() {
+    const hamburger = document.getElementById('hamburger');
+    const megaMenu  = document.getElementById('mega-menu');
+    if (!hamburger || !megaMenu) return; // Safe if called before DOM is ready
 
-	  // Ensure baseline state and ARIA
-	  function ensureBaseline() {
-		if (
-		  !megaMenu.classList.contains('is-active') &&
-		  !megaMenu.classList.contains('not-active')
-		) {
-		  megaMenu.classList.add('not-active');
-		}
-		hamburger.setAttribute(
-		  'aria-expanded',
-		  megaMenu.classList.contains('is-active') ? 'true' : 'false'
-		);
-		hamburger.setAttribute('aria-controls', 'mega-menu');
-		hamburger.setAttribute('role', 'button');
-		hamburger.setAttribute('tabindex', '0');
-	  }
+    const isOpen = megaMenu.classList.contains('is-active');
 
-	  function openMenu() {
-		megaMenu.classList.remove('not-active');
-		megaMenu.classList.add('is-active');
-		hamburger.classList.add('is-active');
-		hamburger.setAttribute('aria-expanded', 'true');
-	  }
+    // Toggle menu state
+    if (isOpen) {
+      megaMenu.classList.remove('is-active');
+      megaMenu.classList.add('not-active');
+      hamburger.classList.remove('is-active'); // restores icon to hamburger
+      hamburger.setAttribute('aria-expanded', 'false');
+    } else {
+      megaMenu.classList.remove('not-active');
+      megaMenu.classList.add('is-active');
+      hamburger.classList.add('is-active'); // triggers .hamburger--spin.is-active animation
+      hamburger.setAttribute('aria-expanded', 'true');
+    }
+  }
 
-	  function closeMenu() {
-		megaMenu.classList.remove('is-active');
-		megaMenu.classList.add('not-active');
-		hamburger.classList.remove('is-active');
-		hamburger.setAttribute('aria-expanded', 'false');
-	  }
+  // Wire everything once the DOM is ready
+  document.addEventListener('DOMContentLoaded', function () {
+    const hamburger = document.getElementById('hamburger');
+    const megaMenu  = document.getElementById('mega-menu');
 
-	  function toggleMenu() {
-		if (megaMenu.classList.contains('is-active')) {
-		  closeMenu();
-		} else {
-		  openMenu();
-		}
-	  }
+    // Baseline state for the menu the first time
+    if (megaMenu && !megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+      megaMenu.classList.add('not-active');
+    }
 
-	  // Keep your inline onClick="myFunction()" working
-	  window.myFunction = toggleMenu;
+    // ARIA + keyboard support for the hamburger button
+    if (hamburger) {
+      hamburger.setAttribute('aria-controls', 'mega-menu');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('role', 'button');
+      hamburger.setAttribute('tabindex', '0');
 
-	  document.addEventListener('DOMContentLoaded', function () {
-		ensureBaseline();
+      hamburger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          myFunction();
+        }
+      });
+    }
 
-		// Keyboard support on the hamburger
-		hamburger.addEventListener('keydown', (e) => {
-		  if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			toggleMenu();
-		  }
-		});
+    // Close menu when a menu link is clicked
+    document.querySelectorAll('#mega-menu a').forEach((link) => {
+      link.addEventListener('click', () => {
+        const hamburgerNow = document.getElementById('hamburger');
+        const megaMenuNow  = document.getElementById('mega-menu');
+        if (!megaMenuNow) return;
 
-		// Close when clicking a menu link
-		document.querySelectorAll('#mega-menu a').forEach((link) => {
-		  link.addEventListener('click', () => {
-			closeMenu();
-		  });
-		});
-	  });
-	})();
-	</script>
+        megaMenuNow.classList.remove('is-active');
+        megaMenuNow.classList.add('not-active');
+        if (hamburgerNow) {
+          hamburgerNow.classList.remove('is-active');
+          hamburgerNow.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  });
+</script>
 
 	<script>
 		$(window).scroll(function(){
@@ -231,6 +229,8 @@
 	body {margin: 0; padding: 0; background-color: #f3f1f1; text-align: center;}
 	.desktop {display: block;}
 	.mobile {display: none;}
+	
+	/** TITLE SCREEN **/
 	.nav-center-screen {
 		width: 100%;
 		display: flex;
@@ -251,11 +251,26 @@
 		-moz-animation: addborder 1s ease-in 4s forwards;
 		animation: addborder 1s ease-in 4s forwards;
 	}
-	
-	.logo-name {font-size: 5.3125vw; letter-spacing: 1; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; margin: 0.5% auto;}
+	.logo-name {
+		font-size: 5.3125vw; 
+		letter-spacing: 1; 
+		font-family: 'Montserrat', sans-serif; 
+		font-weight: 600; 
+		text-transform: uppercase; 
+		margin: 0.5% auto;
+	}
 	.grey {color: #f3f1f1;}
 	.blue {color: #5A91BF;}
-	.logo-title {font-size: 1.5625vw; color: #dcb24c; line-height: 1; letter-spacing: 2; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; text-transform: capitalize;}
+	.logo-title {
+		font-size: 1.5625vw; 
+		color: #dcb24c; 
+		line-height: 1; 
+		letter-spacing: 2; 
+		font-family: 'Bitter', serif; 
+		font-weight: 400; 
+		font-style: italic; 
+		text-transform: capitalize;
+	}
 	.logo-name, .logo-title {
 		text-align: center;  
 		opacity: 0; 
@@ -351,6 +366,7 @@
 	@-moz-keyframes showcontent {100% {height: auto;}}
 	@keyframes showcontent {100% {height: auto;}}
 		
+	/** PORTFOLIO STYLES **/
 	.work-wrapper {
 		width: 100%; 
 		margin: 0 auto; 
