@@ -146,6 +146,35 @@
       });
     })();
   </script>
+	
+	<script>
+	  (function () {
+		function enableLogoReplay() {
+		  const logo = document.querySelector('.logo');
+		  if (!logo) return;
+
+		  logo.addEventListener('dblclick', () => {
+			const svg = logo.querySelector('svg');
+			if (!svg) return;
+
+			// Clone the SVG to restart all CSS animations attached to its children
+			const clone = svg.cloneNode(true);
+
+			// Preserve focusability/ARIA attributes (in case the SVG changes later)
+			if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
+			if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
+
+			svg.replaceWith(clone);
+		  }, { passive: true });
+		}
+
+		if (document.readyState === 'loading') {
+		  document.addEventListener('DOMContentLoaded', enableLogoReplay);
+		} else {
+		  enableLogoReplay();
+		}
+	  })();
+	</script>
 </head>
 
 <style>
@@ -385,13 +414,14 @@
     width: clamp(200px, 60vw, 420px);
     max-width: 100%;
     overflow: hidden;
+    user-select: none; -webkit-user-select: none;
   }
   .logo svg { width: 100%; height: auto; display: block; }
 
   /* ===== Responsive stroke + timing variables ===== */
   :root{
     --seg1-start: 0s;
-    --seg2-start: 0.685s;
+    --seg2-start: 0.658s;
     --seg3-start: 1.6s;
     --seg4-start: 2.4s;
 
