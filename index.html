@@ -18,7 +18,6 @@
       setTimeout(setVH, 250);
     });
 
-    // Optional keyboard/sheet shrink support
     if (window.visualViewport) {
       let last = window.visualViewport.height;
       window.visualViewport.addEventListener('resize', () => {
@@ -125,10 +124,14 @@
     top: 12px;
     right: 12px;
     z-index: 4; /* stays above the menu overlay */
-    padding: 10px 12px;
-    display: inline-flex;                    /* puts label next to the icon */
+
+    /* ↓ stack icon over label */
+    display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;                               /* space between lines and label */
+    gap: 6px;
+
+    padding: 10px 12px;
     cursor: pointer;
     font: inherit;
     color: inherit;
@@ -214,7 +217,7 @@
     text-transform: uppercase;
     font-size: 12px;
     color: #dcb24c;
-    /* no padding-top so it stays inline-centered with the lines */
+    padding-top: 7px; /* keep label visually below the icon like before */
   }
   #hamburger.is-active .hamburger-label { color: #f3f1f1; }
 
@@ -638,7 +641,7 @@ body { background-color: #0f273f; }
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
-      </div> 
+      </div>
       <div class="work-item">
         <img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero">
         <div class="portfolio-info">
