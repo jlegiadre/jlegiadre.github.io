@@ -132,20 +132,18 @@
   <script>
     (function () {
       document.addEventListener('DOMContentLoaded', () => {
+        const sentinel = document.getElementById('hero-sentinel');
+        if (!sentinel) return;
+
         const io = new IntersectionObserver((entries) => {
-		  for (const entry of entries) {
-			if (entry.isIntersecting) {
-			  document.body.classList.remove('hamburger-on-light');   // in hero
-			} else {
-			  document.body.classList.add('hamburger-on-light');      // past hero
-			}
-		  }
-		}, {
-		  root: null,
-		  threshold: 0,
-		  // tweak this number: more negative = earlier switch; less negative = later
-		  rootMargin: "-120px 0px 0px 0px"
-		});
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              document.body.classList.remove('hamburger-on-light');   // in hero: mustard
+            } else {
+              document.body.classList.add('hamburger-on-light');      // over light section: dark blue
+            }
+          }
+        }, { root: null, threshold: 0 });
 
         io.observe(sentinel);
       });
