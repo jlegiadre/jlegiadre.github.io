@@ -130,25 +130,62 @@
 
   <!-- HAMBURGER COLOR SCROLL TOGGLE -->
   <script>
-    (function () {
-      document.addEventListener('DOMContentLoaded', () => {
-        const sentinel = document.getElementById('hero-sentinel');
-        if (!sentinel) return;
+	(function () {
+	  // How many pixels *before* the hero ends the switch should happen
+	  const SWITCH_OFFSET = 96; // tweak this number: bigger = earlier switch
 
-        const io = new IntersectionObserver((entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              document.body.classList.remove('hamburger-on-light');   // in hero: mustard
-            } else {
-              document.body.classList.add('hamburger-on-light');      // over light section: dark blue
-            }
-          }
-        }, { root: null, threshold: 0 });
+	  function setupHamburgerColorSwitch() {
+		const hero = document.querySelector('.nav-center-screen');
+		if (!hero) return;
 
-        io.observe(sentinel);
-      });
-    })();
-  </script>
+		// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
+		let sentinel = hero.querySelector('.hero-sentinel');
+		if (!sentinel) {
+		  sentinel = document.createElement('div');
+		  sentinel.className = 'hero-sentinel';
+		  hero.appendChild(sentinel);
+		}
+
+		// Inline styles so this works without relying on extra CSS
+		Object.assign(sentinel.style, {
+		  position: 'absolute',
+		  left: '0',
+		  right: '0',
+		  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
+		  height: '1px',
+		  pointerEvents: 'none'
+		  // For quick debugging, uncomment the next line to *see* the sentinel:
+		  // ,background: 'rgba(255,0,0,.3)'
+		});
+
+		// Ensure the hero is a positioning context
+		const heroComputed = getComputedStyle(hero);
+		if (heroComputed.position === 'static') {
+		  hero.style.position = 'relative';
+		}
+
+		// Observe the sentinel: when it leaves the viewport, we’re past the hero.
+		const io = new IntersectionObserver((entries) => {
+		  const entry = entries[0];
+		  if (entry.isIntersecting) {
+			// Sentinel is visible -> we're still within the hero
+			document.body.classList.remove('hamburger-on-light');
+		  } else {
+			// Sentinel scrolled out -> we're into the light section
+			document.body.classList.add('hamburger-on-light');
+		  }
+		}, { threshold: 0 });
+
+		io.observe(sentinel);
+	  }
+
+	  if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
+	  } else {
+		setupHamburgerColorSwitch();
+	  }
+	})();
+	</script>
 </head>
 
 <style>
@@ -169,7 +206,7 @@
 
   /* Branding utilities */
   .off-white { color: #f3f1f1; }
-  .light-blue { color: #5A91BF; }
+  .light-blue { color: #568FBD; }
   .dark-blue { color: #0f273f; }
   .mustard  { color: #dcb24c; }
   .font-mont { font-family: 'Montserrat', sans-serif; }
@@ -332,7 +369,7 @@
     --seg4-start: 1.9s;
     --stroke-w: clamp(10px, 6vw, 47px);
     --c12: #f3f1f1;
-    --c34: #5A91BF;
+    --c34: #568FBD;
     --seg1-final-dur: 1.6s;
     --seg2-final-dur: 1.6s;
     --seg3-final-dur: 1.6s;
