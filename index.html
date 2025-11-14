@@ -1,136 +1,135 @@
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
-<!-- 1) Stable viewport height (svh-first with JS fallback) -->
-<script>
-  (function () {
-    function setVH() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
+	<!-- 1) Stable viewport height (svh-first with JS fallback) -->
+	<script>
+	  (function () {
+		function setVH() {
+		  const vh = window.innerHeight * 0.01;
+		  document.documentElement.style.setProperty('--vh', `${vh}px`);
+		}
 
-    document.addEventListener('DOMContentLoaded', setVH);
+		document.addEventListener('DOMContentLoaded', setVH);
 
-    window.addEventListener('orientationchange', () => {
-      setTimeout(setVH, 250);
-    });
+		window.addEventListener('orientationchange', () => {
+		  setTimeout(setVH, 250);
+		});
 
-    if (window.visualViewport) {
-      let last = window.visualViewport.height;
-      window.visualViewport.addEventListener('resize', () => {
-        const now = window.visualViewport.height;
-        if (now < last - 120) setVH();
-        last = now;
-      });
-    }
-  })();
-</script>
+		if (window.visualViewport) {
+		  let last = window.visualViewport.height;
+		  window.visualViewport.addEventListener('resize', () => {
+			const now = window.visualViewport.height;
+			if (now < last - 120) setVH();
+			last = now;
+		  });
+		}
+	  })();
+	</script>
 
-<!-- 2) Hamburger / mega menu (vanilla, button-based) -->
-<script>
-  (function () {
-    const qs  = (sel, root = document) => root.querySelector(sel);
+	<!-- 2) Hamburger / mega menu (vanilla, button-based) -->
+	<script>
+	  (function () {
+		const qs  = (sel, root = document) => root.querySelector(sel);
 
-    function openMenu(hamburger, menu) {
-      menu.classList.remove('not-active');
-      menu.classList.add('is-active');
-      hamburger.classList.add('is-active');
-      hamburger.setAttribute('aria-expanded', 'true');
-    }
+		function openMenu(hamburger, menu) {
+		  menu.classList.remove('not-active');
+		  menu.classList.add('is-active');
+		  hamburger.classList.add('is-active');
+		  hamburger.setAttribute('aria-expanded', 'true');
+		}
 
-    function closeMenu(hamburger, menu) {
-      menu.classList.remove('is-active');
-      menu.classList.add('not-active');
-      hamburger.classList.remove('is-active');
-      hamburger.setAttribute('aria-expanded', 'false');
-    }
+		function closeMenu(hamburger, menu) {
+		  menu.classList.remove('is-active');
+		  menu.classList.add('not-active');
+		  hamburger.classList.remove('is-active');
+		  hamburger.setAttribute('aria-expanded', 'false');
+		}
 
-    function toggleMenu(hamburger, menu) {
-      const isOpen = menu.classList.contains('is-active');
-      isOpen ? closeMenu(hamburger, menu) : openMenu(hamburger, menu);
-    }
+		function toggleMenu(hamburger, menu) {
+		  const isOpen = menu.classList.contains('is-active');
+		  isOpen ? closeMenu(hamburger, menu) : openMenu(hamburger, menu);
+		}
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const hamburger = qs('#hamburger');
-      const megaMenu  = qs('#mega-menu');
-      if (!megaMenu || !hamburger) return;
+		document.addEventListener('DOMContentLoaded', () => {
+		  const hamburger = qs('#hamburger');
+		  const megaMenu  = qs('#mega-menu');
+		  if (!megaMenu || !hamburger) return;
 
-      if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-        megaMenu.classList.add('not-active');
-      }
+		  if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+			megaMenu.classList.add('not-active');
+		  }
 
-      // Click toggles
-      hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+		  // Click toggles
+		  hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-      // Close on menu link click (delegated)
-      megaMenu.addEventListener('click', (e) => {
-        const link = e.target.closest('a');
-        if (link) closeMenu(hamburger, megaMenu);
-      });
+		  // Close on menu link click (delegated)
+		  megaMenu.addEventListener('click', (e) => {
+			const link = e.target.closest('a');
+			if (link) closeMenu(hamburger, megaMenu);
+		  });
 
-      // Close on ESC key anywhere
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && megaMenu.classList.contains('is-active')) {
-          closeMenu(hamburger, megaMenu);
-          hamburger.focus(); // Return focus for accessibility
-        }
-      });
-    });
-  })();
-</script>
+		  // Close on ESC key anywhere
+		  document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && megaMenu.classList.contains('is-active')) {
+			  closeMenu(hamburger, megaMenu);
+			  hamburger.focus(); // Return focus for accessibility
+			}
+		  });
+		});
+	  })();
+	</script>
 
-<!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
-<script>
-  (function () {
-    let ticking = false;
-    const arrowFade = document.querySelector('.arrow-fade');
-    if (!arrowFade) return;
+	<!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
+	<script>
+	  (function () {
+		let ticking = false;
+		const arrowFade = document.querySelector('.arrow-fade');
+		if (!arrowFade) return;
 
-    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+		function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-    function onScroll() {
-      const y = window.scrollY || window.pageYOffset || 0;
-      const opacity = clamp(1 - y / 300, 0, 1);
-      arrowFade.style.opacity = String(opacity);
-      ticking = false;
-    }
+		function onScroll() {
+		  const y = window.scrollY || window.pageYOffset || 0;
+		  const opacity = clamp(1 - y / 300, 0, 1);
+		  arrowFade.style.opacity = String(opacity);
+		  ticking = false;
+		}
 
-    function requestTick() {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(onScroll);
-      }
-    }
+		function requestTick() {
+		  if (!ticking) {
+			ticking = true;
+			requestAnimationFrame(onScroll);
+		  }
+		}
 
-    document.addEventListener('DOMContentLoaded', onScroll);
-    window.addEventListener('scroll', requestTick, { passive: true });
-  })();
-</script>
+		document.addEventListener('DOMContentLoaded', onScroll);
+		window.addEventListener('scroll', requestTick, { passive: true });
+	  })();
+	</script>
 </head>
 
 <style>
   a, a:visited, a:active, a:hover { text-decoration: none; }
   *, *:after, *:before { box-sizing: border-box; }
-  body::-webkit-scrollbar { width: 0 !important }
+
+  /* Legacy scrollbar hiding */
+  body::-webkit-scrollbar { width: 0 !important; }
   body { overflow: -moz-scrollbars-none; }
   body { -ms-overflow-style: none; }
 
-  /* Hamburger button (fixed + above overlay) */
+  /* Hamburger button */
   #hamburger {
     position: fixed;
     top: 12px;
     right: 12px;
-    z-index: 4; /* stays above the menu overlay */
-
-    /* ↓ stack icon over label */
+    z-index: 4; 
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-
     padding: 10px 12px;
     cursor: pointer;
     font: inherit;
@@ -146,7 +145,7 @@
     animation: appear 1s ease-in-out 4s forwards;
   }
   #hamburger:focus {
-    outline: 2px solid #dcb24c; /* visible focus indicator for WCAG compliance */
+    outline: 2px solid #dcb24c;
     outline-offset: 4px;
   }
   #hamburger:hover { opacity: 0.7; }
@@ -217,14 +216,13 @@
     text-transform: uppercase;
     font-size: 12px;
     color: #dcb24c;
-    padding-top: 7px; /* keep label visually below the icon like before */
   }
   #hamburger.is-active .hamburger-label { color: #f3f1f1; }
 
-  /* Menu overlay: transform+opacity (no left/width hacks -> no edge seam) */
+  /* Menu overlay */
   #mega-menu {
     position: fixed;
-    inset: 0;                  /* top:0; right:0; bottom:0; left:0 */
+    inset: 0;                  
     background-color: #0f273f;
     padding: 76px;
     z-index: 3;
@@ -234,16 +232,8 @@
     transition: opacity .35s ease, transform .35s ease;
     will-change: opacity, transform;
   }
-  #mega-menu.is-active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-  #mega-menu.not-active {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateZ(0) scale(1.03);
-  }
+  #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
+  #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
   .menu-item {
     text-transform: capitalize;
@@ -258,11 +248,8 @@
     border-bottom: 2px solid #f3f1f1;
   }
 </style>
-
 <style>
-  body { margin: 0; padding: 0; background-color: #f3f1f1; text-align: center; }
-  .desktop { display: block; }
-  .mobile  { display: none; }
+  body { margin: 0; padding: 0; text-align: center; }
 
   /** TITLE SCREEN **/
   .nav-center-screen {
@@ -272,22 +259,11 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-
-    /* Stable height with safe-area compensation to avoid 1–2px overflow */
-    height: calc(100svh - env(safe-area-inset-bottom, 0px));
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-
-    /* Fallbacks for older browsers */
-    height: calc(var(--vh, 1vh) * 100);
     background-color: #0f273f;
     overflow: hidden;
     position: relative;
     margin: 0 auto;
     border-bottom: 10px solid rgba(90,145,191, 0);
-    box-sizing: border-box;
-    -webkit-animation: addborder 1s ease-in 4s forwards;
-    -moz-animation: addborder 1s ease-in 4s forwards;
-    animation: addborder 1s ease-in 4s forwards;
   }
 
   .logo-name {
@@ -423,9 +399,6 @@
     .menu-item { font-size: 64px; }
   }
   @media screen and (max-width: 767px) {
-    .desktop { display: none; }
-    .mobile  { display: block; }
-    .logo-scale { width: 50%; }
     .logo-name  { font-size: 7.5vw; }
     .logo-title { font-size: 3.25vw; }
     #mega-menu   { padding: 76px 30px; }
@@ -435,136 +408,127 @@
     .project-role { font-size: 2.5vw; }
   }
 </style>
-
 <style>
-/* Container + SVG sizing */
-.logo {
-  display: inline-block;
-  width: clamp(200px, 60vw, 420px);
-  max-width: 100%;
-  overflow: hidden;
-}
-.logo svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Page-level overrides */
-body { background-color: #0f273f; }
-.header-promo-bottom, #header, #footercontent { display: none; }
-
-/* ===== Responsive stroke + timing variables ===== */
-:root{
-  --seg1-start: 0s;
-  --seg2-start: 0.685s;
-  --seg3-start: 1.6s;
-  --seg4-start: 2.4s;
-
-  --stroke-w: clamp(10px, 6vw, 47px);
-
-  --c12: #f3f1f1;
-  --c34: #5A91BF;
-
-  --seg1-final-dur: 1.8s;
-  --seg2-final-dur: 1.8s;
-  --seg3-final-dur: 1.8s;
-  --seg4-final-dur: 1.8s;
-
-  --comet-len: 0;
-  --seg1-comet-dur: 0s;
-  --seg2-comet-dur: 0s;
-  --seg3-comet-dur: 0s;
-  --seg4-comet-dur: 0s;
-
-  --seg1-gap: 0s;
-  --seg2-gap: 0s;
-  --seg3-gap: 0s;
-  --seg4-gap: 0s;
-}
-
-.draw{
-  fill: none;
-  stroke-width: var(--stroke-w);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-opacity: 0;
-  stroke-dasharray: 0 1;
-  stroke-dashoffset: 1;
-  animation-name: comet-move, final-grow;
-  animation-timing-function: cubic-bezier(.2,.6,.2,1), ease-in-out;
-  animation-fill-mode: forwards, forwards;
-}
-.seg1, .seg2 { stroke: var(--c12); }
-.seg3, .seg4 { stroke: var(--c34); }
-
-.seg1{
-  animation-duration: var(--seg1-comet-dur), var(--seg1-final-dur);
-  animation-delay:
-    var(--seg1-start),
-    calc(var(--seg1-start) + var(--seg1-comet-dur) + var(--seg1-gap));
-}
-.seg2{
-  animation-duration: var(--seg2-comet-dur), var(--seg2-final-dur);
-  animation-delay:
-    var(--seg2-start),
-    calc(var(--seg2-start) + var(--seg2-comet-dur) + var(--seg2-gap));
-}
-.seg3{
-  animation-duration: var(--seg3-comet-dur), var(--seg3-final-dur);
-  animation-delay:
-    var(--seg3-start),
-    calc(var(--seg3-start) + var(--seg3-comet-dur) + var(--seg3-gap));
-}
-.seg4{
-  animation-duration: var(--seg4-comet-dur), var(--seg4-final-dur);
-  animation-delay:
-    var(--seg4-start),
-    calc(var(--seg4-start) + var(--seg4-comet-dur) + var(--seg4-gap));
-}
-
-@keyframes comet-move{
-  0%{
-    stroke-opacity: 0;
-    stroke-dasharray: var(--comet-len) 1;
-    stroke-dashoffset: 1;
-    stroke-linecap: butt;
+  .logo {
+    display: inline-block;
+    width: clamp(200px, 60vw, 420px);
+    max-width: 100%;
+    overflow: hidden;
   }
-  1%{ stroke-opacity: 0.95; }
-  100%{
-    stroke-opacity: 0;
-    stroke-dasharray: var(--comet-len) 1;
-    stroke-dashoffset: 0;
-    stroke-linecap: butt;
+  .logo svg {
+    width: 100%;
+    height: auto;
+    display: block;
   }
-}
-@keyframes final-grow{
-  0%{
-    stroke-opacity: 1;
+
+  /* ===== Responsive stroke + timing variables ===== */
+  :root{
+    --seg1-start: 0s;
+    --seg2-start: 0.685s;
+    --seg3-start: 1.6s;
+    --seg4-start: 2.4s;
+
+    --stroke-w: clamp(10px, 6vw, 47px);
+
+    --c12: #f3f1f1;
+    --c34: #5A91BF;
+
+    --seg1-final-dur: 1.8s;
+    --seg2-final-dur: 1.8s;
+    --seg3-final-dur: 1.8s;
+    --seg4-final-dur: 1.8s;
+
+    --comet-len: 0;
+    --seg1-comet-dur: 0s;
+    --seg2-comet-dur: 0s;
+    --seg3-comet-dur: 0s;
+    --seg4-comet-dur: 0s;
+
+    --seg1-gap: 0s;
+    --seg2-gap: 0s;
+    --seg3-gap: 0s;
+    --seg4-gap: 0s;
+  }
+
+  .draw{
+    fill: none;
+    stroke-width: var(--stroke-w);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0;
     stroke-dasharray: 0 1;
     stroke-dashoffset: 1;
-    stroke-linecap: round;
+    animation-name: comet-move, final-grow;
+    animation-timing-function: cubic-bezier(.2,.6,.2,1), ease-in-out;
+    animation-fill-mode: forwards, forwards;
   }
-  100%{
-    stroke-opacity: 1;
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 0;
-    stroke-linecap: round;
-  }
-}
+  .seg1, .seg2 { stroke: var(--c12); }
+  .seg3, .seg4 { stroke: var(--c34); }
 
-@media (max-width: 420px) {
-  :root { --stroke-w: clamp(8px, 8vw, 28px); }
-}
+  .seg1{
+    animation-duration: var(--seg1-comet-dur), var(--seg1-final-dur);
+    animation-delay:
+      var(--seg1-start),
+      calc(var(--seg1-start) + var(--seg1-comet-dur) + var(--seg1-gap));
+  }
+  .seg2{
+    animation-duration: var(--seg2-comet-dur), var(--seg2-final-dur);
+    animation-delay:
+      var(--seg2-start),
+      calc(var(--seg2-start) + var(--seg2-comet-dur) + var(--seg2-gap));
+  }
+  .seg3{
+    animation-duration: var(--seg3-comet-dur), var(--seg3-final-dur);
+    animation-delay:
+      var(--seg3-start),
+      calc(var(--seg3-start) + var(--seg3-comet-dur) + var(--seg3-gap));
+  }
+  .seg4{
+    animation-duration: var(--seg4-comet-dur), var(--seg4-final-dur);
+    animation-delay:
+      var(--seg4-start),
+      calc(var(--seg4-start) + var(--seg4-comet-dur) + var(--seg4-gap));
+  }
+
+  @keyframes comet-move{
+    0%{
+      stroke-opacity: 0;
+      stroke-dasharray: var(--comet-len) 1;
+      stroke-dashoffset: 1;
+      stroke-linecap: butt;
+    }
+    1%{ stroke-opacity: 0.95; }
+    100%{
+      stroke-opacity: 0;
+      stroke-dasharray: var(--comet-len) 1;
+      stroke-dashoffset: 0;
+      stroke-linecap: butt;
+    }
+  }
+  @keyframes final-grow{
+    0%{
+      stroke-opacity: 1;
+      stroke-dasharray: 0 1;
+      stroke-dashoffset: 1;
+      stroke-linecap: round;
+    }
+    100%{
+      stroke-opacity: 1;
+      stroke-dasharray: 1 1;
+      stroke-dashoffset: 0;
+      stroke-linecap: round;
+    }
+  }
+
+  @media (max-width: 420px) {
+    :root { --stroke-w: clamp(8px, 8vw, 28px); }
+  }
 </style>
-
-<!-- svh override + fallback (now only for the hero) -->
 <style>
   .nav-center-screen {
     height: calc(100svh - env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-
   @supports not (height: 100svh) {
     .nav-center-screen {
       height: calc(var(--vh, 1vh) * 100);
@@ -572,6 +536,8 @@ body { background-color: #0f273f; }
     }
   }
 </style>
+
+
 
 <div class="page">
   <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false">
