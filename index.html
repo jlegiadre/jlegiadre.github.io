@@ -5,100 +5,112 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 	
 <script>
-  function setVH() {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
+  (function () {
+    function setVH() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
 
-  document.addEventListener('DOMContentLoaded', setVH);
+    document.addEventListener('DOMContentLoaded', setVH);
 
-  window.addEventListener('orientationchange', () => {
-    setTimeout(setVH, 250);
-  });
-  
-  if (window.visualViewport) {
-    let last = window.visualViewport.height;
-    window.visualViewport.addEventListener('resize', () => {
-      const now = window.visualViewport.height;
-      if (now < last - 120) setVH();
-      last = now;
+    window.addEventListener('orientationchange', () => {
+      setTimeout(setVH, 250);
     });
-  }
-  
+    
+    if (window.visualViewport) {
+      let last = window.visualViewport.height;
+      window.visualViewport.addEventListener('resize', () => {
+        const now = window.visualViewport.height;
+        if (now < last - 120) setVH();
+        last = now;
+      });
+    }
+    
+  })();
+</script>
+<script>
+  (function () {
+    const qs  = (sel, root = document) => root.querySelector(sel);
+
+    function openMenu(hamburger, menu) {
+      menu.classList.remove('not-active');
+      menu.classList.add('is-active');
+      hamburger.classList.add('is-active');
+      hamburger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenu(hamburger, menu) {
+      menu.classList.remove('is-active');
+      menu.classList.add('not-active');
+      hamburger.classList.remove('is-active');
+      hamburger.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleMenu(hamburger, menu) {
+      const isOpen = menu.classList.contains('is-active');
+      isOpen ? closeMenu(hamburger, menu) : openMenu(hamburger, menu);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburger = qs('#hamburger');
+      const megaMenu  = qs('#mega-menu');
+      if (!megaMenu || !hamburger) return;
+
+      if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+        megaMenu.classList.add('not-active');
+      }
+
+      // Click toggles
+      hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+
+      // Close on menu link click (delegated)
+      megaMenu.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link) closeMenu(hamburger, megaMenu);
+      });
+
+      // Close on ESC key anywhere
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && megaMenu.classList.contains('is-active')) {
+          closeMenu(hamburger, megaMenu);
+          hamburger.focus(); // Return focus for accessibility
+        }
+      });
+    });
+  })();
+</script>
+<script>
+  (function () {
+    let ticking = false;
+    const arrowFade = document.querySelector('.arrow-fade');
+    if (!arrowFade) return;
+
+    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+    function onScroll() {
+      const y = window.scrollY || window.pageYOffset || 0;
+      const opacity = clamp(1 - y / 300, 0, 1);
+      arrowFade.style.opacity = String(opacity);
+      ticking = false;
+    }
+
+    function requestTick() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+      }
+    }
+
+    // Initialize once DOM is ready
+    document.addEventListener('DOMContentLoaded', onScroll);
+
+    // Passive for perf, rAF for smoothness
+    window.addEventListener('scroll', requestTick, { passive: true });
+  })();
 </script>
 
 
-	<script>
-	  // Toggle handler used by your inline onClick="myFunction()"
-	  function myFunction() {
-		const hamburger = document.getElementById('hamburger');
-		const megaMenu  = document.getElementById('mega-menu');
-		if (!hamburger || !megaMenu) return; // Safe if called before DOM is ready
 
-		const isOpen = megaMenu.classList.contains('is-active');
-
-		// Toggle menu state
-		if (isOpen) {
-		  megaMenu.classList.remove('is-active');
-		  megaMenu.classList.add('not-active');
-		  hamburger.classList.remove('is-active'); // restores icon to hamburger
-		  hamburger.setAttribute('aria-expanded', 'false');
-		} else {
-		  megaMenu.classList.remove('not-active');
-		  megaMenu.classList.add('is-active');
-		  hamburger.classList.add('is-active'); // triggers .hamburger--spin.is-active animation
-		  hamburger.setAttribute('aria-expanded', 'true');
-		}
-	  }
-
-	  // Wire everything once the DOM is ready
-	  document.addEventListener('DOMContentLoaded', function () {
-		const hamburger = document.getElementById('hamburger');
-		const megaMenu  = document.getElementById('mega-menu');
-
-		// Baseline state for the menu the first time
-		if (megaMenu && !megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-		  megaMenu.classList.add('not-active');
-		}
-
-		// ARIA + keyboard support for the hamburger button
-		if (hamburger) {
-		  hamburger.setAttribute('aria-controls', 'mega-menu');
-		  hamburger.setAttribute('aria-expanded', 'false');
-		  hamburger.setAttribute('role', 'button');
-		  hamburger.setAttribute('tabindex', '0');
-
-		  hamburger.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-			  e.preventDefault();
-			  myFunction();
-			}
-		  });
-		}
-
-		// Close menu when a menu link is clicked
-		document.querySelectorAll('#mega-menu a').forEach((link) => {
-		  link.addEventListener('click', () => {
-			const hamburgerNow = document.getElementById('hamburger');
-			const megaMenuNow  = document.getElementById('mega-menu');
-			if (!megaMenuNow) return;
-
-			megaMenuNow.classList.remove('is-active');
-			megaMenuNow.classList.add('not-active');
-			if (hamburgerNow) {
-			  hamburgerNow.classList.remove('is-active');
-			  hamburgerNow.setAttribute('aria-expanded', 'false');
-			}
-		  });
-		});
-	  });
-	</script>
-	
-	<script>
-		$(window).scroll(function(){
-			$(".arrow-fade").css("opacity", 1 - $(window).scrollTop() / 300); 
-		  });
-	</script>
 </head>
 <style>
 	a, a:visited, a:active, a:hover {text-decoration:none;}
@@ -116,25 +128,27 @@
 	}
 	
 	#hamburger {
-		padding: 15px 15px;
-		display: inline-block;
-		cursor: pointer;
-		float: right;
-		transition-property: opacity, filter;
-		transition-duration: 0.15s;
-		transition-timing-function: linear;
-		font: inherit;
-		color: inherit;
-		text-transform: none;
-		background-color: transparent;
-		border: 0;
-		margin: 0;
-		overflow: visible; 
-		opacity: 0;
-		-webkit-animation: appear 1s ease-in-out 4s forwards;
-		-moz-animation: appear 1s ease-in-out 4s forwards;
-		animation: appear 1s ease-in-out 4s forwards;
+	  padding: 15px 15px;
+	  display: inline-block;
+	  cursor: pointer;
+	  float: right;
+	  font: inherit;
+	  color: inherit;
+	  background: transparent;
+	  border: none;
+	  margin: 0;
+	  overflow: visible;
+	  transition: opacity 0.15s linear, filter 0.15s linear;
+	  opacity: 0;
+	  -webkit-animation: appear 1s ease-in-out 4s forwards;
+	  -moz-animation: appear 1s ease-in-out 4s forwards;
+	  animation: appear 1s ease-in-out 4s forwards;
 	}
+	#hamburger:focus {
+	  outline: 2px solid #dcb24c; /* visible focus indicator for WCAG compliance */
+	  outline-offset: 4px;
+	}
+
 	#hamburger:hover {opacity: 0.7;}
 	#hamburger.is-active:hover {opacity: 0.7;}
 	#hamburger.is-active .hamburger-inner,
@@ -612,14 +626,12 @@ body {background-color: #0f273f;}
 	
 
 <div class="page">
-	<div id="header-wrapper">
-		<div id="hamburger" class="hamburger--spin js-hamburger" onClick="myFunction()">
-			<div class="hamburger-box">
-				<div class="hamburger-inner"></div>
-			</div>
-			<div class="hamburger-label">Menu</div>
-		</div>
-	</div>
+	<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false">
+	  <span class="hamburger-box" aria-hidden="true">
+		<span class="hamburger-inner"></span>
+	  </span>
+	  <span class="hamburger-label">Menu</span>
+	</button>
 	<div class="nav-center-screen">
 		
 		<div class="w-100 text-center">
