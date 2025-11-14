@@ -412,13 +412,14 @@
     max-width: 100%;
     overflow: hidden;
     user-select: none; -webkit-user-select: none;
+    cursor: pointer;
   }
   .logo svg { width: 100%; height: auto; display: block; }
 
-  /* ===== Timing + stroke vars (keeps your updated delays) ===== */
+  /* ===== Responsive stroke + timing variables ===== */
   :root{
     --seg1-start: 0s;
-    --seg2-start: 0.658s;   /* your tweak */
+    --seg2-start: 0.658s;
     --seg3-start: 1.6s;
     --seg4-start: 2.4s;
 
@@ -427,114 +428,44 @@
     --c12: #f3f1f1;
     --c34: #5A91BF;
 
-    /* Final draw durations (unchanged) */
     --seg1-final-dur: 1.8s;
     --seg2-final-dur: 1.8s;
     --seg3-final-dur: 1.8s;
     --seg4-final-dur: 1.8s;
-
-    /* Invisible warm-up “comet” just to gate opacity (no head shown) */
-    --comet-len: 0;                 /* no visible head */
-    --seg1-comet-dur: 0.12s;        /* tiny warm-up to skip AA pop */
-    --seg2-comet-dur: 0.12s;
-    --seg3-comet-dur: 0.12s;
-    --seg4-comet-dur: 0.12s;
-
-    --seg1-gap: 0s;
-    --seg2-gap: 0s;
-    --seg3-gap: 0s;
-    --seg4-gap: 0s;
   }
 
-  .draw{
+  /* final-grow only (no opacity flicker, ends stay off exact boundaries) */
+  .draw-final{
     fill: none;
     stroke-width: var(--stroke-w);
     stroke-linecap: round;
     stroke-linejoin: round;
-
-    /* Start fully invisible */
-    stroke-opacity: 0;
-    stroke-dasharray: 0 1;   /* nothing drawn */
-    stroke-dashoffset: 1;
-
-    animation-name: comet-gate, final-grow;
-    animation-timing-function: linear, ease-in-out;
-    animation-fill-mode: forwards, forwards;
-    will-change: stroke-dasharray, stroke-dashoffset, stroke-opacity;
-  }
-  .seg1, .seg2 { stroke: var(--c12); }
-  .seg3, .seg4 { stroke: var(--c34); }
-
-  /* Per-segment timings */
-  .seg1{
-    animation-duration: var(--seg1-comet-dur), var(--seg1-final-dur);
-    animation-delay:
-      var(--seg1-start),
-      calc(var(--seg1-start) + var(--seg1-comet-dur) + var(--seg1-gap));
-  }
-  .seg2{
-    animation-duration: var(--seg2-comet-dur), var(--seg2-final-dur);
-    animation-delay:
-      var(--seg2-start),
-      calc(var(--seg2-start) + var(--seg2-comet-dur) + var(--seg2-gap));
-  }
-  .seg3{
-    animation-duration: var(--seg3-comet-dur), var(--seg3-final-dur);
-    animation-delay:
-      var(--seg3-start),
-      calc(var(--seg3-start) + var(--seg3-comet-dur) + var(--seg3-gap));
-  }
-  .seg4{
-    animation-duration: var(--seg4-comet-dur), var(--seg4-final-dur);
-    animation-delay:
-      var(--seg4-start),
-      calc(var(--seg4-start) + var(--seg4-comet-dur) + var(--seg4-gap));
+    stroke: currentColor;               /* color via .segN on the <use> */
+    stroke-dasharray: .02 1;            /* start slightly inboard */
+    stroke-dashoffset: 1;               /* start fully hidden */
+    animation: final-grow-dash var(--segX-dur, 1.8s) ease-in-out forwards;
   }
 
-  /*
-    comet-gate (0.12s):
-    - Keep dash at 0 (nothing drawn), and use butt caps while hidden to avoid any cap pop at t=0.
-    - End with opacity still 0; final-grow takes over immediately after.
-  */
-  @keyframes comet-gate{
-    0%{
-      stroke-opacity: 0;
-      stroke-dasharray: 0 1;
-      stroke-dashoffset: 1;
-      stroke-linecap: butt;
-    }
-    100%{
-      stroke-opacity: 0;     /* still hidden */
-      stroke-dasharray: 0 1; /* still nothing drawn */
-      stroke-dashoffset: 1;
-      stroke-linecap: butt;
-    }
-  }
+  .seg1 { color: var(--c12); }
+  .seg2 { color: var(--c12); }
+  .seg3 { color: var(--c34); }
+  .seg4 { color: var(--c34); }
 
-  /*
-    final-grow: your actual draw-in
-    We flip back to round caps here once visible, so the final look is unchanged.
-  */
-  @keyframes final-grow{
-    0%{
-      stroke-opacity: 1;     /* becomes visible as soon as grow starts */
-      stroke-dasharray: 0 1;
-      stroke-dashoffset: 1;
-      stroke-linecap: round;
-    }
-    100%{
-      stroke-opacity: 1;
-      stroke-dasharray: 1 1;
-      stroke-dashoffset: 0;
-      stroke-linecap: round;
-    }
+  /* assign per-segment timings via custom properties */
+  .seg1.draw-final { --segX-dur: var(--seg1-final-dur); animation-delay: var(--seg1-start); }
+  .seg2.draw-final { --segX-dur: var(--seg2-final-dur); animation-delay: var(--seg2-start); }
+  .seg3.draw-final { --segX-dur: var(--seg3-final-dur); animation-delay: var(--seg3-start); }
+  .seg4.draw-final { --segX-dur: var(--seg4-final-dur); animation-delay: var(--seg4-start); }
+
+  @keyframes final-grow-dash{
+    0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1;     }
+    100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
   }
 
   @media (max-width: 420px) {
     :root { --stroke-w: clamp(8px, 8vw, 28px); }
   }
 </style>
-
 
 
 
