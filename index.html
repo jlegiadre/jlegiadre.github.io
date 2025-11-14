@@ -4,82 +4,96 @@
 	<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 	
-	<script>
-		let vh = window.innerHeight * 0.01;
-		document.documentElement.style.setProperty('--vh', `${vh}px`);
-	</script>
-	<script>
-		window.addEventListener('resize', () => {
-			let vh = window.innerHeight * 0.01;
-			document.documentElement.style.setProperty('--vh', `${vh}px`);
-		});
-	</script>
-	<script>
-  // Toggle handler used by your inline onClick="myFunction()"
-  function myFunction() {
-    const hamburger = document.getElementById('hamburger');
-    const megaMenu  = document.getElementById('mega-menu');
-    if (!hamburger || !megaMenu) return; // Safe if called before DOM is ready
-
-    const isOpen = megaMenu.classList.contains('is-active');
-
-    // Toggle menu state
-    if (isOpen) {
-      megaMenu.classList.remove('is-active');
-      megaMenu.classList.add('not-active');
-      hamburger.classList.remove('is-active'); // restores icon to hamburger
-      hamburger.setAttribute('aria-expanded', 'false');
-    } else {
-      megaMenu.classList.remove('not-active');
-      megaMenu.classList.add('is-active');
-      hamburger.classList.add('is-active'); // triggers .hamburger--spin.is-active animation
-      hamburger.setAttribute('aria-expanded', 'true');
-    }
+<script>
+  function setVH() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 
-  // Wire everything once the DOM is ready
-  document.addEventListener('DOMContentLoaded', function () {
-    const hamburger = document.getElementById('hamburger');
-    const megaMenu  = document.getElementById('mega-menu');
+  document.addEventListener('DOMContentLoaded', setVH);
 
-    // Baseline state for the menu the first time
-    if (megaMenu && !megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-      megaMenu.classList.add('not-active');
-    }
-
-    // ARIA + keyboard support for the hamburger button
-    if (hamburger) {
-      hamburger.setAttribute('aria-controls', 'mega-menu');
-      hamburger.setAttribute('aria-expanded', 'false');
-      hamburger.setAttribute('role', 'button');
-      hamburger.setAttribute('tabindex', '0');
-
-      hamburger.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          myFunction();
-        }
-      });
-    }
-
-    // Close menu when a menu link is clicked
-    document.querySelectorAll('#mega-menu a').forEach((link) => {
-      link.addEventListener('click', () => {
-        const hamburgerNow = document.getElementById('hamburger');
-        const megaMenuNow  = document.getElementById('mega-menu');
-        if (!megaMenuNow) return;
-
-        megaMenuNow.classList.remove('is-active');
-        megaMenuNow.classList.add('not-active');
-        if (hamburgerNow) {
-          hamburgerNow.classList.remove('is-active');
-          hamburgerNow.setAttribute('aria-expanded', 'false');
-        }
-      });
-    });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(setVH, 250);
   });
+  
+  if (window.visualViewport) {
+    let last = window.visualViewport.height;
+    window.visualViewport.addEventListener('resize', () => {
+      const now = window.visualViewport.height;
+      if (now < last - 120) setVH();
+      last = now;
+    });
+  }
+  
 </script>
 
+
+	<script>
+	  // Toggle handler used by your inline onClick="myFunction()"
+	  function myFunction() {
+		const hamburger = document.getElementById('hamburger');
+		const megaMenu  = document.getElementById('mega-menu');
+		if (!hamburger || !megaMenu) return; // Safe if called before DOM is ready
+
+		const isOpen = megaMenu.classList.contains('is-active');
+
+		// Toggle menu state
+		if (isOpen) {
+		  megaMenu.classList.remove('is-active');
+		  megaMenu.classList.add('not-active');
+		  hamburger.classList.remove('is-active'); // restores icon to hamburger
+		  hamburger.setAttribute('aria-expanded', 'false');
+		} else {
+		  megaMenu.classList.remove('not-active');
+		  megaMenu.classList.add('is-active');
+		  hamburger.classList.add('is-active'); // triggers .hamburger--spin.is-active animation
+		  hamburger.setAttribute('aria-expanded', 'true');
+		}
+	  }
+
+	  // Wire everything once the DOM is ready
+	  document.addEventListener('DOMContentLoaded', function () {
+		const hamburger = document.getElementById('hamburger');
+		const megaMenu  = document.getElementById('mega-menu');
+
+		// Baseline state for the menu the first time
+		if (megaMenu && !megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+		  megaMenu.classList.add('not-active');
+		}
+
+		// ARIA + keyboard support for the hamburger button
+		if (hamburger) {
+		  hamburger.setAttribute('aria-controls', 'mega-menu');
+		  hamburger.setAttribute('aria-expanded', 'false');
+		  hamburger.setAttribute('role', 'button');
+		  hamburger.setAttribute('tabindex', '0');
+
+		  hamburger.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+			  e.preventDefault();
+			  myFunction();
+			}
+		  });
+		}
+
+		// Close menu when a menu link is clicked
+		document.querySelectorAll('#mega-menu a').forEach((link) => {
+		  link.addEventListener('click', () => {
+			const hamburgerNow = document.getElementById('hamburger');
+			const megaMenuNow  = document.getElementById('mega-menu');
+			if (!megaMenuNow) return;
+
+			megaMenuNow.classList.remove('is-active');
+			megaMenuNow.classList.add('not-active');
+			if (hamburgerNow) {
+			  hamburgerNow.classList.remove('is-active');
+			  hamburgerNow.setAttribute('aria-expanded', 'false');
+			}
+		  });
+		});
+	  });
+	</script>
+	
 	<script>
 		$(window).scroll(function(){
 			$(".arrow-fade").css("opacity", 1 - $(window).scrollTop() / 300); 
@@ -568,6 +582,31 @@ body {background-color: #0f273f;}
 @media (max-width: 420px) {
   :root { --stroke-w: clamp(8px, 8vw, 28px); }
 }
+</style>
+<style>
+  /* Use stable viewport units so sections don't jump when the URL bar collapses */
+  .nav-center-screen {
+    height: 100svh;
+  }
+  #mega-menu.is-active {
+    height: 100svh;
+  }
+  #mega-menu.not-active {
+    height: 125svh;
+  }
+
+  /* Fallback for browsers without svh support */
+  @supports not (height: 100svh) {
+    .nav-center-screen {
+      height: calc(var(--vh, 1vh) * 100);
+    }
+    #mega-menu.is-active {
+      height: calc(var(--vh, 1vh) * 100);
+    }
+    #mega-menu.not-active {
+      height: calc(var(--vh, 1vh) * 125);
+    }
+  }
 </style>
 
 	
