@@ -129,17 +129,49 @@
       else enableLogoReplay();
     })();
   </script>
+
+  <!-- HAMBURGER COLOR SCROLL TOGGLE -->
+  <script>
+    (function () {
+      document.addEventListener('DOMContentLoaded', () => {
+        const sentinel = document.getElementById('hero-sentinel');
+        if (!sentinel) return;
+
+        const io = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            // If sentinel is visible => we're still in the hero section
+            if (entry.isIntersecting) {
+              document.body.classList.remove('hamburger-on-light');
+            } else {
+              document.body.classList.add('hamburger-on-light');
+            }
+          }
+        }, {
+          root: null,
+          threshold: 0,
+          // When the bottom pixel of the hero leaves the viewport,
+          // we flip to "on-light".
+          rootMargin: '0px 0px 0px 0px'
+        });
+
+        io.observe(sentinel);
+      });
+    })();
+  </script>
 </head>
 
 <style>
   /* Generic Page Settings */
+  :root { --burger: #dcb24c; }             /* default mustard on hero */
+  body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
+
   html { scrollbar-gutter: stable both-edges; }
   * { scrollbar-width: thin; }
   *::-webkit-scrollbar { width: 8px; height: 8px; }
   *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
   *::-webkit-scrollbar-track { background: transparent; }
   body.menu-open { overflow: hidden; }
-  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f;}
+  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
   a, a:visited, a:active, a:hover { text-decoration: none; }
   *, *:after, *:before { box-sizing: border-box; }
 
@@ -147,7 +179,7 @@
   .off-white { color: #f3f1f1; }
   .light-blue { color: #5A91BF; }
   .dark-blue { color: #0f273f; }
-  .mustard {color: #dcb24c;}
+  .mustard { color: #dcb24c; }
   .font-mont { font-family: 'Montserrat', sans-serif; }
   .font-bitter { font-family: 'Bitter', serif; }
 
@@ -161,26 +193,34 @@
   }
   #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
   #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
-  #hamburger.is-active .hamburger-inner,
-  #hamburger.is-active .hamburger-inner::before,
-  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
 
+  /* Use CSS var for bar color; smoothly transition background-color */
   .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
   .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
   .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
-    width: 40px; height: 4px; background-color: #dcb24c; border-radius: 4px;
-    position: absolute; transition-property: transform; transition-duration: 0.15s; transition-timing-function: ease;
+    width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px;
+    position: absolute; transition-property: transform, background-color; transition-duration: 0.15s; transition-timing-function: ease;
   }
   .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
   .hamburger-inner::before { top: -10px; }
   .hamburger-inner::after  { bottom: -10px; }
+
   .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
-  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in; }
-  .hamburger--spin .hamburger-inner::after { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19); }
+  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color 0.15s ease; }
+  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color 0.15s ease; }
   .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
   .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
-  .hamburger--spin.is-active .hamburger-inner::after { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
-  .hamburger-label { font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px; color: #dcb24c; }
+  .hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
+
+  /* Label color follows the same CSS var; animate color too */
+  .hamburger-label {
+    font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
+    color: var(--burger); transition: color .25s ease;
+  }
+  /* When menu is active (overlay is dark), keep lines+label white for contrast */
+  #hamburger.is-active .hamburger-inner,
+  #hamburger.is-active .hamburger-inner::before,
+  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
   #hamburger.is-active .hamburger-label { color: #f3f1f1; }
 
   /* Menu overlay */
@@ -207,11 +247,13 @@
     border-bottom: 10px solid rgba(90,145,191,0);
     height: calc(100svh - env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    gap: 8px; /* small breathing room between blocks */
   }
   @supports not (height: 100svh) {
     .nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
   }
+
+  /* hero sentinel to detect leaving the hero */
+  .hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
 
   .logo-name { font-size: clamp(32px, 7.5vw, 85px); letter-spacing: 1.2; line-height: 0.9; font-weight: 600; text-transform: uppercase; margin: 0.5% auto; }
   .logo-title { font-size: clamp(14px, 3.25vw, 25px); color: #dcb24c; line-height: 1.2; letter-spacing: 2; font-weight: 400; font-style: italic; text-transform: capitalize; }
@@ -242,44 +284,9 @@
     .menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
   }
   @media (min-width: 1024px) { .work-item { width: 28%; } }
-
-  /* ----------------------------------------------------------
-     LANDSCAPE (short height) — ensure everything fits vertically
-     We cap the logo by *height* and shrink text + arrow slightly.
-     No animation properties are touched.
-  ---------------------------------------------------------- */
-  @media (orientation: landscape) and (max-height: 480px) {
-    .nav-center-screen { padding-top: 8px; padding-bottom: 8px; gap: 6px; }
-
-    /* Constrain by height so name/title/arrow always show */
-    .logo { max-height: 46vh; width: auto; }
-    .logo svg { height: 100%; width: auto; }
-
-    /* Make the arrow smaller but keep it visible */
-    .arrow { width: 28px; height: 28px; margin-left: -14px; }
-    .arrow svg { width: 28px; height: 28px; }
-
-    /* Height-aware font sizing */
-    .logo-name  { font-size: clamp(18px, 6vmin, 44px); }
-    .logo-title { font-size: clamp(12px, 3.8vmin, 20px); }
-  }
-
-  /* Slightly taller landscape phones/tablets */
-  @media (orientation: landscape) and (min-height: 481px) and (max-height: 640px) {
-    .nav-center-screen { padding-top: 10px; padding-bottom: 10px; gap: 8px; }
-
-    .logo { max-height: 52vh; width: auto; }
-    .logo svg { height: 100%; width: auto; }
-
-    .arrow { width: 32px; height: 32px; margin-left: -16px; }
-    .arrow svg { width: 32px; height: 32px; }
-
-    .logo-name  { font-size: clamp(20px, 6.5vmin, 52px); }
-    .logo-title { font-size: clamp(12px, 4vmin, 22px); }
-  }
 </style>
 
-<!-- Logo animation styles (UNCHANGED) -->
+<!-- Logo animation styles -->
 <style>
   .logo {
     display: inline-block;
@@ -289,6 +296,7 @@
     user-select: none; -webkit-user-select: none;
     cursor: pointer;
   }
+  /* Your fix: let SVG fill the capped box height to avoid crop in landscape */
   .logo svg { width: 100%; height: 100%; display: block; }
 
   :root{
@@ -305,7 +313,7 @@
     --seg4-final-dur: 1.6s;
   }
 
-  /* Flash-free + no prestart nubs */
+  /* Flash-free + hidden until each segment starts */
   .draw-final{
     fill: none;
     stroke-width: var(--stroke-w);
@@ -358,6 +366,16 @@
   @media (max-width: 420px) {
     :root { --stroke-w: clamp(8px, 8vw, 28px); }
   }
+
+  /* Landscape size controls (from your last fix) */
+  @media (orientation: landscape) and (max-height: 480px) {
+    .nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
+    .logo { max-height: min(42vh, 44svh); width: auto; }
+    .logo svg { width: auto; height: 100%; }
+    .logo-name { font-size: clamp(24px, 6vh, 48px); }
+    .logo-title { font-size: clamp(12px, 3.5vh, 20px); }
+    .arrow { transform: scale(0.85); transform-origin: center bottom; }
+  }
 </style>
 
 <div class="page">
@@ -367,6 +385,9 @@
   </button>
 
   <div class="nav-center-screen">
+    <!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
+    <div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
+
     <div class="w-100 text-center">
       <div class="logo">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
