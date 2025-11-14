@@ -112,13 +112,21 @@
 </head>
 
 <style>
-  a, a:visited, a:active, a:hover { text-decoration: none; }
-  *, *:after, *:before { box-sizing: border-box; }
-
   /* Legacy scrollbar hiding */
   body::-webkit-scrollbar { width: 0 !important; }
   body { overflow: -moz-scrollbars-none; }
   body { -ms-overflow-style: none; }
+	
+  /* Generic Page Settings */
+  body { margin: 0; padding: 0; text-align: center; }
+  a, a:visited, a:active, a:hover { text-decoration: none; }
+  *, *:after, *:before { box-sizing: border-box; }
+	
+  /* Branding utilities (keep even if not used yet) */
+  .off-white { color: #f3f1f1; }
+  .light-blue { color: #5A91BF; }
+  .font-mont { font-family: 'Montserrat', sans-serif; }
+  .font-bitter { font-family: 'Bitter', serif; }
 
   /* Hamburger button */
   #hamburger {
@@ -241,17 +249,14 @@
     font-weight: 400;
     font-style: italic;
     color: #dcb24c;
-    font-size: 4vw;
+    font-size: clamp(24px, 8vw, 64px);
     margin-bottom: 6%;
     text-align: left;
     width: 100%;
     border-bottom: 2px solid #f3f1f1;
   }
-</style>
-<style>
-  body { margin: 0; padding: 0; text-align: center; }
 
-  /** TITLE SCREEN **/
+  /* Title Screen */
   .nav-center-screen {
     width: 100%;
     display: flex;
@@ -264,24 +269,28 @@
     position: relative;
     margin: 0 auto;
     border-bottom: 10px solid rgba(90,145,191, 0);
+    height: calc(100svh - env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @supports not (height: 100svh) {
+    .nav-center-screen {
+      height: calc(var(--vh, 1vh) * 100);
+      padding-bottom: 0;
+    }
   }
 
   .logo-name {
-    font-size: 5.3125vw;
+    font-size: clamp(32px, 7.5vw, 85px);
     letter-spacing: 1;
-    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     text-transform: uppercase;
     margin: 0.5% auto;
   }
-  .grey { color: #f3f1f1; }
-  .blue { color: #5A91BF; }
   .logo-title {
-    font-size: 1.5625vw;
+    font-size: clamp(14px, 3.25vw, 25px);
     color: #dcb24c;
     line-height: 1;
     letter-spacing: 2;
-    font-family: 'Bitter', serif;
     font-weight: 400;
     font-style: italic;
     text-transform: capitalize;
@@ -349,7 +358,7 @@
     justify-content: space-evenly;
     margin-top: 5%;
   }
-  .work-item { width: 28%; margin-bottom: 3%; }
+  .work-item { width: 80%; margin-bottom: 9%; }
   .portfolio-info {
     width: 100%;
     text-align: left;
@@ -371,7 +380,7 @@
     text-transform: uppercase;
     letter-spacing: 1;
     color: #4682b4;
-    font-size: 1.5vw;
+    font-size: clamp(18px, 3.75vw, 22px);
     margin-top: 2%;
   }
   .project-role {
@@ -380,34 +389,28 @@
     font-weight: 400;
     font-style: italic;
     color: #0f273f;
-    font-size: 1vw;
+    font-size: clamp(12px, 2.5vw, 14.66px);
     letter-spacing: 2;
   }
 
-  @media screen and (min-width: 1466px) {
-    .project-name { font-size: 22px; }
-    .project-role { font-size: 14.66px; }
+  @media (max-width: 767px) {
+    #mega-menu { padding: 76px 30px; }
+    .menu-item { margin-bottom: 12%; }
   }
-  @media screen and (min-width: 767px) and (max-width: 980px){
-    .work-item { width: 38%; }
-    .project-role { font-size: 1.25vw; letter-spacing: 1.5; }
-    .project-name { font-size: 1.75vw; }
+
+  @media (min-width: 768px) {
+    .work-item { width: 45%; margin-bottom: 3%; }
+    .project-name { font-size: clamp(18px, 1.75vw, 22px); }
+    .project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
+    .menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
   }
-  @media screen and (min-width: 1600px) {
-    .logo-name { font-size: 85px; }
-    .logo-title { font-size: 25px; }
-    .menu-item { font-size: 64px; }
+
+  @media (min-width: 1024px) {
+    .work-item { width: 28%; }
   }
-  @media screen and (max-width: 767px) {
-    .logo-name  { font-size: 7.5vw; }
-    .logo-title { font-size: 3.25vw; }
-    #mega-menu   { padding: 76px 30px; }
-    .menu-item   { font-size: 8vw; margin-bottom: 12% }
-    .work-item   { width: 80%; margin-bottom: 9%; }
-    .project-name { font-size: 3.75vw; }
-    .project-role { font-size: 2.5vw; }
-  }
+
 </style>
+
 <style>
   .logo {
     display: inline-block;
@@ -524,18 +527,6 @@
     :root { --stroke-w: clamp(8px, 8vw, 28px); }
   }
 </style>
-<style>
-  .nav-center-screen {
-    height: calc(100svh - env(safe-area-inset-bottom, 0px));
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @supports not (height: 100svh) {
-    .nav-center-screen {
-      height: calc(var(--vh, 1vh) * 100);
-      padding-bottom: 0;
-    }
-  }
-</style>
 
 
 
@@ -573,8 +564,8 @@
       </div>
     </div>
 
-    <div class="logo-name"><span class="grey">Jonathan</span> <span class="blue">Legiadre</span></div>
-    <div class="logo-title">Graphic Designer + Front-End Developer</div>
+    <div class="logo-name font-mont"><span class="off-white">Jonathan</span> <span class="light-blue">Legiadre</span></div>
+    <div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
     <div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
   </div>
 
