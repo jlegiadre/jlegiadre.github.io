@@ -319,6 +319,7 @@
 		  font-weight: 600; 
 		  text-transform: uppercase; 
 		  margin: 0.5% auto; 
+		  text-align: center;
 		}
 	  .logo-title { 
 		  font-size: clamp(14px, 3.25vw, 25px); 
@@ -328,9 +329,7 @@
 		  font-weight: 400; 
 		  font-style: italic; 
 		  text-transform: capitalize; 
-		}
-	  .logo-name, .logo-title { 
-		  text-align: center; 
+		  text-align: center;
 		  opacity: 0; 
 		}
 	  @keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
@@ -356,11 +355,13 @@
 
 		/* first name */
 		.first-name {
+			opacity: 0;
 		  animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
 		}
 
 		/* last name */
 		.last-name {
+			opacity: 0;
 		  animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
 		}
 
