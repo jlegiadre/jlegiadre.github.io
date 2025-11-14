@@ -207,6 +207,7 @@
     border-bottom: 10px solid rgba(90,145,191,0);
     height: calc(100svh - env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    gap: 8px; /* small breathing room between blocks */
   }
   @supports not (height: 100svh) {
     .nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
@@ -241,9 +242,44 @@
     .menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
   }
   @media (min-width: 1024px) { .work-item { width: 28%; } }
+
+  /* ----------------------------------------------------------
+     LANDSCAPE (short height) — ensure everything fits vertically
+     We cap the logo by *height* and shrink text + arrow slightly.
+     No animation properties are touched.
+  ---------------------------------------------------------- */
+  @media (orientation: landscape) and (max-height: 480px) {
+    .nav-center-screen { padding-top: 8px; padding-bottom: 8px; gap: 6px; }
+
+    /* Constrain by height so name/title/arrow always show */
+    .logo { max-height: 46vh; width: auto; }
+    .logo svg { height: 100%; width: auto; }
+
+    /* Make the arrow smaller but keep it visible */
+    .arrow { width: 28px; height: 28px; margin-left: -14px; }
+    .arrow svg { width: 28px; height: 28px; }
+
+    /* Height-aware font sizing */
+    .logo-name  { font-size: clamp(18px, 6vmin, 44px); }
+    .logo-title { font-size: clamp(12px, 3.8vmin, 20px); }
+  }
+
+  /* Slightly taller landscape phones/tablets */
+  @media (orientation: landscape) and (min-height: 481px) and (max-height: 640px) {
+    .nav-center-screen { padding-top: 10px; padding-bottom: 10px; gap: 8px; }
+
+    .logo { max-height: 52vh; width: auto; }
+    .logo svg { height: 100%; width: auto; }
+
+    .arrow { width: 32px; height: 32px; margin-left: -16px; }
+    .arrow svg { width: 32px; height: 32px; }
+
+    .logo-name  { font-size: clamp(20px, 6.5vmin, 52px); }
+    .logo-title { font-size: clamp(12px, 4vmin, 22px); }
+  }
 </style>
 
-<!-- Logo animation styles -->
+<!-- Logo animation styles (UNCHANGED) -->
 <style>
   .logo {
     display: inline-block;
@@ -269,23 +305,16 @@
     --seg4-final-dur: 1.6s;
   }
 
-  /* Flash-free + no prestart nubs:
-     1) keep a tiny epsilon dash, but
-     2) keep the segment hidden until its own start via zero-duration `reveal` */
+  /* Flash-free + no prestart nubs */
   .draw-final{
     fill: none;
     stroke-width: var(--stroke-w);
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke: currentColor;
-
-    /* epsilon so the cap doesn't sit exactly on endpoints when drawn */
     stroke-dasharray: .02 1;
     stroke-dashoffset: 1;
-
-    /* hidden until reveal fires at the segment's start */
     visibility: hidden;
-
     will-change: stroke-dasharray, stroke-dashoffset, visibility;
     shape-rendering: geometricPrecision;
   }
@@ -295,7 +324,6 @@
   .seg3 { color: var(--c34); }
   .seg4 { color: var(--c34); }
 
-  /* Per-segment schedules */
   .seg1.draw-final {
     --segX-dur: var(--seg1-final-dur);
     animation:
@@ -322,7 +350,6 @@
   }
 
   @keyframes reveal { to { visibility: visible; } }
-
   @keyframes final-grow-dash{
     0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
     100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
@@ -392,7 +419,7 @@
 
   <div class="below">
     <div id="work"></div>
-	  <div class="section-heading">Work</div>
+    <div class="section-heading">Work</div>
     <div class="work-wrapper">
       <div class="work-item">
         <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
@@ -438,8 +465,8 @@
       </div>
     </div>
     <div id="about"></div>
-	  <div class="section-heading">About</div>
+    <div class="section-heading">About</div>
     <div id="contact"></div>
-	  <div class="section-heading">Contact</div>
+    <div class="section-heading">Contact</div>
   </div>
 </div>
