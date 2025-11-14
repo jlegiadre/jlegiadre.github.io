@@ -1,114 +1,157 @@
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
-	<!-- 1) Stable viewport height (svh-first with JS fallback) -->
-	<script>
-	  (function () {
-		function setVH() {
-		  const vh = window.innerHeight * 0.01;
-		  document.documentElement.style.setProperty('--vh', `${vh}px`);
-		}
+  <!-- 1) Stable viewport height (svh-first with JS fallback) -->
+  <script>
+    (function () {
+      function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
 
-		document.addEventListener('DOMContentLoaded', setVH);
+      document.addEventListener('DOMContentLoaded', setVH);
 
-		window.addEventListener('orientationchange', () => {
-		  setTimeout(setVH, 250);
-		});
+      window.addEventListener('orientationchange', () => {
+        setTimeout(setVH, 250);
+      });
 
-		if (window.visualViewport) {
-		  let last = window.visualViewport.height;
-		  window.visualViewport.addEventListener('resize', () => {
-			const now = window.visualViewport.height;
-			if (now < last - 120) setVH();
-			last = now;
-		  });
-		}
-	  })();
-	</script>
+      if (window.visualViewport) {
+        let last = window.visualViewport.height;
+        window.visualViewport.addEventListener('resize', () => {
+          const now = window.visualViewport.height;
+          if (now < last - 120) setVH();
+          last = now;
+        });
+      }
+    })();
+  </script>
 
-	<!-- 2) Hamburger / mega menu (vanilla, button-based) -->
-	<script>
-	  (function () {
-		const qs  = (sel, root = document) => root.querySelector(sel);
+  <!-- 2) Hamburger / mega menu (vanilla, button-based) -->
+  <script>
+    (function () {
+      const qs  = (sel, root = document) => root.querySelector(sel);
+      const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-		function openMenu(hamburger, menu) {
-		  menu.classList.remove('not-active');
-		  menu.classList.add('is-active');
-		  hamburger.classList.add('is-active');
-		  hamburger.setAttribute('aria-expanded', 'true');
-		}
+      function trapFocus(container, e) {
+        const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
+          .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
+        if (focusables.length === 0) return;
 
-		function closeMenu(hamburger, menu) {
-		  menu.classList.remove('is-active');
-		  menu.classList.add('not-active');
-		  hamburger.classList.remove('is-active');
-		  hamburger.setAttribute('aria-expanded', 'false');
-		}
+        const first = focusables[0];
+        const last  = focusables[focusables.length - 1];
 
-		function toggleMenu(hamburger, menu) {
-		  const isOpen = menu.classList.contains('is-active');
-		  isOpen ? closeMenu(hamburger, menu) : openMenu(hamburger, menu);
-		}
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
 
-		document.addEventListener('DOMContentLoaded', () => {
-		  const hamburger = qs('#hamburger');
-		  const megaMenu  = qs('#mega-menu');
-		  if (!megaMenu || !hamburger) return;
+      function openMenu(hamburger, menu) {
+        document.body.classList.add('menu-open');
+        menu.classList.remove('not-active');
+        menu.classList.add('is-active');
+        hamburger.classList.add('is-active');
+        hamburger.setAttribute('aria-expanded', 'true');
 
-		  if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-			megaMenu.classList.add('not-active');
-		  }
+        // Move focus to the first nav link for accessibility
+        const firstLink = menu.querySelector('a');
+        if (firstLink) firstLink.focus();
+      }
 
-		  // Click toggles
-		  hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+      function closeMenu(hamburger, menu, restoreTo) {
+        document.body.classList.remove('menu-open');
+        menu.classList.remove('is-active');
+        menu.classList.add('not-active');
+        hamburger.classList.remove('is-active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        if (restoreTo) restoreTo.focus();
+      }
 
-		  // Close on menu link click (delegated)
-		  megaMenu.addEventListener('click', (e) => {
-			const link = e.target.closest('a');
-			if (link) closeMenu(hamburger, megaMenu);
-		  });
+      function toggleMenu(hamburger, menu) {
+        const isOpen = menu.classList.contains('is-active');
+        isOpen ? closeMenu(hamburger, menu, hamburger) : openMenu(hamburger, menu);
+      }
 
-		  // Close on ESC key anywhere
-		  document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape' && megaMenu.classList.contains('is-active')) {
-			  closeMenu(hamburger, megaMenu);
-			  hamburger.focus(); // Return focus for accessibility
-			}
-		  });
-		});
-	  })();
-	</script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const hamburger = qs('#hamburger');
+        const megaMenu  = qs('#mega-menu');
+        if (!megaMenu || !hamburger) return;
 
-	<!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
-	<script>
-	  (function () {
-		let ticking = false;
-		const arrowFade = document.querySelector('.arrow-fade');
-		if (!arrowFade) return;
+        if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+          megaMenu.classList.add('not-active');
+        }
 
-		function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+        // Click toggles
+        hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-		function onScroll() {
-		  const y = window.scrollY || window.pageYOffset || 0;
-		  const opacity = clamp(1 - y / 300, 0, 1);
-		  arrowFade.style.opacity = String(opacity);
-		  ticking = false;
-		}
+        // Close when clicking any menu link (delegated)
+        megaMenu.addEventListener('click', (e) => {
+          const link = e.target.closest('a');
+          if (link) closeMenu(hamburger, megaMenu, hamburger);
+        });
 
-		function requestTick() {
-		  if (!ticking) {
-			ticking = true;
-			requestAnimationFrame(onScroll);
-		  }
-		}
+        // Also close if user clicks the overlay background (but not on a link)
+        megaMenu.addEventListener('click', (e) => {
+          if (e.target === megaMenu) {
+            closeMenu(hamburger, megaMenu, hamburger);
+          }
+        });
 
-		document.addEventListener('DOMContentLoaded', onScroll);
-		window.addEventListener('scroll', requestTick, { passive: true });
-	  })();
-	</script>
+        // Close on ESC key anywhere + loop focus within menu while open
+        document.addEventListener('keydown', (e) => {
+          if (!megaMenu.classList.contains('is-active')) return;
+
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeMenu(hamburger, megaMenu, hamburger);
+            return;
+          }
+
+          if (e.key === 'Tab') {
+            trapFocus(megaMenu, e);
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
+  <script>
+    (function () {
+      let ticking = false;
+
+      function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+      function onScroll(arrowFade) {
+        const y = window.scrollY || window.pageYOffset || 0;
+        const opacity = clamp(1 - y / 300, 0, 1);
+        arrowFade.style.opacity = String(opacity);
+        ticking = false;
+      }
+
+      function requestTick(arrowFade) {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(() => onScroll(arrowFade));
+        }
+      }
+
+      // Ensure we query AFTER DOM is ready; previously this ran too early and returned null.
+      document.addEventListener('DOMContentLoaded', () => {
+        const arrowFade = document.querySelector('.arrow-fade');
+        if (!arrowFade) return;
+
+        onScroll(arrowFade);
+        window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
+      });
+    })();
+  </script>
 </head>
 
 <style>
@@ -116,12 +159,15 @@
   body::-webkit-scrollbar { width: 0 !important; }
   body { overflow: -moz-scrollbars-none; }
   body { -ms-overflow-style: none; }
-	
+
+  /* When menu is open, prevent background scroll */
+  body.menu-open { overflow: hidden; }
+
   /* Generic Page Settings */
   body { margin: 0; padding: 0; text-align: center; }
   a, a:visited, a:active, a:hover { text-decoration: none; }
   *, *:after, *:before { box-sizing: border-box; }
-	
+
   /* Branding utilities (keep even if not used yet) */
   .off-white { color: #f3f1f1; }
   .light-blue { color: #5A91BF; }
@@ -133,7 +179,7 @@
     position: fixed;
     top: 12px;
     right: 12px;
-    z-index: 4; 
+    z-index: 4;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -152,10 +198,7 @@
     -moz-animation: appear 1s ease-in-out 4s forwards;
     animation: appear 1s ease-in-out 4s forwards;
   }
-  #hamburger:focus {
-    outline: 2px solid #dcb24c;
-    outline-offset: 4px;
-  }
+  #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
   #hamburger:hover { opacity: 0.7; }
   #hamburger.is-active:hover { opacity: 0.7; }
   #hamburger.is-active .hamburger-inner,
@@ -168,11 +211,7 @@
     display: inline-block;
     position: relative;
   }
-  .hamburger-inner {
-    display: block;
-    top: 50%;
-    margin-top: -2px;
-  }
+  .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
   .hamburger-inner,
   .hamburger-inner::before,
   .hamburger-inner::after {
@@ -186,10 +225,7 @@
     transition-timing-function: ease;
   }
   .hamburger-inner::before,
-  .hamburger-inner::after {
-    content: "";
-    display: block;
-  }
+  .hamburger-inner::after { content: ""; display: block; }
   .hamburger-inner::before { top: -10px; }
   .hamburger-inner::after  { bottom: -10px; }
 
@@ -230,7 +266,7 @@
   /* Menu overlay */
   #mega-menu {
     position: fixed;
-    inset: 0;                  
+    inset: 0;
     background-color: #0f273f;
     padding: 76px;
     z-index: 3;
@@ -243,7 +279,9 @@
   #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
   #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
+  /* Make the links block-level (so the whole row is clickable) with visible focus */
   .menu-item {
+    display: block;
     text-transform: capitalize;
     font-family: 'Bitter', serif;
     font-weight: 400;
@@ -254,6 +292,11 @@
     text-align: left;
     width: 100%;
     border-bottom: 2px solid #f3f1f1;
+    outline: none;
+  }
+  .menu-item:focus-visible {
+    outline: 2px solid #f3f1f1;
+    outline-offset: 4px;
   }
 
   /* Title Screen */
@@ -408,7 +451,6 @@
   @media (min-width: 1024px) {
     .work-item { width: 28%; }
   }
-
 </style>
 
 <style>
@@ -531,7 +573,7 @@
 
 
 <div class="page">
-  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false">
+  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
     <span class="hamburger-box" aria-hidden="true">
       <span class="hamburger-inner"></span>
     </span>
@@ -569,52 +611,53 @@
     <div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
   </div>
 
-  <div id="mega-menu">
-    <a href="#work"><div class="menu-item">Work</div></a>
-    <a href="#about"><div class="menu-item">About</div></a>
-    <a href="#contact"><div class="menu-item">Contact</div></a>
-  </div>
+  <!-- Use a <nav> for semantics; the overlay background is clickable to close -->
+  <nav id="mega-menu" aria-label="Primary">
+    <a class="menu-item" href="#work">Work</a>
+    <a class="menu-item" href="#about">About</a>
+    <a class="menu-item" href="#contact">Contact</a>
+  </nav>
 
   <div class="below">
-    <a id="work"></a>
+    <div id="work"></div>
     <div class="work-wrapper">
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
       </div>
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
       </div>
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
       </div>
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
       </div>
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
         </div>
       </div>
       <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
         <div class="portfolio-info">
           <div class="project-name">typezero</div>
           <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
