@@ -10,10 +10,8 @@
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
       }
-
       document.addEventListener('DOMContentLoaded', setVH);
       window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
-
       if (window.visualViewport) {
         let last = window.visualViewport.height;
         window.visualViewport.addEventListener('resize', () => {
@@ -139,20 +137,13 @@
 
         const io = new IntersectionObserver((entries) => {
           for (const entry of entries) {
-            // If sentinel is visible => we're still in the hero section
             if (entry.isIntersecting) {
-              document.body.classList.remove('hamburger-on-light');
+              document.body.classList.remove('hamburger-on-light');   // in hero: mustard
             } else {
-              document.body.classList.add('hamburger-on-light');
+              document.body.classList.add('hamburger-on-light');      // over light section: dark blue
             }
           }
-        }, {
-          root: null,
-          threshold: 0,
-          // When the bottom pixel of the hero leaves the viewport,
-          // we flip to "on-light".
-          rootMargin: '0px 0px 0px 0px'
-        });
+        }, { root: null, threshold: 0 });
 
         io.observe(sentinel);
       });
@@ -161,8 +152,8 @@
 </head>
 
 <style>
-  /* Generic Page Settings */
-  :root { --burger: #dcb24c; }             /* default mustard on hero */
+  /* Theme tokens */
+  :root { --burger: #dcb24c; }                /* default mustard on hero */
   body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
 
   html { scrollbar-gutter: stable both-edges; }
@@ -170,6 +161,7 @@
   *::-webkit-scrollbar { width: 8px; height: 8px; }
   *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
   *::-webkit-scrollbar-track { background: transparent; }
+
   body.menu-open { overflow: hidden; }
   body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
   a, a:visited, a:active, a:hover { text-decoration: none; }
@@ -179,11 +171,11 @@
   .off-white { color: #f3f1f1; }
   .light-blue { color: #5A91BF; }
   .dark-blue { color: #0f273f; }
-  .mustard { color: #dcb24c; }
+  .mustard  { color: #dcb24c; }
   .font-mont { font-family: 'Montserrat', sans-serif; }
   .font-bitter { font-family: 'Bitter', serif; }
 
-  /* Hamburger button */
+  /* Hamburger */
   #hamburger {
     position: fixed; top: 12px; right: 12px; z-index: 4;
     display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
@@ -194,34 +186,68 @@
   #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
   #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
 
-  /* Use CSS var for bar color; smoothly transition background-color */
   .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
   .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
-  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
-    width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px;
-    position: absolute; transition-property: transform, background-color; transition-duration: 0.15s; transition-timing-function: ease;
+  /* Base transitions: keep transform timings, color transitions get overridden per state to add delays */
+  .hamburger-inner,
+  .hamburger-inner::before,
+  .hamburger-inner::after {
+    width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
+    /* transform always 0.15s; background-color 0.25s (delay added in state-specific rules) */
+    transition: transform 0.15s ease 0s, background-color .25s ease 0s;
   }
   .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
-  .hamburger-inner::before { top: -10px; }
-  .hamburger-inner::after  { bottom: -10px; }
+  .hamburger-inner::before { top: -10px; }   /* TOP line */
+  .hamburger-inner::after  { bottom: -10px; }/* BOTTOM line */
+  .hamburger-label {
+    font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
+    color: var(--burger);
+    transition: color .25s ease 0s; /* delay overridden per state below */
+  }
 
+  /* Spin animation remains the same */
   .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
-  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color 0.15s ease; }
-  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color 0.15s ease; }
+  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; }
+  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; }
   .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
   .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
   .hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
 
-  /* Label color follows the same CSS var; animate color too */
-  .hamburger-label {
-    font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
-    color: var(--burger); transition: color .25s ease;
-  }
-  /* When menu is active (overlay is dark), keep lines+label white for contrast */
+  /* While overlay menu is open, force white for contrast */
   #hamburger.is-active .hamburger-inner,
   #hamburger.is-active .hamburger-inner::before,
-  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
-  #hamburger.is-active .hamburger-label { color: #f3f1f1; }
+  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
+  #hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
+
+  /* ------ Direction-aware staggered color timing ------ */
+
+  /* MUSTARD -> DARK BLUE (leaving hero): label -> bottom -> middle -> top */
+  body.hamburger-on-light #hamburger .hamburger-label {
+    transition: color .25s ease 0ms;
+  }
+  body.hamburger-on-light #hamburger .hamburger-inner::after { /* bottom */
+    transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+  }
+  body.hamburger-on-light #hamburger .hamburger-inner {        /* middle */
+    transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+  }
+  body.hamburger-on-light #hamburger .hamburger-inner::before { /* top */
+    transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
+  }
+
+  /* DARK BLUE -> MUSTARD (re-entering hero): top -> middle -> bottom -> label */
+  body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { /* top */
+    transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
+  }
+  body:not(.hamburger-on-light) #hamburger .hamburger-inner {        /* middle */
+    transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+  }
+  body:not(.hamburger-on-light) #hamburger .hamburger-inner::after { /* bottom */
+    transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+  }
+  body:not(.hamburger-on-light) #hamburger .hamburger-label {         /* label last */
+    transition: color .25s ease 240ms;
+  }
 
   /* Menu overlay */
   #mega-menu {
@@ -296,7 +322,7 @@
     user-select: none; -webkit-user-select: none;
     cursor: pointer;
   }
-  /* Your fix: let SVG fill the capped box height to avoid crop in landscape */
+  /* Fill the capped box height to avoid crop in landscape */
   .logo svg { width: 100%; height: 100%; display: block; }
 
   :root{
@@ -363,11 +389,7 @@
     100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
   }
 
-  @media (max-width: 420px) {
-    :root { --stroke-w: clamp(8px, 8vw, 28px); }
-  }
-
-  /* Landscape size controls (from your last fix) */
+  /* Landscape size controls */
   @media (orientation: landscape) and (max-height: 480px) {
     .nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
     .logo { max-height: min(42vh, 44svh); width: auto; }
