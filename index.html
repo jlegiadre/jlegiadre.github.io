@@ -1,10 +1,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
-  <!-- 1) Stable viewport height (svh-first with JS fallback) -->
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Viewport height -->
   <script>
     (function () {
       function setVH() {
@@ -29,7 +28,7 @@
     })();
   </script>
 
-  <!-- 2) Hamburger / mega menu (vanilla, button-based) -->
+  <!-- Hamburger / mega menu -->
   <script>
     (function () {
       const qs  = (sel, root = document) => root.querySelector(sel);
@@ -59,7 +58,6 @@
         hamburger.classList.add('is-active');
         hamburger.setAttribute('aria-expanded', 'true');
 
-        // Move focus to the first nav link for accessibility
         const firstLink = menu.querySelector('a');
         if (firstLink) firstLink.focus();
       }
@@ -90,20 +88,18 @@
         // Click toggles
         hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-        // Close when clicking any menu link (delegated)
+        // Close when clicking a menu link (delegated)
         megaMenu.addEventListener('click', (e) => {
           const link = e.target.closest('a');
           if (link) closeMenu(hamburger, megaMenu, hamburger);
         });
 
-        // Also close if user clicks the overlay background (but not on a link)
+        // Close if clicking overlay background
         megaMenu.addEventListener('click', (e) => {
-          if (e.target === megaMenu) {
-            closeMenu(hamburger, megaMenu, hamburger);
-          }
+          if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
         });
 
-        // Close on ESC key anywhere + loop focus within menu while open
+        // ESC to close + focus trap
         document.addEventListener('keydown', (e) => {
           if (!megaMenu.classList.contains('is-active')) return;
 
@@ -112,7 +108,6 @@
             closeMenu(hamburger, megaMenu, hamburger);
             return;
           }
-
           if (e.key === 'Tab') {
             trapFocus(megaMenu, e);
           }
@@ -121,7 +116,7 @@
     })();
   </script>
 
-  <!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
+  <!-- Arrow fade on scroll -->
   <script>
     (function () {
       let ticking = false;
@@ -142,7 +137,6 @@
         }
       }
 
-      // Ensure we query AFTER DOM is ready; previously this ran too early and returned null.
       document.addEventListener('DOMContentLoaded', () => {
         const arrowFade = document.querySelector('.arrow-fade');
         if (!arrowFade) return;
@@ -155,20 +149,18 @@
 </head>
 
 <style>
-  /* Legacy scrollbar hiding */
-  body::-webkit-scrollbar { width: 0 !important; }
-  body { overflow: -moz-scrollbars-none; }
-  body { -ms-overflow-style: none; }
-
-  /* When menu is open, prevent background scroll */
-  body.menu-open { overflow: hidden; }
-
   /* Generic Page Settings */
+  html { scrollbar-gutter: stable both-edges; }
+  * { scrollbar-width: thin; } 
+  *::-webkit-scrollbar { width: 8px; height: 8px; } 
+  *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  body.menu-open { overflow: hidden; }
   body { margin: 0; padding: 0; text-align: center; }
   a, a:visited, a:active, a:hover { text-decoration: none; }
   *, *:after, *:before { box-sizing: border-box; }
 
-  /* Branding utilities (keep even if not used yet) */
+  /* Branding utilities */
   .off-white { color: #f3f1f1; }
   .light-blue { color: #5A91BF; }
   .font-mont { font-family: 'Montserrat', sans-serif; }
@@ -205,27 +197,13 @@
   #hamburger.is-active .hamburger-inner::before,
   #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
 
-  .hamburger-box {
-    width: 40px;
-    height: 24px;
-    display: inline-block;
-    position: relative;
-  }
+  .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
   .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
-  .hamburger-inner,
-  .hamburger-inner::before,
-  .hamburger-inner::after {
-    width: 40px;
-    height: 4px;
-    background-color: #dcb24c;
-    border-radius: 4px;
-    position: absolute;
-    transition-property: transform;
-    transition-duration: 0.15s;
-    transition-timing-function: ease;
+  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+    width: 40px; height: 4px; background-color: #dcb24c; border-radius: 4px;
+    position: absolute; transition-property: transform; transition-duration: 0.15s; transition-timing-function: ease;
   }
-  .hamburger-inner::before,
-  .hamburger-inner::after { content: ""; display: block; }
+  .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
   .hamburger-inner::before { top: -10px; }
   .hamburger-inner::after  { bottom: -10px; }
 
@@ -245,14 +223,10 @@
     transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   .hamburger--spin.is-active .hamburger-inner::before {
-    top: 0;
-    opacity: 0;
-    transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out;
+    top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out;
   }
   .hamburger--spin.is-active .hamburger-inner::after {
-    bottom: 0;
-    transform: rotate(-90deg);
-    transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
+    bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   .hamburger-label {
     font-family: 'Montserrat', sans-serif;
@@ -279,7 +253,6 @@
   #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
   #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
-  /* Make the links block-level (so the whole row is clickable) with visible focus */
   .menu-item {
     display: block;
     text-transform: capitalize;
@@ -294,32 +267,19 @@
     border-bottom: 2px solid #f3f1f1;
     outline: none;
   }
-  .menu-item:focus-visible {
-    outline: 2px solid #f3f1f1;
-    outline-offset: 4px;
-  }
+  .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
 
   /* Title Screen */
   .nav-center-screen {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background-color: #0f273f;
-    overflow: hidden;
-    position: relative;
-    margin: 0 auto;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
     border-bottom: 10px solid rgba(90,145,191, 0);
     height: calc(100svh - env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   @supports not (height: 100svh) {
-    .nav-center-screen {
-      height: calc(var(--vh, 1vh) * 100);
-      padding-bottom: 0;
-    }
+    .nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
   }
 
   .logo-name {
@@ -339,8 +299,7 @@
     text-transform: capitalize;
   }
   .logo-name, .logo-title {
-    text-align: center;
-    opacity: 0;
+    text-align: center; opacity: 0;
     -webkit-animation: appear 1s ease-in 4s forwards;
     -moz-animation: appear 1s ease-in 4s forwards;
     animation: appear 1s ease-in 4s forwards;
@@ -349,20 +308,15 @@
   @-moz-keyframes appear    { 0% {opacity:0;} 100% {opacity:1;} }
   @keyframes appear         { 0% {opacity:0;} 100% {opacity:1;} }
 
-  i { display: block; color: #f3f1f1; }
-
   .arrow {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    margin-left: -20px;
-    width: 40px;
-    height: 40px;
-    opacity: 0;
+    position: absolute; bottom: 0; left: 50%; margin-left: -20px;
+    width: 40px; height: 40px; opacity: 0;
     -webkit-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
     -moz-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
     animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
   }
+  .arrow svg { width: 40px; height: 40px; display: block; }
+  .arrow path { fill: #f3f1f1; }
   @-webkit-keyframes bounce {
     0%,20%,50%,80%,100% { -webkit-transform: translateY(0); transform: translateY(0); }
     40% { -webkit-transform: translateY(-30px); transform: translateY(-30px); }
@@ -380,9 +334,7 @@
   }
 
   .below {
-    height: 0;
-    overflow: hidden;
-    background-color: #f3f1f1;
+    height: 0; overflow: hidden; background-color: #f3f1f1;
     -webkit-animation: showcontent 1s ease-in 4s forwards;
     -moz-animation: showcontent 1s ease-in 4s forwards;
     animation: showcontent 1s ease-in 4s forwards;
@@ -393,47 +345,21 @@
 
   /** PORTFOLIO STYLES **/
   .work-wrapper {
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    margin-top: 5%;
+    width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap;
+    justify-content: space-evenly; margin-top: 5%;
   }
   .work-item { width: 80%; margin-bottom: 9%; }
-  .portfolio-info {
-    width: 100%;
-    text-align: left;
-    padding: 2% 0% 4%;
-  }
+  .portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
   .portfolio-info::before {
-    content: "";
-    display: block;
-    position: relative;
-    top: 0;
-    right: 0;
-    height: 2px;
-    background: #dcb24c;
-    width: 50%;
+    content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%;
   }
   .project-name {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1;
-    color: #4682b4;
-    font-size: clamp(18px, 3.75vw, 22px);
-    margin-top: 2%;
+    font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1; color: #4682b4; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%;
   }
   .project-role {
-    text-transform: capitalize;
-    font-family: 'Bitter', serif;
-    font-weight: 400;
-    font-style: italic;
-    color: #0f273f;
-    font-size: clamp(12px, 2.5vw, 14.66px);
-    letter-spacing: 2;
+    text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f;
+    font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2;
   }
 
   @media (max-width: 767px) {
@@ -460,11 +386,7 @@
     max-width: 100%;
     overflow: hidden;
   }
-  .logo svg {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+  .logo svg { width: 100%; height: auto; display: block; }
 
   /* ===== Responsive stroke + timing variables ===== */
   :root{
@@ -536,33 +458,13 @@
   }
 
   @keyframes comet-move{
-    0%{
-      stroke-opacity: 0;
-      stroke-dasharray: var(--comet-len) 1;
-      stroke-dashoffset: 1;
-      stroke-linecap: butt;
-    }
+    0%{ stroke-opacity: 0; stroke-dasharray: var(--comet-len) 1; stroke-dashoffset: 1; stroke-linecap: butt; }
     1%{ stroke-opacity: 0.95; }
-    100%{
-      stroke-opacity: 0;
-      stroke-dasharray: var(--comet-len) 1;
-      stroke-dashoffset: 0;
-      stroke-linecap: butt;
-    }
+    100%{ stroke-opacity: 0; stroke-dasharray: var(--comet-len) 1; stroke-dashoffset: 0; stroke-linecap: butt; }
   }
   @keyframes final-grow{
-    0%{
-      stroke-opacity: 1;
-      stroke-dasharray: 0 1;
-      stroke-dashoffset: 1;
-      stroke-linecap: round;
-    }
-    100%{
-      stroke-opacity: 1;
-      stroke-dasharray: 1 1;
-      stroke-dashoffset: 0;
-      stroke-linecap: round;
-    }
+    0%{ stroke-opacity: 1; stroke-dasharray: 0 1; stroke-dashoffset: 1; stroke-linecap: round; }
+    100%{ stroke-opacity: 1; stroke-dasharray: 1 1; stroke-dashoffset: 0; stroke-linecap: round; }
   }
 
   @media (max-width: 420px) {
@@ -608,10 +510,16 @@
 
     <div class="logo-name font-mont"><span class="off-white">Jonathan</span> <span class="light-blue">Legiadre</span></div>
     <div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
-    <div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
+
+    <div class="arrow-fade">
+      <div class="arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+          <path d="M12 16a1 1 0 0 1-.7-.29l-7-7a1 1 0 1 1 1.4-1.42L12 13.59l6.3-6.3a1 1 0 1 1 1.4 1.42l-7 7A1 1 0 0 1 12 16z"/>
+        </svg>
+      </div>
+    </div>
   </div>
 
-  <!-- Use a <nav> for semantics; the overlay background is clickable to close -->
   <nav id="mega-menu" aria-label="Primary">
     <a class="menu-item" href="#work">Work</a>
     <a class="menu-item" href="#about">About</a>
