@@ -132,7 +132,7 @@
   <script>
 	(function () {
 	  // How many pixels *before* the hero ends the switch should happen
-	  const SWITCH_OFFSET = 96; // tweak this number: bigger = earlier switch
+	  const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
 
 	  function setupHamburgerColorSwitch() {
 		const hero = document.querySelector('.nav-center-screen');
@@ -188,366 +188,418 @@
 	</script>
 </head>
 <html lang="en">
-<style>
-  /* Theme tokens */
-  :root { --burger: #dcb24c; }                /* default mustard on hero */
-  body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
 
-  html { scrollbar-gutter: stable both-edges; }
-  * { scrollbar-width: thin; }
-  *::-webkit-scrollbar { width: 8px; height: 8px; }
-  *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
-  *::-webkit-scrollbar-track { background: transparent; }
+	<style>
+	  /* Theme tokens */
+	  :root { --burger: #dcb24c; }                /* default mustard on hero */
+	  body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
 
-  body.menu-open { overflow: hidden; }
-  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
-  a, a:visited, a:active, a:hover { text-decoration: none; }
-  *, *:after, *:before { box-sizing: border-box; }
+	  html { scrollbar-gutter: stable both-edges; }
+	  * { scrollbar-width: thin; }
+	  *::-webkit-scrollbar { width: 8px; height: 8px; }
+	  *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
+	  *::-webkit-scrollbar-track { background: transparent; }
 
-  /* Branding utilities */
-  .off-white { color: #f3f1f1; }
-  .light-blue { color: #4F8ABA; }
-  .dark-blue { color: #0f273f; }
-  .mustard  { color: #dcb24c; }
-  .font-mont { font-family: 'Montserrat', sans-serif; }
-  .font-bitter { font-family: 'Bitter', serif; }
+	  body.menu-open { overflow: hidden; }
+	  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
+	  a, a:visited, a:active, a:hover { text-decoration: none; }
+	  *, *:after, *:before { box-sizing: border-box; }
 
-  /* Hamburger */
-  #hamburger {
-    position: fixed; top: 12px; right: 12px; z-index: 4;
-    display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
-    padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
-    overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
-    opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
-  }
-  #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
-  #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
+	  /* Branding utilities */
+	  .off-white { color: #f3f1f1; }
+	  .light-blue { color: #4F8ABA; }
+	  .dark-blue { color: #0f273f; }
+	  .mustard  { color: #dcb24c; }
+	  .font-mont { font-family: 'Montserrat', sans-serif; }
+	  .font-bitter { font-family: 'Bitter', serif; }
 
-  .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
-  .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
-  /* Base transitions: keep transform timings, color transitions get overridden per state to add delays */
-  .hamburger-inner,
-  .hamburger-inner::before,
-  .hamburger-inner::after {
-    width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
-    /* transform always 0.15s; background-color 0.25s (delay added in state-specific rules) */
-    transition: transform 0.15s ease 0s, background-color .25s ease 0s;
-  }
-  .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
-  .hamburger-inner::before { top: -10px; }   /* TOP line */
-  .hamburger-inner::after  { bottom: -10px; }/* BOTTOM line */
-  .hamburger-label {
-    font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
-    color: var(--burger);
-    transition: color .25s ease 0s; /* delay overridden per state below */
-  }
+	  /* Hamburger */
+	  #hamburger {
+		position: fixed; top: 12px; right: 12px; z-index: 4;
+		display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+		padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
+		overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
+		opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
+	  }
+	  #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
+	  #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
 
-  /* Spin animation remains the same */
-  .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
-  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; }
-  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; }
-  .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
-  .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
-  .hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
+	  .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
+	  .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
+	  /* Base transitions: keep transform timings, color transitions get overridden per state to add delays */
+	  .hamburger-inner,
+	  .hamburger-inner::before,
+	  .hamburger-inner::after {
+		width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
+		transition: transform 0.15s ease 0s, background-color .25s ease 0s;
+	  }
+	  .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
+	  .hamburger-inner::before { top: -10px; }  
+	  .hamburger-inner::after  { bottom: -10px; }
+	  .hamburger-label {
+		font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
+		color: var(--burger);
+		transition: color .25s ease 0s; /* delay overridden per state below */
+	  }
 
-  /* While overlay menu is open, force white for contrast */
-  #hamburger.is-active .hamburger-inner,
-  #hamburger.is-active .hamburger-inner::before,
-  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
-  #hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
+	  .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
+	  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; }
+	  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; }
+	  .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
+	  .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
+	  .hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
 
-  /* ------ Direction-aware staggered color timing ------ */
+	  #hamburger.is-active .hamburger-inner,
+	  #hamburger.is-active .hamburger-inner::before,
+	  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
+	  #hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
 
-  /* MUSTARD -> DARK BLUE (leaving hero): label -> bottom -> middle -> top */
-  body.hamburger-on-light #hamburger .hamburger-label {
-    transition: color .25s ease 0ms;
-  }
-  body.hamburger-on-light #hamburger .hamburger-inner::after { /* bottom */
-    transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-  }
-  body.hamburger-on-light #hamburger .hamburger-inner {        /* middle */
-    transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-  }
-  body.hamburger-on-light #hamburger .hamburger-inner::before { /* top */
-    transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
-  }
 
-  /* DARK BLUE -> MUSTARD (re-entering hero): top -> middle -> bottom -> label */
-  body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { /* top */
-    transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
-  }
-  body:not(.hamburger-on-light) #hamburger .hamburger-inner {        /* middle */
-    transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-  }
-  body:not(.hamburger-on-light) #hamburger .hamburger-inner::after { /* bottom */
-    transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-  }
-  body:not(.hamburger-on-light) #hamburger .hamburger-label {         /* label last */
-    transition: color .25s ease 240ms;
-  }
+	  body.hamburger-on-light #hamburger .hamburger-label {
+		transition: color .25s ease 0ms;
+	  }
+	  body.hamburger-on-light #hamburger .hamburger-inner::after { 
+		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+	  }
+	  body.hamburger-on-light #hamburger .hamburger-inner { 
+		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+	  }
+	  body.hamburger-on-light #hamburger .hamburger-inner::before { 
+		transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
+	  }
 
-  /* Menu overlay */
-  #mega-menu {
-    position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
-    opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
-    transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
-  }
-  #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
-  #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
+	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
+		transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
+	  }
+	  body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
+		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+	  }
+	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
+		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+	  }
+	  body:not(.hamburger-on-light) #hamburger .hamburger-label {  
+		transition: color .25s ease 240ms;
+	  }
 
-  .menu-item {
-    display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
-    color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
-    border-bottom: 2px solid #f3f1f1; outline: none;
-  }
-  .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
+	  /* Menu overlay */
+	  #mega-menu {
+		position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
+		opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
+		transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
+	  }
+	  #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
+	  #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
-  /* Title Screen */
-  .nav-center-screen {
-    width: 100%;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
-    border-bottom: 10px solid rgba(90,145,191,0);
-    height: calc(100svh - env(safe-area-inset-bottom, 0px));
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @supports not (height: 100svh) {
-    .nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
-  }
+	  .menu-item {
+		display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
+		color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
+		border-bottom: 2px solid #f3f1f1; outline: none;
+	  }
+	  .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
 
-  /* hero sentinel to detect leaving the hero */
-  .hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
+	  /* Title Screen */
+	  .nav-center-screen {
+		width: 100%;
+		display: flex; flex-direction: column; justify-content: center; align-items: center;
+		text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
+		border-bottom: 10px solid rgba(90,145,191,0);
+		height: calc(100svh - env(safe-area-inset-bottom, 0px));
+		padding-bottom: env(safe-area-inset-bottom, 0px);
+	  }
+	  @supports not (height: 100svh) {
+		.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
+	  }
+		
+	  .hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
 
-  .logo-name { font-size: clamp(32px, 7.5vw, 85px); letter-spacing: 1.2; line-height: 0.9; font-weight: 600; text-transform: uppercase; margin: 0.5% auto; }
-  .logo-title { font-size: clamp(14px, 3.25vw, 25px); color: #dcb24c; line-height: 1.2; letter-spacing: 2; font-weight: 400; font-style: italic; text-transform: capitalize; }
-  .logo-name, .logo-title { text-align: center; opacity: 0; animation: appear 1s ease-in 4s forwards; }
-  @keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
+	  .logo-name { 
+		  font-size: clamp(32px, 7.5vw, 85px); 
+		  letter-spacing: 1.2; 
+		  line-height: 0.9; 
+		  font-weight: 600; 
+		  text-transform: uppercase; 
+		  margin: 0.5% auto; 
+		}
+	  .logo-title { 
+		  font-size: clamp(14px, 3.25vw, 25px); 
+		  color: #dcb24c; 
+		  line-height: 1.2; 
+		  letter-spacing: 2; 
+		  font-weight: 400; 
+		  font-style: italic; 
+		  text-transform: capitalize; 
+		}
+	  .logo-name, .logo-title { 
+		  text-align: center; 
+		  opacity: 0; 
+		}
+	  @keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
 
-  .arrow { position: absolute; bottom: 0; left: 50%; margin-left: -20px; width: 40px; height: 40px; opacity: 0; animation: bounce 2s infinite, appear 1s ease-in 4s forwards; }
-  .arrow svg { width: 40px; height: 40px; display: block; }
-  .arrow path { fill: #f3f1f1; }
-  @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-25px); } 60% { transform: translateY(-15px); } }
+	  .arrow { position: absolute; bottom: 0; left: 50%; margin-left: -20px; width: 40px; height: 40px; opacity: 0;}
+	  .arrow svg { width: 40px; height: 40px; display: block; }
+	  .arrow path { fill: #f3f1f1; }
+	  @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-25px); } 60% { transform: translateY(-15px); } }
+		
+		
+		@keyframes appear { 
+			0% {opacity: 0;} 
+			100% {opacity: 1;} 
+		}
 
-  .below { height: 0; overflow: hidden; background-color: #f3f1f1; animation: showcontent 1s ease-in 4s forwards; }
-  @keyframes showcontent { 100% { height: auto; } }
+		:root {
+		  --firstName-delay: 4s;
+		  --lastName-delay: 4.25s;
+		  --title-delay: 4.5s;
+		  --arrow-delay: 4.75s;         
+		  --fade-dur: 1s;
+		}
 
-  /** PORTFOLIO STYLES **/
-  .work-wrapper { width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; }
-  .work-item { width: 80%; margin-bottom: 9%; }
-  .portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
-  .portfolio-info::before { content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%; }
-  .project-name { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1; color: #3D729E; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%; }
-  .project-role { text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f; font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2; }
+		/* first name */
+		.first-name {
+		  animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
+		}
 
-  @media (max-width: 767px) { #mega-menu { padding: 76px 30px; } .menu-item { margin-bottom: 12%; } }
-  @media (min-width: 768px) {
-    .work-item { width: 45%; margin-bottom: 3%; }
-    .project-name { font-size: clamp(18px, 1.75vw, 22px); }
-    .project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
-    .menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
-  }
-  @media (min-width: 1024px) { .work-item { width: 28%; } }
-</style>
+		/* last name */
+		.last-name {
+		  animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
+		}
 
-<!-- Logo animation styles -->
-<style>
-  .logo {
-    display: inline-block;
-    width: clamp(200px, 60vw, 420px);
-    max-width: 100%;
-    overflow: hidden;
-    user-select: none; -webkit-user-select: none;
-    cursor: pointer;
-  }
-  /* Fill the capped box height to avoid crop in landscape */
-  .logo svg { width: 100%; height: 100%; display: block; }
+		/* title */
+		.logo-title {
+		  animation: appear var(--fade-dur) ease-in var(--title-delay) forwards;
+		}
 
-  :root{
-    --seg1-start: 0s;
-    --seg2-start: 0.575s;
-    --seg3-start: 1.2s;
-    --seg4-start: 1.9s;
-    --stroke-w: clamp(10px, 6vw, 47px);
-    --c12: #f3f1f1;
-    --c34: #4F8ABA;
-    --seg1-final-dur: 1.6s;
-    --seg2-final-dur: 1.6s;
-    --seg3-final-dur: 1.6s;
-    --seg4-final-dur: 1.6s;
-  }
+		/* arrow */
+		.arrow {
+		  animation:
+			bounce 2s infinite,
+			appear var(--fade-dur) ease-in var(--arrow-delay) forwards;
+		}
 
-  /* Flash-free + hidden until each segment starts */
-  .draw-final{
-    fill: none;
-    stroke-width: var(--stroke-w);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke: currentColor;
-    stroke-dasharray: .02 1;
-    stroke-dashoffset: 1;
-    visibility: hidden;
-    will-change: stroke-dasharray, stroke-dashoffset, visibility;
-    shape-rendering: geometricPrecision;
-  }
+	  .below { height: 0; overflow: hidden; background-color: #f3f1f1; animation: showcontent 1s ease-in 4s forwards; }
+	  @keyframes showcontent { 100% { height: auto; } }
 
-  .seg1 { color: var(--c12); }
-  .seg2 { color: var(--c12); }
-  .seg3 { color: var(--c34); }
-  .seg4 { color: var(--c34); }
+	  /** PORTFOLIO STYLES **/
+	  .work-wrapper { width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; }
+	  .work-item { width: 80%; margin-bottom: 9%; }
+	  .portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
+	  .portfolio-info::before { content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%; }
+	  .project-name { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1; color: #3D729E; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%; }
+	  .project-role { text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f; font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2; }
 
-  .seg1.draw-final {
-    --segX-dur: var(--seg1-final-dur);
-    animation:
-      reveal 0s step-end var(--seg1-start) forwards,
-      final-grow-dash var(--seg1-final-dur) ease-in-out var(--seg1-start) forwards;
-  }
-  .seg2.draw-final {
-    --segX-dur: var(--seg2-final-dur);
-    animation:
-      reveal 0s step-end var(--seg2-start) forwards,
-      final-grow-dash var(--seg2-final-dur) ease-in-out var(--seg2-start) forwards;
-  }
-  .seg3.draw-final {
-    --segX-dur: var(--seg3-final-dur);
-    animation:
-      reveal 0s step-end var(--seg3-start) forwards,
-      final-grow-dash var(--seg3-final-dur) ease-in-out var(--seg3-start) forwards;
-  }
-  .seg4.draw-final {
-    --segX-dur: var(--seg4-final-dur);
-    animation:
-      reveal 0s step-end var(--seg4-start) forwards,
-      final-grow-dash var(--seg4-final-dur) ease-in-out var(--seg4-start) forwards;
-  }
+	  @media (max-width: 767px) { #mega-menu { padding: 76px 30px; } .menu-item { margin-bottom: 12%; } }
+	  @media (min-width: 768px) {
+		.work-item { width: 45%; margin-bottom: 3%; }
+		.project-name { font-size: clamp(18px, 1.75vw, 22px); }
+		.project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
+		.menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
+	  }
+	  @media (min-width: 1024px) { .work-item { width: 28%; } }
+	</style>
 
-  @keyframes reveal { to { visibility: visible; } }
-  @keyframes final-grow-dash{
-    0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
-    100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
-  }
+	<!-- Logo animation styles -->
+	<style>
+	  .logo {
+		display: inline-block;
+		width: clamp(200px, 60vw, 420px);
+		max-width: 100%;
+		overflow: hidden;
+		user-select: none; -webkit-user-select: none;
+		cursor: pointer;
+	  }
+	  /* Fill the capped box height to avoid crop in landscape */
+	  .logo svg { width: 100%; height: 100%; display: block; }
 
-  /* Landscape size controls */
-  @media (orientation: landscape) and (max-height: 480px) {
-    .nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
-    .logo { max-height: min(42vh, 44svh); width: auto; }
-    .logo svg { width: auto; height: 100%; }
-    .logo-name { font-size: clamp(24px, 6vh, 48px); }
-    .logo-title { font-size: clamp(12px, 3.5vh, 20px); }
-    .arrow { transform: scale(0.85); transform-origin: center bottom; }
-  }
-</style>
+	  :root{
+		--seg1-start: 0s;
+		--seg2-start: 0.575s;
+		--seg3-start: 1.2s;
+		--seg4-start: 1.9s;
+		--stroke-w: clamp(10px, 6vw, 47px);
+		--c12: #f3f1f1;
+		--c34: #4F8ABA;
+		--seg1-final-dur: 1.6s;
+		--seg2-final-dur: 1.6s;
+		--seg3-final-dur: 1.6s;
+		--seg4-final-dur: 1.6s;
+	  }
 
-<div class="page">
-  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
-    <span class="hamburger-box" aria-hidden="true"><span class="hamburger-inner"></span></span>
-    <span class="hamburger-label">Menu</span>
-  </button>
+	  /* Flash-free + hidden until each segment starts */
+	  .draw-final{
+		fill: none;
+		stroke-width: var(--stroke-w);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke: currentColor;
+		stroke-dasharray: .02 1;
+		stroke-dashoffset: 1;
+		visibility: hidden;
+		will-change: stroke-dasharray, stroke-dashoffset, visibility;
+		shape-rendering: geometricPrecision;
+	  }
 
-  <div class="nav-center-screen">
-    <!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
-    <div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
+	  .seg1 { color: var(--c12); }
+	  .seg2 { color: var(--c12); }
+	  .seg3 { color: var(--c34); }
+	  .seg4 { color: var(--c34); }
 
-    <div class="w-100 text-center">
-      <div class="logo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-          <defs>
-            <!-- Centerline paths -->
-            <path id="p1" pathLength="1" d="M161.6,181.1c0,0,40.3-38.4,40.3-38.4c72.8,324.2-76.5,356.7-121.3,292.8" />
-            <path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
-            <path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
-            <path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
-            <!-- Outline clips -->
-            <path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4c0,0-4.9,5.3-4.9,5.3   c-12,13-25.7,28.1-37.4,41.5c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1   c0.6,13.5,0.7,26.9,0.4,40.4c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.6-8.1-42.9-22.1l-22.1,20.5   c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
-            <path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
-            <path id="op3" d="M255.3,206.5c-20.2-15.6-17.7-50.5-13.8-73c7.2-37.1,24.2-77.1,50.8-104.9c11.8-12,27.9-22.7,45.6-18   c12.4,3,22.7,13,26.2,25.3c5.4,18.9,2.8,40.4-1.7,58.3c-6.3,25-16.8,48.9-27.8,72c-20.9,43.8-47.4,88-65.3,132.9   c-8.8,22.8-16,46.4-13.5,71.2c-9.1-23.9-5.9-51-0.6-75.6c14.4-61.1,45.2-116,67.3-174.1c8.2-22.4,16.5-46.5,14.7-69.9   c-0.2-1.8-0.5-3.7-0.8-5.4c0,0-0.2-0.9-0.2-0.9s-0.1-0.4-0.1-0.4c-0.1-0.3-0.1-0.6-0.2-0.8c-1.2-3.4-4.9-5.9-8.5-5.5   c-1.6,0.2-3,0.8-4.6,1.5C285.9,56.9,225.8,170.3,255.3,206.5L255.3,206.5z" />
-            <path id="op4" d="M189.7,367c-11.6-4.1-23.1-11.6-28.5-23.2c-6.4-13.6-1.2-29.4,9-39.5c19.4-19.3,49.6-23.3,75.4-18.1   c12.9,2.6,25.1,7.3,36.5,13.6c6.2,3.4,12.4,7.1,18.5,10.6c23.2,13.6,47.2,28.2,71.7,37.8c23.8,9.3,48.5,13.6,70.9,1.8   c8-4.1,15.9-10,16.7-19.2c0.6-12.4-8.7-24.4-17.8-32.3c-1.8-1.5-3.6-2.9-5.7-4c2.4,0.3,4.7,1.1,6.9,2c14,5.9,27.3,17.9,29.8,33.5   c3.2,22.6-18.4,38.9-36.8,46.6c-23.5,9.5-50,6.4-73.5-1.4c-37.1-12.2-67.8-33.8-100.5-53.6c-21.1-11.6-47.2-17.9-70.3-9.6   c-12,4.2-24,14.7-21.2,28.6C173,351.6,181.3,359.9,189.7,367L189.7,367z" />
+	  .seg1.draw-final {
+		--segX-dur: var(--seg1-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg1-start) forwards,
+		  final-grow-dash var(--seg1-final-dur) ease-in-out var(--seg1-start) forwards;
+	  }
+	  .seg2.draw-final {
+		--segX-dur: var(--seg2-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg2-start) forwards,
+		  final-grow-dash var(--seg2-final-dur) ease-in-out var(--seg2-start) forwards;
+	  }
+	  .seg3.draw-final {
+		--segX-dur: var(--seg3-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg3-start) forwards,
+		  final-grow-dash var(--seg3-final-dur) ease-in-out var(--seg3-start) forwards;
+	  }
+	  .seg4.draw-final {
+		--segX-dur: var(--seg4-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg4-start) forwards,
+		  final-grow-dash var(--seg4-final-dur) ease-in-out var(--seg4-start) forwards;
+	  }
 
-            <clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
-            <clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
-            <clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
-            <clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
-          </defs>
+	  @keyframes reveal { to { visibility: visible; } }
+	  @keyframes final-grow-dash{
+		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
+		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
+	  }
 
-          <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
-          <g style="shape-rendering:geometricPrecision">
-            <g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
-            <g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-            <g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-            <g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-          </g>
-        </svg>
-      </div>
-    </div>
+	  /* Landscape size controls */
+	  @media (orientation: landscape) and (max-height: 480px) {
+		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
+		.logo { max-height: min(42vh, 44svh); width: auto; }
+		.logo svg { width: auto; height: 100%; }
+		.logo-name { font-size: clamp(24px, 6vh, 48px); }
+		.logo-title { font-size: clamp(12px, 3.5vh, 20px); }
+		.arrow { transform: scale(0.85); transform-origin: center bottom; }
+	  }
+	</style>
 
-    <div class="logo-name font-mont"><span class="off-white">Jonathan</span> <span class="light-blue">Legiadre</span></div>
-    <div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
+	<div class="page">
+	  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
+		<span class="hamburger-box" aria-hidden="true"><span class="hamburger-inner"></span></span>
+		<span class="hamburger-label">Menu</span>
+	  </button>
 
-    <div class="arrow-fade">
-      <div class="arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-          <path d="M12 16a1 1 0 0 1-.7-.29l-7-7a1 1 0 1 1 1.4-1.42L12 13.59l6.3-6.3a1 1 0 1 1 1.4 1.42l-7 7A1 1 0 0 1 12 16z"/>
-        </svg>
-      </div>
-    </div>
-  </div>
+	  <div class="nav-center-screen">
+		<!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
+		<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
 
-  <nav id="mega-menu" aria-label="Primary">
-    <a class="menu-item" href="#work">Work</a>
-    <a class="menu-item" href="#about">About</a>
-    <a class="menu-item" href="#contact">Contact</a>
-  </nav>
+		<div class="w-100 text-center">
+		  <div class="logo">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+			  <defs>
+				<!-- Centerline paths -->
+				<path id="p1" pathLength="1" d="M161.6,181.1c0,0,40.3-38.4,40.3-38.4c72.8,324.2-76.5,356.7-121.3,292.8" />
+				<path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
+				<path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
+				<path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
+				<!-- Outline clips -->
+				<path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4c0,0-4.9,5.3-4.9,5.3   c-12,13-25.7,28.1-37.4,41.5c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1   c0.6,13.5,0.7,26.9,0.4,40.4c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.6-8.1-42.9-22.1l-22.1,20.5   c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
+				<path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
+				<path id="op3" d="M255.3,206.5c-20.2-15.6-17.7-50.5-13.8-73c7.2-37.1,24.2-77.1,50.8-104.9c11.8-12,27.9-22.7,45.6-18   c12.4,3,22.7,13,26.2,25.3c5.4,18.9,2.8,40.4-1.7,58.3c-6.3,25-16.8,48.9-27.8,72c-20.9,43.8-47.4,88-65.3,132.9   c-8.8,22.8-16,46.4-13.5,71.2c-9.1-23.9-5.9-51-0.6-75.6c14.4-61.1,45.2-116,67.3-174.1c8.2-22.4,16.5-46.5,14.7-69.9   c-0.2-1.8-0.5-3.7-0.8-5.4c0,0-0.2-0.9-0.2-0.9s-0.1-0.4-0.1-0.4c-0.1-0.3-0.1-0.6-0.2-0.8c-1.2-3.4-4.9-5.9-8.5-5.5   c-1.6,0.2-3,0.8-4.6,1.5C285.9,56.9,225.8,170.3,255.3,206.5L255.3,206.5z" />
+				<path id="op4" d="M189.7,367c-11.6-4.1-23.1-11.6-28.5-23.2c-6.4-13.6-1.2-29.4,9-39.5c19.4-19.3,49.6-23.3,75.4-18.1   c12.9,2.6,25.1,7.3,36.5,13.6c6.2,3.4,12.4,7.1,18.5,10.6c23.2,13.6,47.2,28.2,71.7,37.8c23.8,9.3,48.5,13.6,70.9,1.8   c8-4.1,15.9-10,16.7-19.2c0.6-12.4-8.7-24.4-17.8-32.3c-1.8-1.5-3.6-2.9-5.7-4c2.4,0.3,4.7,1.1,6.9,2c14,5.9,27.3,17.9,29.8,33.5   c3.2,22.6-18.4,38.9-36.8,46.6c-23.5,9.5-50,6.4-73.5-1.4c-37.1-12.2-67.8-33.8-100.5-53.6c-21.1-11.6-47.2-17.9-70.3-9.6   c-12,4.2-24,14.7-21.2,28.6C173,351.6,181.3,359.9,189.7,367L189.7,367z" />
 
-  <div class="below">
-    <div id="work"></div>
-    <div class="section-heading">Work</div>
-    <div class="work-wrapper">
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-      <div class="work-item">
-        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-        <div class="portfolio-info">
-          <div class="project-name">typezero</div>
-          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-        </div>
-      </div>
-    </div>
-    <div id="about"></div>
-    <div class="section-heading">About</div>
-    <div id="contact"></div>
-    <div class="section-heading">Contact</div>
-  </div>
-</div>
+				<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
+				<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
+				<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
+				<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
+			  </defs>
+
+			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
+			  <g style="shape-rendering:geometricPrecision">
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
+				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
+				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
+				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
+			  </g>
+			</svg>
+		  </div>
+		</div>
+
+		  <div class="logo-name font-mont">
+			  <span class="first-name off-white">Jonathan</span>
+			  <span class="last-name light-blue">Legiadre</span>
+			</div>
+		<div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
+
+		<div class="arrow-fade">
+		  <div class="arrow" aria-hidden="true">
+			<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+			  <path d="M12 16a1 1 0 0 1-.7-.29l-7-7a1 1 0 1 1 1.4-1.42L12 13.59l6.3-6.3a1 1 0 1 1 1.4 1.42l-7 7A1 1 0 0 1 12 16z"/>
+			</svg>
+		  </div>
+		</div>
+	  </div>
+
+	  <nav id="mega-menu" aria-label="Primary">
+		<a class="menu-item" href="#work">Work</a>
+		<a class="menu-item" href="#about">About</a>
+		<a class="menu-item" href="#contact">Contact</a>
+	  </nav>
+
+	  <div class="below">
+		<div id="work"></div>
+		<div class="section-heading">Work</div>
+		<div class="work-wrapper">
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		  <div class="work-item">
+			<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+			<div class="portfolio-info">
+			  <div class="project-name">typezero</div>
+			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+			</div>
+		  </div>
+		</div>
+		<div id="about"></div>
+		<div class="section-heading">About</div>
+		<div id="contact"></div>
+		<div class="section-heading">Contact</div>
+	  </div>
+	</div>
+	
 </html>
