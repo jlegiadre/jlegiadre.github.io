@@ -1,9 +1,10 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
-	
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+<!-- 1) Stable viewport height (svh-first with JS fallback) -->
 <script>
   (function () {
     function setVH() {
@@ -16,7 +17,8 @@
     window.addEventListener('orientationchange', () => {
       setTimeout(setVH, 250);
     });
-    
+
+    // Optional keyboard/sheet shrink support
     if (window.visualViewport) {
       let last = window.visualViewport.height;
       window.visualViewport.addEventListener('resize', () => {
@@ -25,9 +27,10 @@
         last = now;
       });
     }
-    
   })();
 </script>
+
+<!-- 2) Hamburger / mega menu (vanilla, button-based) -->
 <script>
   (function () {
     const qs  = (sel, root = document) => root.querySelector(sel);
@@ -79,6 +82,8 @@
     });
   })();
 </script>
+
+<!-- 3) Arrow fade on scroll (vanilla, passive + rAF) -->
 <script>
   (function () {
     let ticking = false;
@@ -101,391 +106,350 @@
       }
     }
 
-    // Initialize once DOM is ready
     document.addEventListener('DOMContentLoaded', onScroll);
-
-    // Passive for perf, rAF for smoothness
     window.addEventListener('scroll', requestTick, { passive: true });
   })();
 </script>
-
-
-
 </head>
-<style>
-	a, a:visited, a:active, a:hover {text-decoration:none;}
-	*, *:after, *:before {box-sizing: border-box;}
-	body::-webkit-scrollbar { width: 0 !important }
-	body { overflow: -moz-scrollbars-none; }
-	body { -ms-overflow-style: none; }
-	
-	#header-wrapper {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		z-index: 4;
-	}
-	
-	#hamburger {
-	  padding: 15px 15px;
-	  display: inline-block;
-	  cursor: pointer;
-	  float: right;
-	  font: inherit;
-	  color: inherit;
-	  background: transparent;
-	  border: none;
-	  margin: 0;
-	  overflow: visible;
-	  transition: opacity 0.15s linear, filter 0.15s linear;
-	  opacity: 0;
-	  -webkit-animation: appear 1s ease-in-out 4s forwards;
-	  -moz-animation: appear 1s ease-in-out 4s forwards;
-	  animation: appear 1s ease-in-out 4s forwards;
-	}
-	#hamburger:focus {
-	  outline: 2px solid #dcb24c; /* visible focus indicator for WCAG compliance */
-	  outline-offset: 4px;
-	}
 
-	#hamburger:hover {opacity: 0.7;}
-	#hamburger.is-active:hover {opacity: 0.7;}
-	#hamburger.is-active .hamburger-inner,
-	#hamburger.is-active .hamburger-inner::before,
-	#hamburger.is-active .hamburger-inner::after {background-color: #f3f1f1; }
-	.hamburger-box {
-	  width: 40px;
-	  height: 24px;
-	  display: inline-block;
-	  position: relative; }
-	.hamburger-inner {
-	  display: block;
-	  top: 50%;
-	  margin-top: -2px; }
-	.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
-	width: 40px;
-	height: 4px;
-	background-color: #dcb24c;
-	border-radius: 4px;
-	position: absolute;
-	transition-property: transform;
-	transition-duration: 0.15s;
-	transition-timing-function: ease; }
-	.hamburger-inner::before, .hamburger-inner::after {
-	content: "";
-	display: block; }
-	.hamburger-inner::before {top: -10px; }
-	.hamburger-inner::after { bottom: -10px; }
-	.hamburger--spin .hamburger-inner {
-	  transition-duration: 0.22s;
-	  transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); 
-	}
-	.hamburger--spin .hamburger-inner::before {transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in; }
-	.hamburger--spin .hamburger-inner::after {transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19); }
-	.hamburger--spin.is-active .hamburger-inner {
-	  transform: rotate(225deg);
-	  transition-delay: 0.12s;
-	  transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
-	.hamburger--spin.is-active .hamburger-inner::before {
-	top: 0;
-	opacity: 0;
-	transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
-	.hamburger--spin.is-active .hamburger-inner::after {
-		bottom: 0;
-		transform: rotate(-90deg);
-		transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1); }
-	.hamburger-label {
-		font-family: 'Montserrat', sans-serif; 
-		font-weight: 700; 
-		text-transform: uppercase; 
-		font-size: 12px;
-		color: #dcb24c;
-		padding-top: 7px;
-	}
-	#hamburger.is-active .hamburger-label {
-		color: #f3f1f1;
-	}
-
-	#mega-menu {
-		position: fixed;
-		top: -12.5%;
-		left: -12.5%;
-		opacity: 0;
-		z-index: -1;
-		width: 125%;
-		height: 125vh;
-		height: calc(var(--vh, 1vh) * 125);
-		background-color: #0f273f;
-		padding: 76px;
-		-webkit-transition: all 0.5s ease-in-out;
-		transition: all 0.5s ease-in-out;
-	}
-	#mega-menu.is-active {
-		top: 0;
-		left: 0;
-		z-index: 1;
-		opacity: 1;
-		width: 100%;
-		height: 100vh;
-		height: calc(var(--vh, 1vh) * 100);
-	}
-	#mega-menu.not-active {
-		top: -12.5%;
-		left: -12.5%;
-		width: 125%;
-		height: 125vh;
-		z-index: -1;
-		opacity: 0;
-		height: calc(var(--vh, 1vh) * 125);
-	}
-	
-	.menu-item {
-		text-transform: capitalize;
-		font-family: 'Bitter', serif; 
-		font-weight: 400;
-		font-style: italic;
-		color: #dcb24c;
-		font-size: 4vw;
-		margin-bottom: 6%;
-		text-align: left;
-		width: 100%;
-		border-bottom: 2px solid #f3f1f1;
-	}
-</style>
 <style>
-	body {margin: 0; padding: 0; background-color: #f3f1f1; text-align: center;}
-	.desktop {display: block;}
-	.mobile {display: none;}
-	
-	/** TITLE SCREEN **/
-	.nav-center-screen {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		text-align: center;
-		height: 100vh; 
-		height: calc(var(--vh, 1vh) * 100);
-		background-color: #0f273f;
-		overflow: hidden;
-		position: relative;
-		margin: 0 auto;
-		/*z-index: 2;*/
-		border-bottom: 10px solid rgba(90,145,191, 0);
-		box-sizing: border-box;
-		-webkit-animation: addborder 1s ease-in 4s forwards;
-		-moz-animation: addborder 1s ease-in 4s forwards;
-		animation: addborder 1s ease-in 4s forwards;
-	}
-	.logo-name {
-		font-size: 5.3125vw; 
-		letter-spacing: 1; 
-		font-family: 'Montserrat', sans-serif; 
-		font-weight: 600; 
-		text-transform: uppercase; 
-		margin: 0.5% auto;
-	}
-	.grey {color: #f3f1f1;}
-	.blue {color: #5A91BF;}
-	.logo-title {
-		font-size: 1.5625vw; 
-		color: #dcb24c; 
-		line-height: 1; 
-		letter-spacing: 2; 
-		font-family: 'Bitter', serif; 
-		font-weight: 400; 
-		font-style: italic; 
-		text-transform: capitalize;
-	}
-	.logo-name, .logo-title {
-		text-align: center;  
-		opacity: 0; 
-		-webkit-animation: appear 1s ease-in 4s forwards;
-		-moz-animation: appear 1s ease-in 4s forwards;
-		animation: appear 1s ease-in 4s forwards;
-	}
-	@-webkit-keyframes appear {
-		0% {opacity: 0;}
-		100% {opacity: 1;}
-	}
-	@-moz-keyframes appear {
-		0% {opacity: 0;}
-		100% {opacity: 1;}
-	}
-	@keyframes appear {
-		0% {opacity: 0;}
-		100% {opacity: 1;}
-	}
-	
-	i {display: block;color: #f3f1f1;}
-	
-	.arrow {
-		position: absolute;
-		bottom: 0px;
-		left: 50%;
-		margin-left: -20px;
-		width: 40px;
-		height: 40px;
-		opacity: 0;
-		-webkit-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-		-moz-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-		animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-	}
-	@-webkit-keyframes bounce {
-		0%, 20%, 50%, 80%, 100% {
-			-webkit-transform: translateY(0);
-			transform: translateY(0);
-		}
-		40% {
-			-webkit-transform: translateY(-30px);
-			transform: translateY(-30px);
-		}
-		60% {
-			-webkit-transform: translateY(-15px);
-			transform: translateY(-15px);
-		}
-	}
-	@-moz-keyframes bounce {
-		0%, 20%, 50%, 80%, 100% {
-			-moz-transform: translateY(0);
-			transform: translateY(0);
-		}
-		40% {
-			-moz-transform: translateY(-30px);
-			transform: translateY(-30px);
-		}
-		60% {
-			-moz-transform: translateY(-15px);
-			transform: translateY(-15px);
-		}
-	}
-	@keyframes bounce {
-		0%, 20%, 50%, 80%, 100% {
-			-moz-transform: translateY(0);
-			-ms-transform: translateY(0);
-			-webkit-transform: translateY(0);
-			transform: translateY(0);
-		}
-		40% {
-			-moz-transform: translateY(-25px);
-			-ms-transform: translateY(-25px);
-			-webkit-transform: translateY(-25px);
-			transform: translateY(-25px);
-		}
-		60% {
-			-moz-transform: translateY(-15px);
-			-ms-transform: translateY(-15px);
-			-webkit-transform: translateY(-15px);
-			transform: translateY(-15px);
-		}
-	}
-		
-	.below { 
-		height: 0;
-		overflow: hidden;
-		background-color: #f3f1f1;
-		-webkit-animation: showcontent 1s ease-in 4s forwards;
-		-moz-animation: showcontent 1s ease-in 4s forwards;
-		animation: showcontent 1s ease-in 4s forwards;
-	}
-	@-webkit-keyframes showcontent {100% {height: auto;}}
-	@-moz-keyframes showcontent {100% {height: auto;}}
-	@keyframes showcontent {100% {height: auto;}}
-		
-	/** PORTFOLIO STYLES **/
-	.work-wrapper {
-		width: 100%; 
-		margin: 0 auto; 
-		display: flex; 
-		flex-direction: row; 
-		flex-wrap: wrap; 
-		justify-content: space-evenly; 
-		margin-top: 5%;
-	}
-	.work-item {
-		width: 28%; 
-		margin-bottom: 3%;
-	}
-	.portfolio-info {
-		width: 100%; 
-		text-align: left; 
-		padding: 2% 0% 4%;
-	}
-	.portfolio-info::before {
-		content: "";
-		display: block;
-		position: relative;
-		top: 0;
-		right: 0;
-		height: 2px;
-		background: #dcb24c;
-		width: 50%;
-	}
-	.project-name {
-		font-family: 'Montserrat', sans-serif; 
-		font-weight: 600; 
-		text-transform: uppercase;
-		letter-spacing: 1;
-		color: #4682b4;
-		font-size: 1.5vw;
-		margin-top: 2%;
-	}
-	.project-role {
-		text-transform: capitalize;
-		font-family: 'Bitter', serif; 
-		font-weight: 400;
-		font-style: italic;
-		color: #0f273f;
-		font-size: 1vw;
-		letter-spacing: 2;
-	}
-	
-	@media screen and (min-width: 1466px) {
-		.project-name {font-size: 22px;}
-		.project-role {font-size: 14.66px}
-	}
-	@media screen and (min-width: 767px) and (max-width: 980px){
-		.work-item {width: 38%;}
-		.project-role {font-size: 1.25vw; letter-spacing: 1.5;}
-		.project-name {font-size: 1.75vw;}
-	}
-	@media screen and (min-width: 1600px) {
-		.logo-name {font-size: 85px;} 
-		.logo-title {font-size: 25px;}
-		.menu-item {font-size: 64px;}
-	}
-	@media screen and (max-width: 767px) {
-		.desktop {display: none;}
-		.mobile {display: block;}
-		.logo-scale {width: 50%;}
-		.logo-name {font-size: 7.5vw;} 
-		.logo-title {font-size: 3.25vw;}
-		#mega-menu {padding: 76px 30px;}
-		.menu-item {font-size: 8vw; margin-bottom: 12%}
-		.work-item {width: 80%; margin-bottom: 9%;}
-		.project-name {font-size: 3.75vw;}
-		.project-role {font-size: 2.5vw;;}
-	}
+  a, a:visited, a:active, a:hover { text-decoration: none; }
+  *, *:after, *:before { box-sizing: border-box; }
+  body::-webkit-scrollbar { width: 0 !important }
+  body { overflow: -moz-scrollbars-none; }
+  body { -ms-overflow-style: none; }
+
+  /* Hamburger button (fixed + above overlay) */
+  #hamburger {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 4; /* stays above the menu overlay */
+    padding: 10px 12px;
+    display: inline-flex;                    /* puts label next to the icon */
+    align-items: center;
+    gap: 10px;                               /* space between lines and label */
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: none;
+    margin: 0;
+    overflow: visible;
+    transition: opacity 0.15s linear, filter 0.15s linear;
+    opacity: 0;
+    -webkit-animation: appear 1s ease-in-out 4s forwards;
+    -moz-animation: appear 1s ease-in-out 4s forwards;
+    animation: appear 1s ease-in-out 4s forwards;
+  }
+  #hamburger:focus {
+    outline: 2px solid #dcb24c; /* visible focus indicator for WCAG compliance */
+    outline-offset: 4px;
+  }
+  #hamburger:hover { opacity: 0.7; }
+  #hamburger.is-active:hover { opacity: 0.7; }
+  #hamburger.is-active .hamburger-inner,
+  #hamburger.is-active .hamburger-inner::before,
+  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
+
+  .hamburger-box {
+    width: 40px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+  }
+  .hamburger-inner {
+    display: block;
+    top: 50%;
+    margin-top: -2px;
+  }
+  .hamburger-inner,
+  .hamburger-inner::before,
+  .hamburger-inner::after {
+    width: 40px;
+    height: 4px;
+    background-color: #dcb24c;
+    border-radius: 4px;
+    position: absolute;
+    transition-property: transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+  }
+  .hamburger-inner::before,
+  .hamburger-inner::after {
+    content: "";
+    display: block;
+  }
+  .hamburger-inner::before { top: -10px; }
+  .hamburger-inner::after  { bottom: -10px; }
+
+  .hamburger--spin .hamburger-inner {
+    transition-duration: 0.22s;
+    transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  .hamburger--spin .hamburger-inner::before {
+    transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in;
+  }
+  .hamburger--spin .hamburger-inner::after {
+    transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  .hamburger--spin.is-active .hamburger-inner {
+    transform: rotate(225deg);
+    transition-delay: 0.12s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  .hamburger--spin.is-active .hamburger-inner::before {
+    top: 0;
+    opacity: 0;
+    transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out;
+  }
+  .hamburger--spin.is-active .hamburger-inner::after {
+    bottom: 0;
+    transform: rotate(-90deg);
+    transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  .hamburger-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #dcb24c;
+    /* no padding-top so it stays inline-centered with the lines */
+  }
+  #hamburger.is-active .hamburger-label { color: #f3f1f1; }
+
+  /* Menu overlay: transform+opacity (no left/width hacks -> no edge seam) */
+  #mega-menu {
+    position: fixed;
+    inset: 0;                  /* top:0; right:0; bottom:0; left:0 */
+    background-color: #0f273f;
+    padding: 76px;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateZ(0) scale(1.03);
+    transition: opacity .35s ease, transform .35s ease;
+    will-change: opacity, transform;
+  }
+  #mega-menu.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+  #mega-menu.not-active {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateZ(0) scale(1.03);
+  }
+
+  .menu-item {
+    text-transform: capitalize;
+    font-family: 'Bitter', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: #dcb24c;
+    font-size: 4vw;
+    margin-bottom: 6%;
+    text-align: left;
+    width: 100%;
+    border-bottom: 2px solid #f3f1f1;
+  }
 </style>
+
+<style>
+  body { margin: 0; padding: 0; background-color: #f3f1f1; text-align: center; }
+  .desktop { display: block; }
+  .mobile  { display: none; }
+
+  /** TITLE SCREEN **/
+  .nav-center-screen {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* Stable height with safe-area compensation to avoid 1–2px overflow */
+    height: calc(100svh - env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* Fallbacks for older browsers */
+    height: calc(var(--vh, 1vh) * 100);
+    background-color: #0f273f;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+    border-bottom: 10px solid rgba(90,145,191, 0);
+    box-sizing: border-box;
+    -webkit-animation: addborder 1s ease-in 4s forwards;
+    -moz-animation: addborder 1s ease-in 4s forwards;
+    animation: addborder 1s ease-in 4s forwards;
+  }
+
+  .logo-name {
+    font-size: 5.3125vw;
+    letter-spacing: 1;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0.5% auto;
+  }
+  .grey { color: #f3f1f1; }
+  .blue { color: #5A91BF; }
+  .logo-title {
+    font-size: 1.5625vw;
+    color: #dcb24c;
+    line-height: 1;
+    letter-spacing: 2;
+    font-family: 'Bitter', serif;
+    font-weight: 400;
+    font-style: italic;
+    text-transform: capitalize;
+  }
+  .logo-name, .logo-title {
+    text-align: center;
+    opacity: 0;
+    -webkit-animation: appear 1s ease-in 4s forwards;
+    -moz-animation: appear 1s ease-in 4s forwards;
+    animation: appear 1s ease-in 4s forwards;
+  }
+  @-webkit-keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
+  @-moz-keyframes appear    { 0% {opacity:0;} 100% {opacity:1;} }
+  @keyframes appear         { 0% {opacity:0;} 100% {opacity:1;} }
+
+  i { display: block; color: #f3f1f1; }
+
+  .arrow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -20px;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+    -webkit-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+    -moz-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+    animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
+  }
+  @-webkit-keyframes bounce {
+    0%,20%,50%,80%,100% { -webkit-transform: translateY(0); transform: translateY(0); }
+    40% { -webkit-transform: translateY(-30px); transform: translateY(-30px); }
+    60% { -webkit-transform: translateY(-15px); transform: translateY(-15px); }
+  }
+  @-moz-keyframes bounce {
+    0%,20%,50%,80%,100% { -moz-transform: translateY(0); transform: translateY(0); }
+    40% { -moz-transform: translateY(-30px); transform: translateY(-30px); }
+    60% { -moz-transform: translateY(-15px); transform: translateY(-15px); }
+  }
+  @keyframes bounce {
+    0%,20%,50%,80%,100% { transform: translateY(0); }
+    40% { transform: translateY(-25px); }
+    60% { transform: translateY(-15px); }
+  }
+
+  .below {
+    height: 0;
+    overflow: hidden;
+    background-color: #f3f1f1;
+    -webkit-animation: showcontent 1s ease-in 4s forwards;
+    -moz-animation: showcontent 1s ease-in 4s forwards;
+    animation: showcontent 1s ease-in 4s forwards;
+  }
+  @-webkit-keyframes showcontent { 100% { height: auto; } }
+  @-moz-keyframes showcontent    { 100% { height: auto; } }
+  @keyframes showcontent         { 100% { height: auto; } }
+
+  /** PORTFOLIO STYLES **/
+  .work-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-top: 5%;
+  }
+  .work-item { width: 28%; margin-bottom: 3%; }
+  .portfolio-info {
+    width: 100%;
+    text-align: left;
+    padding: 2% 0% 4%;
+  }
+  .portfolio-info::before {
+    content: "";
+    display: block;
+    position: relative;
+    top: 0;
+    right: 0;
+    height: 2px;
+    background: #dcb24c;
+    width: 50%;
+  }
+  .project-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1;
+    color: #4682b4;
+    font-size: 1.5vw;
+    margin-top: 2%;
+  }
+  .project-role {
+    text-transform: capitalize;
+    font-family: 'Bitter', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: #0f273f;
+    font-size: 1vw;
+    letter-spacing: 2;
+  }
+
+  @media screen and (min-width: 1466px) {
+    .project-name { font-size: 22px; }
+    .project-role { font-size: 14.66px; }
+  }
+  @media screen and (min-width: 767px) and (max-width: 980px){
+    .work-item { width: 38%; }
+    .project-role { font-size: 1.25vw; letter-spacing: 1.5; }
+    .project-name { font-size: 1.75vw; }
+  }
+  @media screen and (min-width: 1600px) {
+    .logo-name { font-size: 85px; }
+    .logo-title { font-size: 25px; }
+    .menu-item { font-size: 64px; }
+  }
+  @media screen and (max-width: 767px) {
+    .desktop { display: none; }
+    .mobile  { display: block; }
+    .logo-scale { width: 50%; }
+    .logo-name  { font-size: 7.5vw; }
+    .logo-title { font-size: 3.25vw; }
+    #mega-menu   { padding: 76px 30px; }
+    .menu-item   { font-size: 8vw; margin-bottom: 12% }
+    .work-item   { width: 80%; margin-bottom: 9%; }
+    .project-name { font-size: 3.75vw; }
+    .project-role { font-size: 2.5vw; }
+  }
+</style>
+
 <style>
 /* Container + SVG sizing */
-.logo { 
-  display: inline-block; 
-  width: clamp(200px, 60vw, 420px); /* responsive container width */
+.logo {
+  display: inline-block;
+  width: clamp(200px, 60vw, 420px);
   max-width: 100%;
-  overflow: hidden;                /* clip any overflow just in case */
+  overflow: hidden;
 }
-.logo svg { 
-  width: 100%; 
-  height: auto; 
-  display: block; 
+.logo svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* You can keep your page-level overrides if you need them */
-body {background-color: #0f273f;}
-.header-promo-bottom, #header, #footercontent {display: none;}
+/* Page-level overrides */
+body { background-color: #0f273f; }
+.header-promo-bottom, #header, #footercontent { display: none; }
 
 /* ===== Responsive stroke + timing variables ===== */
 :root{
@@ -494,19 +458,18 @@ body {background-color: #0f273f;}
   --seg3-start: 1.6s;
   --seg4-start: 2.4s;
 
-  /* Make the stroke responsive: scales down on small viewports, caps at 47px */
   --stroke-w: clamp(10px, 6vw, 47px);
 
-  --c12: #f3f1f1;   /* seg1 + seg2 */
-  --c34: #5A91BF;   /* seg3 + seg4 */
+  --c12: #f3f1f1;
+  --c34: #5A91BF;
 
   --seg1-final-dur: 1.8s;
   --seg2-final-dur: 1.8s;
   --seg3-final-dur: 1.8s;
   --seg4-final-dur: 1.8s;
 
-  --comet-len: 0;       
-  --seg1-comet-dur: 0s;  
+  --comet-len: 0;
+  --seg1-comet-dur: 0s;
   --seg2-comet-dur: 0s;
   --seg3-comet-dur: 0s;
   --seg4-comet-dur: 0s;
@@ -522,18 +485,13 @@ body {background-color: #0f273f;}
   stroke-width: var(--stroke-w);
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* IMPORTANT: let stroke scale with the SVG to avoid bleed on small screens */
-  /* vector-effect: non-scaling-stroke;  <-- removed on purpose */
-
   stroke-opacity: 0;
   stroke-dasharray: 0 1;
   stroke-dashoffset: 1;
-
   animation-name: comet-move, final-grow;
   animation-timing-function: cubic-bezier(.2,.6,.2,1), ease-in-out;
   animation-fill-mode: forwards, forwards;
 }
-
 .seg1, .seg2 { stroke: var(--c12); }
 .seg3, .seg4 { stroke: var(--c34); }
 
@@ -592,143 +550,116 @@ body {background-color: #0f273f;}
   }
 }
 
-/* Optional: tiny tweak for very small screens if you want thinner strokes */
 @media (max-width: 420px) {
   :root { --stroke-w: clamp(8px, 8vw, 28px); }
 }
 </style>
+
+<!-- svh override + fallback (now only for the hero) -->
 <style>
-  /* Use stable viewport units so sections don't jump when the URL bar collapses */
   .nav-center-screen {
-    height: 100svh;
-  }
-  #mega-menu.is-active {
-    height: 100svh;
-  }
-  #mega-menu.not-active {
-    height: 125svh;
+    height: calc(100svh - env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* Fallback for browsers without svh support */
   @supports not (height: 100svh) {
     .nav-center-screen {
       height: calc(var(--vh, 1vh) * 100);
-    }
-    #mega-menu.is-active {
-      height: calc(var(--vh, 1vh) * 100);
-    }
-    #mega-menu.not-active {
-      height: calc(var(--vh, 1vh) * 125);
+      padding-bottom: 0;
     }
   }
 </style>
 
-	
-
 <div class="page">
-	<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false">
-	  <span class="hamburger-box" aria-hidden="true">
-		<span class="hamburger-inner"></span>
-	  </span>
-	  <span class="hamburger-label">Menu</span>
-	</button>
-	<div class="nav-center-screen">
-		
-		<div class="w-100 text-center">
-		  <div class="logo">
-			<svg 
-			  xmlns="http://www.w3.org/2000/svg" 
-			  viewBox="0 0 500 500" 
-			  preserveAspectRatio="xMidYMid meet"
-			  aria-hidden="true" 
-			  focusable="false"
-			>
-			  <defs>
-				<!-- ===== CENTERLINE STROKES (pathLength=1 normalizes dash units 0..1) ===== -->
-				<path id="p1" pathLength="1" d="M161.7,181.1c0,0,40.3-38.4,40.3-38.4c61.9,271-33.8,339.2-93.3,317c-2.4-0.9-4.8-2-7.1-3.2  c-2.2-1.2-4.3-2.4-6.4-3.8" />
-				<path id="p2" pathLength="1" d="M108.6,459.7c-2.4-0.9-4.8-2-7.1-3.2c-2.2-1.2-4.3-2.4-6.4-3.8c-56-38.3-52.9-169.2,245-255.7" />
-				<path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
-				<path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
+  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false">
+    <span class="hamburger-box" aria-hidden="true">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="hamburger-label">Menu</span>
+  </button>
 
-				<!-- ===== OUTLINED (TAPERED) FILLS — non-overlapping where possible ===== -->
-				<path id="op1" d="M233.4,247c-0.2-1.4-0.4-2.7-0.6-4.1c-1-6.1-2-12.1-3.2-18.2c-6.1-32.1-14.9-63.3-25.2-94  c-14.1,16.2-29.2,33.6-42.7,50.3c11.6-8.5,24-18,35.7-27.2c3.4,26.8,6.1,53.6,7.6,80.2c0.2,3.9,0.4,7.7,0.6,11.6  c0.2,5.5,0.4,11.1,0.5,16.6c0.5,27.6-0.8,55.5-5.4,82.4c-6.4,37.3-24.5,92.9-67.2,97.3c-7.3,0.5-14.2-0.9-20.3-3.8  c-2-0.9-3.9-2.1-5.7-3.3l-23,36.4c1.9,1.2,3.8,2.4,5.8,3.5c3.9,2.2,8.1,4,12.4,5.5c39,14,79.8-4.1,102.7-36.6  C244.1,388.9,242.8,311,233.4,247z" />
-				<path id="op2" d="M251.3,217.6c-7.3,2.3-14.6,4.6-21.8,7.2c-8.3,2.9-16.5,6-24.6,9.3c-21.6,8.8-42.6,19-62.5,31.2  c-34.4,21.2-67.6,49.3-85.3,86.7c-7.3,15.4-11.4,32.5-10.9,49.8c0.5,29.9,17.7,58.6,43.8,73c2,1.1,4,2.1,6.1,3l23.1-37.3  c-2.2-0.6-4.3-1.4-6.3-2.3c-14.3-6.7-24.2-21.5-25-38.3c-1.8-27.7,17.1-55.8,36.2-75.7c23.7-24.5,52-44.5,81.7-61.9  c9-5.3,18.2-10.4,27.4-15.2c8.2-4.3,16.4-8.5,24.6-12.6c11.3-5.6,23.3-11.3,34.8-16.5c15.6-7.1,31.4-14,47.3-20.9  C310.1,201.7,280.4,208.7,251.3,217.6z" />
-				<path id="op3" d="M255.3,206.5c-20.8-15.1-19.1-50.7-15.4-73.4c6.5-40.9,35.1-108.9,76.3-124.7c18-6.7,39.2,2,48.1,18.8  c1.9,3.4,3.3,7.2,4.1,11.1c9.4,42.8-12.8,91.6-30.7,129.3c-21.7,44.9-47.4,86.3-66.7,132c-9.2,22.6-16.8,45.8-15.2,70.7  c-2.5-5.8-4.1-12-5.2-18.4c-1-6.3-1.5-12.8-1.5-19.3c0.2-25.8,6.7-51,14.6-75.4c13.6-41.6,32.7-81.1,49-121.1  c10.1-25.6,24.5-61,20.6-88.4c0,0-0.3-1.7-0.3-1.7l-0.1-0.8c-0.1-0.2-0.1-0.3-0.1-0.5c0-0.1-0.1-0.2-0.1-0.2c-0.6-2.3-3.2-4-5.6-3.5  c-5.3,1.6-9.4,4.8-14.4,9c-4,3.5-7.9,7.5-11.5,11.6C276.8,88.5,230.3,172.6,255.3,206.5L255.3,206.5z" />
-				<path id="op4" d="M189.7,367c-21.9-6.3-39.5-25.3-30.6-49.3c8.8-22,32.6-33.2,54.8-35.9c24.3-2.9,48.9,3.4,70,15.1  c13.9,7.7,28.7,16.8,42.4,24.6c33.5,18.6,78.3,45.4,115.8,26.8c6.2-3,12.2-6.9,15.1-12.9c4.5-10.8-3.3-23.3-10.5-31.7  c-3.1-3.5-6.4-6.7-10.4-9.1c9.9,1.4,18.7,6.9,26,13.7c8.2,7.7,14.1,19,12.4,31.2c-1.8,12.5-10.2,22.1-19.7,29.3  c-17.5,13.7-41.1,18.6-62.7,16.2c-40.2-4.4-75.7-25.5-108.9-46c-5.3-3.3-14.9-9.5-20.1-12.6c-7.8-4.6-16.1-8.4-24.6-11.1  c-13.1-4-26.9-5.4-40.3-2.4c-11.8,2.8-24.7,9.5-26.5,22.1C170.6,347.9,180.6,358.6,189.7,367L189.7,367z" />
+  <div class="nav-center-screen">
+    <div class="w-100 text-center">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+          <defs>
+            <path id="p1" pathLength="1" d="M161.7,181.1c0,0,40.3-38.4,40.3-38.4c61.9,271-33.8,339.2-93.3,317c-2.4-0.9-4.8-2-7.1-3.2  c-2.2-1.2-4.3-2.4-6.4-3.8" />
+            <path id="p2" pathLength="1" d="M108.6,459.7c-2.4-0.9-4.8-2-7.1-3.2c-2.2-1.2-4.3-2.4-6.4-3.8c-56-38.3-52.9-169.2,245-255.7" />
+            <path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
+            <path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
+            <path id="op1" d="M233.4,247c-0.2-1.4-0.4-2.7-0.6-4.1c-1-6.1-2-12.1-3.2-18.2c-6.1-32.1-14.9-63.3-25.2-94  c-14.1,16.2-29.2,33.6-42.7,50.3c11.6-8.5,24-18,35.7-27.2c3.4,26.8,6.1,53.6,7.6,80.2c0.2,3.9,0.4,7.7,0.6,11.6  c0.2,5.5,0.4,11.1,0.5,16.6c0.5,27.6-0.8,55.5-5.4,82.4c-6.4,37.3-24.5,92.9-67.2,97.3c-7.3,0.5-14.2-0.9-20.3-3.8  c-2-0.9-3.9-2.1-5.7-3.3l-23,36.4c1.9,1.2,3.8,2.4,5.8,3.5c3.9,2.2,8.1,4,12.4,5.5c39,14,79.8-4.1,102.7-36.6  C244.1,388.9,242.8,311,233.4,247z" />
+            <path id="op2" d="M251.3,217.6c-7.3,2.3-14.6,4.6-21.8,7.2c-8.3,2.9-16.5,6-24.6,9.3c-21.6,8.8-42.6,19-62.5,31.2  c-34.4,21.2-67.6,49.3-85.3,86.7c-7.3,15.4-11.4,32.5-10.9,49.8c0.5,29.9,17.7,58.6,43.8,73c2,1.1,4,2.1,6.1,3l23.1-37.3  c-2.2-0.6-4.3-1.4-6.3-2.3c-14.3-6.7-24.2-21.5-25-38.3c-1.8-27.7,17.1-55.8,36.2-75.7c23.7-24.5,52-44.5,81.7-61.9  c9-5.3,18.2-10.4,27.4-15.2c8.2-4.3,16.4-8.5,24.6-12.6c11.3-5.6,23.3-11.3,34.8-16.5c15.6-7.1,31.4-14,47.3-20.9  C310.1,201.7,280.4,208.7,251.3,217.6z" />
+            <path id="op3" d="M255.3,206.5c-20.8-15.1-19.1-50.7-15.4-73.4c6.5-40.9,35.1-108.9,76.3-124.7c18-6.7,39.2,2,48.1,18.8  c1.9,3.4,3.3,7.2,4.1,11.1c9.4,42.8-12.8,91.6-30.7,129.3c-21.7,44.9-47.4,86.3-66.7,132c-9.2,22.6-16.8,45.8-15.2,70.7  c-2.5-5.8-4.1-12-5.2-18.4c-1-6.3-1.5-12.8-1.5-19.3c0.2-25.8,6.7-51,14.6-75.4c13.6-41.6,32.7-81.1,49-121.1  c10.1-25.6,24.5-61,20.6-88.4c0,0-0.3-1.7-0.3-1.7l-0.1-0.8c-0.1-0.2-0.1-0.3-0.1-0.5c0-0.1-0.1-0.2-0.1-0.2c-0.6-2.3-3.2-4-5.6-3.5  c-5.3,1.6-9.4,4.8-14.4,9c-4,3.5-7.9,7.5-11.5,11.6C276.8,88.5,230.3,172.6,255.3,206.5L255.3,206.5z" />
+            <path id="op4" d="M189.7,367c-21.9-6.3-39.5-25.3-30.6-49.3c8.8-22,32.6-33.2,54.8-35.9c24.3-2.9,48.9,3.4,70,15.1  c13.9,7.7,28.7,16.8,42.4,24.6c33.5,18.6,78.3,45.4,115.8,26.8c6.2-3,12.2-6.9,15.1-12.9c4.5-10.8-3.3-23.3-10.5-31.7  c-3.1-3.5-6.4-6.7-10.4-9.1c9.9,1.4,18.7,6.9,26,13.7c8.2,7.7,14.1,19,12.4,31.2c-1.8,12.5-10.2,22.1-19.7,29.3  c-17.5,13.7-41.1,18.6-62.7,16.2c-40.2-4.4-75.7-25.5-108.9-46c-5.3-3.3-14.9-9.5-20.1-12.6c-7.8-4.6-16.1-8.4-24.6-11.1  c-13.1-4-26.9-5.4-40.3-2.4c-11.8,2.8-24.7,9.5-26.5,22.1C170.6,347.9,180.6,358.6,189.7,367L189.7,367z" />
+            <clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
+            <clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
+            <clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
+            <clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
+          </defs>
+          <g clip-path="url(#clip1)"><use href="#p1" class="draw seg1"/></g>
+          <g clip-path="url(#clip2)"><use href="#p2" class="draw seg2"/></g>
+          <g clip-path="url(#clip3)"><use href="#p3" class="draw seg3"/></g>
+          <g clip-path="url(#clip4)"><use href="#p4" class="draw seg4"/></g>
+        </svg>
+      </div>
+    </div>
 
-				<!-- ===== CLIP PATHS ===== -->
-				<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
-				<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
-				<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
-				<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
-			  </defs>
+    <div class="logo-name"><span class="grey">Jonathan</span> <span class="blue">Legiadre</span></div>
+    <div class="logo-title">Graphic Designer + Front-End Developer</div>
+    <div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
+  </div>
 
-			  <!-- Render: each centerline drawn with stroke, clipped by its outline -->
-			  <g clip-path="url(#clip1)"><use href="#p1" class="draw seg1"/></g>
-			  <g clip-path="url(#clip2)"><use href="#p2" class="draw seg2"/></g>
-			  <g clip-path="url(#clip3)"><use href="#p3" class="draw seg3"/></g>
-			  <g clip-path="url(#clip4)"><use href="#p4" class="draw seg4"/></g>
-			</svg>
-		  </div>
-		</div>
+  <div id="mega-menu">
+    <a href="#work"><div class="menu-item">Work</div></a>
+    <a href="#about"><div class="menu-item">About</div></a>
+    <a href="#contact"><div class="menu-item">Contact</div></a>
+  </div>
 
-		
-		
-		
-		<div class="logo-name"><span class="grey">Jonathan</span> <span class="blue">Legiadre</span></div>
-		<div class="logo-title">Graphic Designer + Front-End Developer</div>
-		<div class="arrow-fade"><div class="arrow"><i class="fa fa-angle-down fa-3x" aria-hidden="true"></i></div></div>
-	</div>
-	<div id="mega-menu">
-		<a href="#work"><div class="menu-item">Work</div></a>
-		<a href="#about"><div class="menu-item">About</div></a>
-		<a href="#contact"><div class="menu-item">Contact</div>	</a>
-	</div>
-	<div class="below">
-		<a id="work"></a>
-		<div class="work-wrapper">
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>	
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>
-			<div class="work-item">
-				<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
-				<div class="portfolio-info">
-					<div class="project-name">typezero</div>
-					<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-				</div>
-			</div>		
-		</div>
-	</div>
+  <div class="below">
+    <a id="work"></a>
+    <div class="work-wrapper">
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div> 
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero">
+        <div class="portfolio-info">
+          <div class="project-name">typezero</div>
+          <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
