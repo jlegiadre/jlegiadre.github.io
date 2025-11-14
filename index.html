@@ -12,10 +12,7 @@
       }
 
       document.addEventListener('DOMContentLoaded', setVH);
-
-      window.addEventListener('orientationchange', () => {
-        setTimeout(setVH, 250);
-      });
+      window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
 
       if (window.visualViewport) {
         let last = window.visualViewport.height;
@@ -37,18 +34,10 @@
       function trapFocus(container, e) {
         const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
           .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
-        if (focusables.length === 0) return;
-
-        const first = focusables[0];
-        const last  = focusables[focusables.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+        if (!focusables.length) return;
+        const first = focusables[0], last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
 
       function openMenu(hamburger, menu) {
@@ -57,11 +46,8 @@
         menu.classList.add('is-active');
         hamburger.classList.add('is-active');
         hamburger.setAttribute('aria-expanded', 'true');
-
-        const firstLink = menu.querySelector('a');
-        if (firstLink) firstLink.focus();
+        const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
       }
-
       function closeMenu(hamburger, menu, restoreTo) {
         document.body.classList.remove('menu-open');
         menu.classList.remove('is-active');
@@ -70,10 +56,9 @@
         hamburger.setAttribute('aria-expanded', 'false');
         if (restoreTo) restoreTo.focus();
       }
-
       function toggleMenu(hamburger, menu) {
-        const isOpen = menu.classList.contains('is-active');
-        isOpen ? closeMenu(hamburger, menu, hamburger) : openMenu(hamburger, menu);
+        menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
+                                             : openMenu(hamburger, menu);
       }
 
       document.addEventListener('DOMContentLoaded', () => {
@@ -84,33 +69,20 @@
         if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
           megaMenu.classList.add('not-active');
         }
-
-        // Click toggles
         hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-        // Close when clicking a menu link (delegated)
         megaMenu.addEventListener('click', (e) => {
           const link = e.target.closest('a');
           if (link) closeMenu(hamburger, megaMenu, hamburger);
         });
-
-        // Close if clicking overlay background
         megaMenu.addEventListener('click', (e) => {
           if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
         });
 
-        // ESC to close + focus trap
         document.addEventListener('keydown', (e) => {
           if (!megaMenu.classList.contains('is-active')) return;
-
-          if (e.key === 'Escape') {
-            e.preventDefault();
-            closeMenu(hamburger, megaMenu, hamburger);
-            return;
-          }
-          if (e.key === 'Tab') {
-            trapFocus(megaMenu, e);
-          }
+          if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
+          if (e.key === 'Tab') { trapFocus(megaMenu, e); }
         });
       });
     })();
@@ -120,56 +92,41 @@
   <script>
     (function () {
       let ticking = false;
-
-      function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
-
+      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
       function onScroll(arrowFade) {
         const y = window.scrollY || window.pageYOffset || 0;
-        const opacity = clamp(1 - y / 300, 0, 1);
-        arrowFade.style.opacity = String(opacity);
+        arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
         ticking = false;
       }
-
       function requestTick(arrowFade) {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(() => onScroll(arrowFade));
-        }
+        if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
       }
-
       document.addEventListener('DOMContentLoaded', () => {
         const arrowFade = document.querySelector('.arrow-fade');
         if (!arrowFade) return;
-
         onScroll(arrowFade);
         window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
       });
     })();
   </script>
-  
+
   <!-- Logo animation replay (double-click/tap) -->
   <script>
     (function () {
       function enableLogoReplay() {
         const logo = document.querySelector('.logo');
         if (!logo) return;
-
         logo.addEventListener('dblclick', () => {
           const svg = logo.querySelector('svg');
           if (!svg) return;
-
           const clone = svg.cloneNode(true);
           if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
           if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
           svg.replaceWith(clone);
         }, { passive: true });
       }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', enableLogoReplay);
-      } else {
-        enableLogoReplay();
-      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
+      else enableLogoReplay();
     })();
   </script>
 </head>
@@ -177,48 +134,33 @@
 <style>
   /* Generic Page Settings */
   html { scrollbar-gutter: stable both-edges; }
-  * { scrollbar-width: thin; } 
-  *::-webkit-scrollbar { width: 8px; height: 8px; } 
+  * { scrollbar-width: thin; }
+  *::-webkit-scrollbar { width: 8px; height: 8px; }
   *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
   *::-webkit-scrollbar-track { background: transparent; }
   body.menu-open { overflow: hidden; }
-  body { margin: 0; padding: 0; text-align: center; }
+  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f;}
   a, a:visited, a:active, a:hover { text-decoration: none; }
   *, *:after, *:before { box-sizing: border-box; }
 
   /* Branding utilities */
   .off-white { color: #f3f1f1; }
   .light-blue { color: #5A91BF; }
+  .dark-blue { color: #0f273f; }
+  .mustard {color: #dcb24c;}
   .font-mont { font-family: 'Montserrat', sans-serif; }
   .font-bitter { font-family: 'Bitter', serif; }
 
   /* Hamburger button */
   #hamburger {
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    z-index: 4;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 12px;
-    cursor: pointer;
-    font: inherit;
-    color: inherit;
-    background: transparent;
-    border: none;
-    margin: 0;
-    overflow: visible;
-    transition: opacity 0.15s linear, filter 0.15s linear;
-    opacity: 0;
-    -webkit-animation: appear 1s ease-in-out 4s forwards;
-    -moz-animation: appear 1s ease-in-out 4s forwards;
-    animation: appear 1s ease-in-out 4s forwards;
+    position: fixed; top: 12px; right: 12px; z-index: 4;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
+    overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
+    opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
   }
   #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
-  #hamburger:hover { opacity: 0.7; }
-  #hamburger.is-active:hover { opacity: 0.7; }
+  #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
   #hamburger.is-active .hamburger-inner,
   #hamburger.is-active .hamburger-inner::before,
   #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1; }
@@ -232,66 +174,28 @@
   .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
   .hamburger-inner::before { top: -10px; }
   .hamburger-inner::after  { bottom: -10px; }
-
-  .hamburger--spin .hamburger-inner {
-    transition-duration: 0.22s;
-    transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-  .hamburger--spin .hamburger-inner::before {
-    transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in;
-  }
-  .hamburger--spin .hamburger-inner::after {
-    transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-  .hamburger--spin.is-active .hamburger-inner {
-    transform: rotate(225deg);
-    transition-delay: 0.12s;
-    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  .hamburger--spin.is-active .hamburger-inner::before {
-    top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out;
-  }
-  .hamburger--spin.is-active .hamburger-inner::after {
-    bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  .hamburger-label {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 12px;
-    color: #dcb24c;
-  }
+  .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
+  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in; }
+  .hamburger--spin .hamburger-inner::after { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19); }
+  .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
+  .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
+  .hamburger--spin.is-active .hamburger-inner::after { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
+  .hamburger-label { font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px; color: #dcb24c; }
   #hamburger.is-active .hamburger-label { color: #f3f1f1; }
 
   /* Menu overlay */
   #mega-menu {
-    position: fixed;
-    inset: 0;
-    background-color: #0f273f;
-    padding: 76px;
-    z-index: 3;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateZ(0) scale(1.03);
-    transition: opacity .35s ease, transform .35s ease;
-    will-change: opacity, transform;
+    position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
+    opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
+    transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
   }
   #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
   #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
   .menu-item {
-    display: block;
-    text-transform: capitalize;
-    font-family: 'Bitter', serif;
-    font-weight: 400;
-    font-style: italic;
-    color: #dcb24c;
-    font-size: clamp(24px, 8vw, 64px);
-    margin-bottom: 6%;
-    text-align: left;
-    width: 100%;
-    border-bottom: 2px solid #f3f1f1;
-    outline: none;
+    display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
+    color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
+    border-bottom: 2px solid #f3f1f1; outline: none;
   }
   .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
 
@@ -300,7 +204,7 @@
     width: 100%;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
-    border-bottom: 10px solid rgba(90,145,191, 0);
+    border-bottom: 10px solid rgba(90,145,191,0);
     height: calc(100svh - env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -308,144 +212,38 @@
     .nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
   }
 
-  .logo-name {
-    font-size: clamp(32px, 7.5vw, 85px);
-    letter-spacing: 1;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin: 0.5% auto;
-  }
-  .logo-title {
-    font-size: clamp(14px, 3.25vw, 25px);
-    color: #dcb24c;
-    line-height: 1;
-    letter-spacing: 2;
-    font-weight: 400;
-    font-style: italic;
-    text-transform: capitalize;
-  }
-  .logo-name, .logo-title {
-    text-align: center; opacity: 0;
-    -webkit-animation: appear 1s ease-in 4s forwards;
-    -moz-animation: appear 1s ease-in 4s forwards;
-    animation: appear 1s ease-in 4s forwards;
-  }
-  @-webkit-keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
-  @-moz-keyframes appear    { 0% {opacity:0;} 100% {opacity:1;} }
-  @keyframes appear         { 0% {opacity:0;} 100% {opacity:1;} }
+  .logo-name { font-size: clamp(32px, 7.5vw, 85px); letter-spacing: 1.2; line-height: 0.9; font-weight: 600; text-transform: uppercase; margin: 0.5% auto; }
+  .logo-title { font-size: clamp(14px, 3.25vw, 25px); color: #dcb24c; line-height: 1.2; letter-spacing: 2; font-weight: 400; font-style: italic; text-transform: capitalize; }
+  .logo-name, .logo-title { text-align: center; opacity: 0; animation: appear 1s ease-in 4s forwards; }
+  @keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
 
-  .arrow {
-    position: absolute; bottom: 0; left: 50%; margin-left: -20px;
-    width: 40px; height: 40px; opacity: 0;
-    -webkit-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-    -moz-animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-    animation: bounce 2s infinite, appear 1s ease-in 4s forwards;
-  }
+  .arrow { position: absolute; bottom: 0; left: 50%; margin-left: -20px; width: 40px; height: 40px; opacity: 0; animation: bounce 2s infinite, appear 1s ease-in 4s forwards; }
   .arrow svg { width: 40px; height: 40px; display: block; }
   .arrow path { fill: #f3f1f1; }
-  @-webkit-keyframes bounce {
-    0%,20%,50%,80%,100% { -webkit-transform: translateY(0); transform: translateY(0); }
-    40% { -webkit-transform: translateY(-30px); transform: translateY(-30px); }
-    60% { -webkit-transform: translateY(-15px); transform: translateY(-15px); }
-  }
-  @-moz-keyframes bounce {
-    0%,20%,50%,80%,100% { -moz-transform: translateY(0); transform: translateY(0); }
-    40% { -moz-transform: translateY(-30px); transform: translateY(-30px); }
-    60% { -moz-transform: translateY(-15px); transform: translateY(-15px); }
-  }
-  @keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-25px); }
-    60% { transform: translateY(-15px); }
-  }
+  @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-25px); } 60% { transform: translateY(-15px); } }
 
-  .below {
-    height: 0; overflow: hidden; background-color: #f3f1f1;
-    -webkit-animation: showcontent 1s ease-in 4s forwards;
-    -moz-animation: showcontent 1s ease-in 4s forwards;
-    animation: showcontent 1s ease-in 4s forwards;
-  }
-  @-webkit-keyframes showcontent { 100% { height: auto; } }
-  @-moz-keyframes showcontent    { 100% { height: auto; } }
-  @keyframes showcontent         { 100% { height: auto; } }
+  .below { height: 0; overflow: hidden; background-color: #f3f1f1; animation: showcontent 1s ease-in 4s forwards; }
+  @keyframes showcontent { 100% { height: auto; } }
 
   /** PORTFOLIO STYLES **/
-  .work-wrapper {
-    width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap;
-    justify-content: space-evenly; margin-top: 5%;
-  }
+  .work-wrapper { width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; }
   .work-item { width: 80%; margin-bottom: 9%; }
   .portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
-  .portfolio-info::before {
-    content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%;
-  }
-  .project-name {
-    font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 1; color: #4682b4; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%;
-  }
-  .project-role {
-    text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f;
-    font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2;
-  }
+  .portfolio-info::before { content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%; }
+  .project-name { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1; color: #4682b4; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%; }
+  .project-role { text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f; font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2; }
 
-  @media (max-width: 767px) {
-    #mega-menu { padding: 76px 30px; }
-    .menu-item { margin-bottom: 12%; }
-  }
-
+  @media (max-width: 767px) { #mega-menu { padding: 76px 30px; } .menu-item { margin-bottom: 12%; } }
   @media (min-width: 768px) {
     .work-item { width: 45%; margin-bottom: 3%; }
     .project-name { font-size: clamp(18px, 1.75vw, 22px); }
     .project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
     .menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
   }
-
-  @media (min-width: 1024px) {
-    .work-item { width: 28%; }
-  }
-
-  /* -------------------------------------------------------
-     LANDSCAPE PHONE TUNING (short, wide viewports)
-     Triggers on small heights to cap everything by height
-  ------------------------------------------------------- */
-  @media (orientation: landscape) and (max-height: 480px) {
-    /* Make hero breathe a bit and avoid clipping */
-    .nav-center-screen {
-      padding-top: 8px;
-      padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
-      gap: 6px;
-    }
-
-    /* Constrain logo primarily by height */
-    .logo {
-      /* never larger than 42vmin, but keep reasonable min/max */
-      width: clamp(160px, 42vmin, 360px);
-    }
-
-    /* Slim the stroke so lines don’t look too heavy when scaled down */
-    :root { --stroke-w: clamp(6px, 4vmin, 22px); }
-
-    /* Scale name/title with vmin (height-aware) and tighten spacing */
-    .logo-name  { font-size: clamp(20px, 6vmin, 48px); margin-top: 6px; }
-    .logo-title { font-size: clamp(12px, 3.5vmin, 20px); }
-
-    /* The bounce arrow competes for vertical space here—hide it */
-    .arrow { display: none; }
-
-    /* Menu overlay padding should be smaller in short viewports */
-    #mega-menu { padding: 48px 32px; }
-  }
-
-  /* A slightly taller landscape (tablets/some phones) */
-  @media (orientation: landscape) and (min-height: 481px) and (max-height: 640px) {
-    .logo       { width: clamp(180px, 48vmin, 400px); }
-    :root       { --stroke-w: clamp(7px, 4.5vmin, 26px); }
-    .logo-name  { font-size: clamp(24px, 6.5vmin, 56px); }
-    .logo-title { font-size: clamp(12px, 3.8vmin, 22px); }
-    #mega-menu  { padding: 56px 40px; }
-  }
+  @media (min-width: 1024px) { .work-item { width: 28%; } }
 </style>
 
+<!-- Logo animation styles -->
 <style>
   .logo {
     display: inline-block;
@@ -457,45 +255,39 @@
   }
   .logo svg { width: 100%; height: auto; display: block; }
 
-  /* ===== Responsive stroke + timing variables ===== */
   :root{
     --seg1-start: 0s;
-    --seg2-start: 0.658s;
-    --seg3-start: 1.6s;
-    --seg4-start: 2.4s;
-
+    --seg2-start: 0.575s;
+    --seg3-start: 1.2s;
+    --seg4-start: 1.9s;
     --stroke-w: clamp(10px, 6vw, 47px);
-
     --c12: #f3f1f1;
     --c34: #5A91BF;
-
-    --seg1-final-dur: 1.8s;
-    --seg2-final-dur: 1.8s;
-    --seg3-final-dur: 1.8s;
-    --seg4-final-dur: 1.8s;
-
-    --comet-len: 0;
-    --seg1-comet-dur: 0s;
-    --seg2-comet-dur: 0s;
-    --seg3-comet-dur: 0s;
-    --seg4-comet-dur: 0s;
-
-    --seg1-gap: 0s;
-    --seg2-gap: 0s;
-    --seg3-gap: 0s;
-    --seg4-gap: 0s;
+    --seg1-final-dur: 1.6s;
+    --seg2-final-dur: 1.6s;
+    --seg3-final-dur: 1.6s;
+    --seg4-final-dur: 1.6s;
   }
 
-  /* final-grow only (no opacity flicker, ends stay off exact boundaries) */
+  /* Flash-free + no prestart nubs:
+     1) keep a tiny epsilon dash, but
+     2) keep the segment hidden until its own start via zero-duration `reveal` */
   .draw-final{
     fill: none;
     stroke-width: var(--stroke-w);
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke: currentColor;
+
+    /* epsilon so the cap doesn't sit exactly on endpoints when drawn */
     stroke-dasharray: .02 1;
     stroke-dashoffset: 1;
-    animation: final-grow-dash var(--segX-dur, 1.8s) ease-in-out forwards;
+
+    /* hidden until reveal fires at the segment's start */
+    visibility: hidden;
+
+    will-change: stroke-dasharray, stroke-dashoffset, visibility;
+    shape-rendering: geometricPrecision;
   }
 
   .seg1 { color: var(--c12); }
@@ -503,13 +295,36 @@
   .seg3 { color: var(--c34); }
   .seg4 { color: var(--c34); }
 
-  .seg1.draw-final { --segX-dur: var(--seg1-final-dur); animation-delay: var(--seg1-start); }
-  .seg2.draw-final { --segX-dur: var(--seg2-final-dur); animation-delay: var(--seg2-start); }
-  .seg3.draw-final { --segX-dur: var(--seg3-final-dur); animation-delay: var(--seg3-start); }
-  .seg4.draw-final { --segX-dur: var(--seg4-final-dur); animation-delay: var(--seg4-start); }
+  /* Per-segment schedules */
+  .seg1.draw-final {
+    --segX-dur: var(--seg1-final-dur);
+    animation:
+      reveal 0s step-end var(--seg1-start) forwards,
+      final-grow-dash var(--seg1-final-dur) ease-in-out var(--seg1-start) forwards;
+  }
+  .seg2.draw-final {
+    --segX-dur: var(--seg2-final-dur);
+    animation:
+      reveal 0s step-end var(--seg2-start) forwards,
+      final-grow-dash var(--seg2-final-dur) ease-in-out var(--seg2-start) forwards;
+  }
+  .seg3.draw-final {
+    --segX-dur: var(--seg3-final-dur);
+    animation:
+      reveal 0s step-end var(--seg3-start) forwards,
+      final-grow-dash var(--seg3-final-dur) ease-in-out var(--seg3-start) forwards;
+  }
+  .seg4.draw-final {
+    --segX-dur: var(--seg4-final-dur);
+    animation:
+      reveal 0s step-end var(--seg4-start) forwards,
+      final-grow-dash var(--seg4-final-dur) ease-in-out var(--seg4-start) forwards;
+  }
+
+  @keyframes reveal { to { visibility: visible; } }
 
   @keyframes final-grow-dash{
-    0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1;     }
+    0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
     100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
   }
 
@@ -520,9 +335,7 @@
 
 <div class="page">
   <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
-    <span class="hamburger-box" aria-hidden="true">
-      <span class="hamburger-inner"></span>
-    </span>
+    <span class="hamburger-box" aria-hidden="true"><span class="hamburger-inner"></span></span>
     <span class="hamburger-label">Menu</span>
   </button>
 
@@ -536,7 +349,6 @@
             <path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
             <path id="p3" pathLength="1" d="M255.3,206.5c-36.7-34.9,20-164.5,65.6-181.6c12.6-4.7,26.4,3,29.5,16.1c19.6,81.7-117,237.6-94.7,329.3" />
             <path id="p4" pathLength="1" d="M189.7,367c-64.7-36.6,6.7-101.3,86.4-54c48.5,28.8,114.6,75,165.6,49.3s10.3-62.9-5.3-67.8" />
-
             <!-- Outline clips -->
             <path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4c0,0-4.9,5.3-4.9,5.3   c-12,13-25.7,28.1-37.4,41.5c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1   c0.6,13.5,0.7,26.9,0.4,40.4c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.6-8.1-42.9-22.1l-22.1,20.5   c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
             <path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
@@ -549,6 +361,7 @@
             <clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
           </defs>
 
+          <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
           <g style="shape-rendering:geometricPrecision">
             <g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
             <g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
@@ -579,6 +392,7 @@
 
   <div class="below">
     <div id="work"></div>
+	  <div class="section-heading">Work</div>
     <div class="work-wrapper">
       <div class="work-item">
         <img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
@@ -623,5 +437,9 @@
         </div>
       </div>
     </div>
+    <div id="about"></div>
+	  <div class="section-heading">About</div>
+    <div id="contact"></div>
+	  <div class="section-heading">Contact</div>
   </div>
 </div>
