@@ -1,0 +1,70 @@
+<style>
+/* SVG stroke “draw-on” animation (works with your pathLength="1") */
+/* Drop this CSS anywhere after your SVG or in your stylesheet */
+
+/* Base styling for animated stroke */
+svg .draw-once {
+  /* Visuals */
+  stroke: currentColor;           /* inherits from text color, customize if needed */
+  stroke-width: 6;                /* adjust to taste */
+  stroke-linecap: round;          /* smoother ends */
+  fill: none;
+
+  /* Keep stroke width consistent if SVG scales */
+  vector-effect: non-scaling-stroke;
+
+  /* Dash setup: with pathLength="1", a dash of 1 spans the entire path */
+  --dash: 1;
+  stroke-dasharray: var(--dash);
+  stroke-dashoffset: var(--dash);
+
+  /* Animation controls (override per-segment if you like) */
+  --draw-duration: 2.5s;
+  --draw-delay: 0ms;
+  --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Animate once and keep the final state */
+  animation: svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards;
+
+  /* Small perf hint */
+  will-change: stroke-dashoffset;
+}
+
+/* Example: customize timing per segment (your SVG has .seg1) */
+svg .seg1 {
+  --draw-duration: 2s;
+  --draw-delay: 100ms;
+}
+
+/* The actual animation: moves the dash to reveal the stroke */
+@keyframes svg-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Optional: pause/disable motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  svg .draw-once {
+    animation: none;
+    stroke-dashoffset: 0; /* show the path immediately */
+  }
+}
+
+</style>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <defs>
+	<!-- Centerline paths -->
+	<path id="p1" pathLength="1" d="M161.6,181.1l40.3-38.4c53.8,223.9-4.5,308.4-60.3,317.8" />
+	<!-- Outline clips -->
+	<path id="op1" d="M206.5,141.6l-2.6-8.2c-13.8,15.3-29,32.1-42.3,47.7c11.8-9.2,24.8-19.6,36.9-29.4c12,77.8,25.2,192.4-15.6,259.2  c-10,16.4-25.9,30-44.2,33l5.8,33.2c18.1-3.2,35.1-12.3,48-25.7C263.1,377,234.5,229.5,206.5,141.6z" />
+
+	<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
+  </defs>
+
+  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
+  <g style="shape-rendering:geometricPrecision">
+	<g clip-path="url(#clip1)"><use href="#p1" class="draw-once seg1"/></g>
+  </g>
+</svg>
