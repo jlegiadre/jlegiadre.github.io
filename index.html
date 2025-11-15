@@ -410,114 +410,133 @@
 	  }
 	  /* Fill the capped box height to avoid crop in landscape */
 	  .logo svg { width: 100%; height: 100%; display: block; }
+	</style>
+	<style>
+	/* ============ LOGO 3-PHASE ANIMATION (draw preview → gap → final draw & stay) ============ */
+/* Works with pathLength="1" on each <path>. Keeps flicker-free behavior you liked. */
 
-	  :root{
+:root{
+  /* Colors & stroke */
   --stroke-w: clamp(10px, 6vw, 47px);
-
   --c12:  #f3f1f1;  /* light */
-  --c345: #4F8ABA;  /* blue */
+  --c34:  #4F8ABA;  /* blue */
 
-  /* draw starts + durations */
-  --seg1-start: 0s;     --seg1-draw1-dur: 1.2s;
-  --seg2-start: 0.55s;  --seg2-draw1-dur: 1.2s;
-  --seg3-start: 1.10s;  --seg3-draw1-dur: 1.2s;
-  --seg4-start: 1.65s;  --seg4-draw1-dur: 1.2s;
-  --seg5-start: 2.20s;  --seg5-draw1-dur: 1.2s;
+  /* Epsilon to avoid endpoint flicker / wrap */
+  --eps: .02;
+  --full: 1.02;
 
-  /* gap before erase + erase durations */
-  --seg1-erase-gap: .25s; --seg1-erase-dur: .9s;
-  --seg2-erase-gap: .25s; --seg2-erase-dur: .9s;
-  --seg3-erase-gap: .25s; --seg3-erase-dur: .9s;
-  --seg4-erase-gap: .25s; --seg4-erase-dur: .9s;
-  --seg5-erase-gap: .25s; --seg5-erase-dur: .9s;
+  /* ===================== PER-SEGMENT TIMING CONTROL ===================== */
+  /* PHASE 1 (moving preview stroke) */
+  --seg1-p1-start: 0s;     --seg1-p1-dur: 0.75s;  --seg1-comet: 0.20;
+  --seg2-p1-start: 0.60s;  --seg2-p1-dur: 0.65s;  --seg2-comet: 0.18;
+  --seg3-p1-start: 0.90s;  --seg3-p1-dur: 0.55s;  --seg3-comet: 0.16;
+  --seg4-p1-start: 1.25s;  --seg4-p1-dur: 0.60s;  --seg4-comet: 0.18;
+  --seg5-p1-start: 1.40s;  --seg5-p1-dur: 0.80s;  --seg5-comet: 0.22;
 
-  /* dash tweaks to avoid wrap artifacts */
-  --dash-full: 1.005;        /* slightly > 1 to avoid rounding */
-  --dash-overshoot: 0.06;    /* how far past the end we slide */
+  /* PHASE 2 (gap before final draw) */
+  --seg1-gap: 0.25s;
+  --seg2-gap: 0.25s;
+  --seg3-gap: 0.20s;
+  --seg4-gap: 0.22s;
+  --seg5-gap: 0.30s;
+
+  /* PHASE 3 (final draw & stay) */
+  --seg1-p3-dur: 1.00s;
+  --seg2-p3-dur: 0.90s;
+  --seg3-p3-dur: 0.60s;
+  --seg4-p3-dur: 0.80s;
+  --seg5-p3-dur: 1.20s;
 }
 
-.draw-seq{
+/* Base stroke */
+.draw-3phase{
   fill: none;
   stroke-width: var(--stroke-w);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke: currentColor;
 
-  /* Start fully hidden */
+  /* Start fully “not there” and hidden to avoid any nubs */
   stroke-dasharray: 0 1;
-  stroke-dashoffset: 0;
-
-  /* hidden until its own start */
+  stroke-dashoffset: 1;
   visibility: hidden;
 
-  will-change: stroke-dasharray, stroke-dashoffset, visibility;
+  will-change: stroke-dasharray, stroke-dashoffset, visibility, opacity;
   shape-rendering: geometricPrecision;
 }
 
-/* colors */
-.seg1,.seg2{ color: var(--c12); }
-.seg3,.seg4,.seg5{ color: var(--c345); }
+/* Segment colors */
+.seg1,.seg2 { color: var(--c12); }
+.seg3,.seg4,.seg5 { color: var(--c34); }
 
-/* keyframes */
-/* 1) draw-only: grow dash from 0 → ~1 and stay */
-@keyframes draw-only {
-  0%   { visibility: visible; stroke-dasharray: 0 1;               stroke-dashoffset: 0; }
-  100% { visibility: visible; stroke-dasharray: var(--dash-full) 0; stroke-dashoffset: 0; }
-}
-
-/* 2) erase-from-start: slide the full dash forward past the end */
-@keyframes erase-from-start {
-  0%   { stroke-dasharray: var(--dash-full) 0; stroke-dashoffset: 0; }
-  100% { stroke-dasharray: var(--dash-full) 0; stroke-dashoffset: calc(1 + var(--dash-overshoot)); }
-}
-
-/* reveal gate so no pre-start nubs */
+/* ===================== KEYFRAMES ===================== */
+/* Phase 0: gate on to prevent pre-start glimpses */
 @keyframes reveal { to { visibility: visible; } }
 
-/* =========================
-   Per-segment schedules
-   ========================= */
-
-/* seg1: ease-in */
-.seg1.draw-seq{
-  animation:
-    reveal            0s step-end var(--seg1-start) forwards,
-    draw-only         var(--seg1-draw1-dur)  ease-in     var(--seg1-start) forwards,
-    erase-from-start  var(--seg1-erase-dur)  ease-in     calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap)) forwards;
+/* Phase 1: moving preview stroke (draws and “erases itself” as it travels) */
+@keyframes comet-move {
+  /* Use a short dash (var(--comet)) that slides along from start→end.
+     Fade in/out to keep it subtle and flicker-free. */
+  0%   { stroke-dasharray: var(--comet) 1; stroke-dashoffset: 1;     opacity: 0; }
+  10%  { stroke-dasharray: var(--comet) 1; stroke-dashoffset: 0.85;  opacity: 0.95; }
+  90%  { stroke-dasharray: var(--comet) 1; stroke-dashoffset: 0.10;  opacity: 0.95; }
+  100% { stroke-dasharray: var(--comet) 1; stroke-dashoffset: 0;     opacity: 0; }
 }
 
-/* seg2: ease-out */
-.seg2.draw-seq{
-  animation:
-    reveal            0s step-end var(--seg2-start) forwards,
-    draw-only         var(--seg2-draw1-dur)  ease-out    var(--seg2-start) forwards,
-    erase-from-start  var(--seg2-erase-dur)  ease-out    calc(var(--seg2-start) + var(--seg2-draw1-dur) + var(--seg2-erase-gap)) forwards;
+/* Phase 3: final draw & stay (your previous final-grow-dash) */
+@keyframes final-grow-dash{
+  0%   { stroke-dasharray: var(--eps) 1;  stroke-dashoffset: 1; }
+  100% { stroke-dasharray: var(--full) 1; stroke-dashoffset: -var(--eps); }
 }
 
-/* seg3: ease-in */
-.seg3.draw-seq{
+/* ===================== PER-SEGMENT SCHEDULES + EASING ===================== */
+/* seg1: comet (ease-in), gap, final draw (ease-in) */
+.seg1.draw-3phase{
+  --comet: var(--seg1-comet);
   animation:
-    reveal            0s step-end var(--seg3-start) forwards,
-    draw-only         var(--seg3-draw1-dur)  ease-in     var(--seg3-start) forwards,
-    erase-from-start  var(--seg3-erase-dur)  ease-in     calc(var(--seg3-start) + var(--seg3-draw1-dur) + var(--seg3-erase-gap)) forwards;
+    reveal           0s step-end var(--seg1-p1-start) forwards,
+    comet-move       var(--seg1-p1-dur) ease-in   var(--seg1-p1-start) forwards,
+    final-grow-dash  var(--seg1-p3-dur) ease-in   calc(var(--seg1-p1-start) + var(--seg1-p1-dur) + var(--seg1-gap)) forwards;
 }
 
-/* seg4: ease-out */
-.seg4.draw-seq{
+/* seg2: comet (ease-out), gap, final draw (ease-out) */
+.seg2.draw-3phase{
+  --comet: var(--seg2-comet);
   animation:
-    reveal            0s step-end var(--seg4-start) forwards,
-    draw-only         var(--seg4-draw1-dur)  ease-out    var(--seg4-start) forwards,
-    erase-from-start  var(--seg4-erase-dur)  ease-out    calc(var(--seg4-start) + var(--seg4-draw1-dur) + var(--seg4-erase-gap)) forwards;
+    reveal           0s step-end var(--seg2-p1-start) forwards,
+    comet-move       var(--seg2-p1-dur) ease-out  var(--seg2-p1-start) forwards,
+    final-grow-dash  var(--seg2-p3-dur) ease-out  calc(var(--seg2-p1-start) + var(--seg2-p1-dur) + var(--seg2-gap)) forwards;
 }
 
-/* seg5: ease-in-out */
-.seg5.draw-seq{
+/* seg3: comet (ease-in), gap, final draw (ease-in) */
+.seg3.draw-3phase{
+  --comet: var(--seg3-comet);
   animation:
-    reveal            0s step-end var(--seg5-start) forwards,
-    draw-only         var(--seg5-draw1-dur)  ease-in-out var(--seg5-start) forwards,
-    erase-from-start  var(--seg5-erase-dur)  ease-in-out calc(var(--seg5-start) + var(--seg5-draw1-dur) + var(--seg5-erase-gap)) forwards;
+    reveal           0s step-end var(--seg3-p1-start) forwards,
+    comet-move       var(--seg3-p1-dur) ease-in   var(--seg3-p1-start) forwards,
+    final-grow-dash  var(--seg3-p3-dur) ease-in   calc(var(--seg3-p1-start) + var(--seg3-p1-dur) + var(--seg3-gap)) forwards;
 }
 
+/* seg4: comet (ease-out), gap, final draw (ease-out) */
+.seg4.draw-3phase{
+  --comet: var(--seg4-comet);
+  animation:
+    reveal           0s step-end var(--seg4-p1-start) forwards,
+    comet-move       var(--seg4-p1-dur) ease-out  var(--seg4-p1-start) forwards,
+    final-grow-dash  var(--seg4-p3-dur) ease-out  calc(var(--seg4-p1-start) + var(--seg4-p1-dur) + var(--seg4-gap)) forwards;
+}
+
+/* seg5: comet (ease-in-out), gap, final draw (ease-in-out) */
+.seg5.draw-3phase{
+  --comet: var(--seg5-comet);
+  animation:
+    reveal           0s step-end var(--seg5-p1-start) forwards,
+    comet-move       var(--seg5-p1-dur) ease-in-out var(--seg5-p1-start) forwards,
+    final-grow-dash  var(--seg5-p3-dur) ease-in-out calc(var(--seg5-p1-start) + var(--seg5-p1-dur) + var(--seg5-gap)) forwards;
+}
+
+	</style>
+	<style>
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
 		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
@@ -565,11 +584,12 @@
 
 			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
 			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)"><use href="#p1" class="draw-seq seg1"/></g>
-				<g clip-path="url(#clip2)"><use href="#p2" class="draw-seq seg2"/></g>
-				<g clip-path="url(#clip3)"><use href="#p3" class="draw-seq seg3"/></g>
-				<g clip-path="url(#clip4)"><use href="#p4" class="draw-seq seg4"/></g>
-				<g clip-path="url(#clip5)"><use href="#p5" class="draw-seq seg5"/></g>
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-3phase seg1"/></g>
+<g clip-path="url(#clip2)"><use href="#p2" class="draw-3phase seg2"/></g>
+<g clip-path="url(#clip3)"><use href="#p3" class="draw-3phase seg3"/></g>
+<g clip-path="url(#clip4)"><use href="#p4" class="draw-3phase seg4"/></g>
+<g clip-path="url(#clip5)"><use href="#p5" class="draw-3phase seg5"/></g>
+
 			  </g>
 			</svg>
 		  </div>
