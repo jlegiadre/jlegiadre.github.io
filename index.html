@@ -492,57 +492,36 @@
 	.seg1.draw-seq{
 	  animation:
 		reveal 0s step-end var(--seg1-start) forwards,
-		draw-dash  var(--seg1-draw1-dur) ease-in var(--seg1-start) forwards,
-		erase-dash var(--seg1-erase-dur) ease-in
-		  calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap)) forwards,
-		draw-dash  var(--seg1-draw2-dur) ease-in
-		  calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap) + var(--seg1-erase-dur) + var(--seg1-draw2-gap)) forwards;
+		draw-dash  var(--seg1-draw1-dur) ease-in var(--seg1-start) forwards;
 	}
 
 	/* seg2 */
 	.seg2.draw-seq{
 	  animation:
 		reveal 0s step-end var(--seg2-start) forwards,
-		draw-dash  var(--seg2-draw1-dur) ease-out var(--seg2-start) forwards,
-		erase-dash var(--seg2-erase-dur) ease-out
-		  calc(var(--seg2-start) + var(--seg2-draw1-dur) + var(--seg2-erase-gap)) forwards,
-		draw-dash  var(--seg2-draw2-dur) ease-out
-		  calc(var(--seg2-start) + var(--seg2-draw1-dur) + var(--seg2-erase-gap) + var(--seg2-erase-dur) + var(--seg2-draw2-gap)) forwards;
+		draw-dash  var(--seg2-draw1-dur) ease-out var(--seg2-start) forwards;
 	}
 
 	/* seg3 */
 	.seg3.draw-seq{
 	  animation:
 		reveal 0s step-end var(--seg3-start) forwards,
-		draw-dash  var(--seg3-draw1-dur) ease-in var(--seg3-start) forwards,
-		erase-dash var(--seg3-erase-dur) ease-in
-		  calc(var(--seg3-start) + var(--seg3-draw1-dur) + var(--seg3-erase-gap)) forwards,
-		draw-dash  var(--seg3-draw2-dur) ease-in
-		  calc(var(--seg3-start) + var(--seg3-draw1-dur) + var(--seg3-erase-gap) + var(--seg3-erase-dur) + var(--seg3-draw2-gap)) forwards;
+		draw-dash  var(--seg3-draw1-dur) ease-in var(--seg3-start) forwards;
 	}
 
 	/* seg4 */
 	.seg4.draw-seq{
 	  animation:
 		reveal 0s step-end var(--seg4-start) forwards,
-		draw-dash  var(--seg4-draw1-dur) ease-out var(--seg4-start) forwards,
-		erase-dash var(--seg4-erase-dur) ease-out
-		  calc(var(--seg4-start) + var(--seg4-draw1-dur) + var(--seg4-erase-gap)) forwards,
-		draw-dash  var(--seg4-draw2-dur) ease-out
-		  calc(var(--seg4-start) + var(--seg4-draw1-dur) + var(--seg4-erase-gap) + var(--seg4-erase-dur) + var(--seg4-draw2-gap)) forwards;
+		draw-dash  var(--seg4-draw1-dur) ease-out var(--seg4-start) forwards;
 	}
 
 	/* seg5 */
 	.seg5.draw-seq{
 	  animation:
 		reveal 0s step-end var(--seg5-start) forwards,
-		draw-dash  var(--seg5-draw1-dur) ease-in-out var(--seg5-start) forwards,
-		erase-dash var(--seg5-erase-dur) ease-in-out
-		  calc(var(--seg5-start) + var(--seg5-draw1-dur) + var(--seg5-erase-gap)) forwards,
-		draw-dash  var(--seg5-draw2-dur) ease-in-out
-		  calc(var(--seg5-start) + var(--seg5-draw1-dur) + var(--seg5-erase-gap) + var(--seg5-erase-dur) + var(--seg5-draw2-gap)) forwards;
+		draw-dash  var(--seg5-draw1-dur) ease-in-out var(--seg5-start) forwards;
 	}
-
 
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
