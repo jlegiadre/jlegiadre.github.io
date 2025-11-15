@@ -42,6 +42,44 @@ svg .seg1 {
     stroke-dashoffset: 0;
   }
 }
+	/* --- Add this to extend the previous animation setup --- */
+
+/* Define a second animation that “pushes” the stroke off the path */
+@keyframes svg-stroke-push {
+  0% {
+    stroke-dasharray: var(--dash);
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dasharray: var(--dash);
+    stroke-dashoffset: var(--dash);
+  }
+}
+
+/* Apply both animations in sequence:
+   1. Draws on
+   2. Waits 1s
+   3. Pushes out of view
+*/
+svg .draw-once {
+  animation:
+    svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards,
+    svg-stroke-push 1.5s ease-in-out calc(var(--draw-duration) + var(--draw-delay) + 1s) forwards;
+}
+
+/* Optional: Adjust duration/delay per segment */
+svg .seg1 {
+  --draw-duration: 2s;
+  --draw-delay: 100ms;
+}
+
+/* Reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  svg .draw-once {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
 
 /* Optional: pause/disable motion for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -50,6 +88,7 @@ svg .seg1 {
     stroke-dashoffset: 0; /* show the path immediately */
   }
 }
+	
 
 </style>
 
