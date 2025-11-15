@@ -1,11 +1,14 @@
 <style>
-/* Root-level controls */
+/* ===== Root controls ===== */
 :root {
   /* Timings */
-  --initial-delay: 0ms;        /* wait before the draw starts */
-  --draw-duration: 2s;         /* speed of draw */
-  --post-draw-delay: 400ms;    /* pause after draw */
-  --push-duration: 1.6s;       /* speed of push */
+  --initial-delay: 0ms;          /* wait before draw begins */
+  --draw-duration: 2s;           /* length of the draw */
+  --push-duration: 1.6s;         /* length of the push */
+
+  /* Overlap controls */
+  --push-start-frac: 0.70;       /* 0..1: when (as a fraction of draw) push begins */
+  --push-extra-delay: 0ms;       /* additional fixed delay before push starts */
 
   /* Easing */
   --draw-ease: cubic-bezier(0.42, 0, 1, 1);
@@ -16,12 +19,13 @@
   --stroke-color: currentColor;
 
   /* Dash mechanics (pathLength="1" normalizes units) */
-  --gap: 1000;                 /* huge gap => only one dash is ever visible */
-  --push-distance: -1;         /* you said -1 was correct for your path direction */
-  --overshoot: 0.02;           /* tiny extra push beyond the end (tweak 0.01–0.06) */
+  --gap: 1000;                   /* huge gap ⇒ only one dash visible */
+  --push-distance: -1;           /* -1 for your path direction */
+  --overshoot: 0.02;             /* small extra push to clear any residual */
+  --shrink-start-frac: 0.80;     /* when (as fraction of push) to start shrinking to 0 */
 }
 
-/* Attach this class to your <use> element (e.g., <use href="#p1" class="draw-then-push seg1"/>) */
+/* ===== Attach to your <use> (e.g., <use href="#p1" class="draw-then-push seg1"/>) ===== */
 svg .draw-then-push {
   stroke: var(--stroke-color);
   stroke-width: var(--stroke-width);
@@ -29,51 +33,57 @@ svg .draw-then-push {
   fill: none;
   vector-effect: non-scaling-stroke;
 
-  /* Start hidden: zero-length dash + huge gap */
+  /* Start hidden: one zero-length dash + huge gap (prevents “mini dashes”) */
   stroke-dasharray: 0 var(--gap);
   stroke-dashoffset: 0;
 
-  /* draw → (pause) → push */
+  /* Draw starts at initial delay; push starts partway through the draw */
   animation:
     svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
     svg-stroke-push var(--push-duration) var(--push-ease)
-      calc(var(--initial-delay) + var(--draw-duration) + var(--post-draw-delay)) forwards;
+      calc(
+        var(--initial-delay)
+        + (var(--draw-duration) * var(--push-start-frac))
+        + var(--push-extra-delay)
+      ) forwards;
 
   will-change: stroke-dasharray, stroke-dashoffset;
 }
 
-/* Phase 1: Draw (grow a single dash from 0 → 1; gap stays huge so no repeats) */
+/* (Optional) per-element overrides */
+/*
+svg .seg1 {
+  --push-start-frac: 0.6;
+  --push-duration: 1.4s;
+}
+*/
+
+/* ===== Keyframes ===== */
+
+/* Phase 1: Draw — grow the single dash from 0 → 1; gap stays huge */
 @keyframes svg-stroke-draw {
   from { stroke-dasharray: 0 var(--gap); }
   to   { stroke-dasharray: 1 var(--gap); }
 }
 
-/* Phase 2: Push
-   - First, slide the full-length dash off the end (to 1 * push-direction).
-   - Then, during the final 20%, also shrink the dash to 0 and overshoot slightly.
-   This eliminates the tiny residual you saw from round caps/AA. */
+/* Phase 2: Push — move the dash forward; shrink to 0 near the end + overshoot */
 @keyframes svg-stroke-push {
   0% {
     stroke-dasharray: 1 var(--gap);
     stroke-dashoffset: 0;
   }
-  80% {
+  /* Keep full dash length until shrink phase kicks in */
+  calc(var(--shrink-start-frac) * 100%) {
     stroke-dasharray: 1 var(--gap);
-    stroke-dashoffset: var(--push-distance);
+    stroke-dashoffset: calc(var(--push-distance) * var(--shrink-start-frac));
   }
   100% {
-    stroke-dasharray: 0 var(--gap); /* dash fully collapsed */
+    stroke-dasharray: 0 var(--gap); /* collapse to eliminate any tail */
     stroke-dashoffset: calc(var(--push-distance) * (1 + var(--overshoot)));
   }
 }
 
-/* Optional: if you prefer a crisp cutoff at the tail,
-   switch to square ends (comment out to keep round) */
-/*
-svg .draw-then-push { stroke-linecap: butt; }
-*/
-
-/* Reduced motion: show the final state instantly */
+/* Accessibility: skip motion if requested */
 @media (prefers-reduced-motion: reduce) {
   svg .draw-then-push {
     animation: none;
