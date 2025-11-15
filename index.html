@@ -412,75 +412,77 @@
 	  .logo svg { width: 100%; height: 100%; display: block; }
 
 	  :root{
-		  /* schedule */
-		  --seg1-start:       0s;
-		  --seg1-draw1-dur:   1s;
-		  --seg1-erase-gap:   0.25s;   /* pause after first draw before erase */
-		  --seg1-erase-dur:   0.8s;
-		  --seg1-draw2-gap:   0.25s;   /* pause after erase before final draw */
-		  --seg1-draw2-dur:   1.2s;
+		--seg1-start: 0s;
+		--seg2-start: 0.6s;
+		--seg3-start: 0.9s;
+		--seg4-start: 1.25s;
+		--seg5-start: 1.4s;
+		--stroke-w: clamp(10px, 6vw, 47px);
+		--c12: #f3f1f1;
+		--c34: #4F8ABA;
+		--seg1-final-dur: 1s;
+		--seg2-final-dur: 0.9s;
+		--seg3-final-dur: 0.6s;
+		--seg4-final-dur: 0.8s;
+		--seg5-final-dur: 1.2s;
+	  }
 
-		  /* visuals */
-		  --stroke-w: clamp(10px, 6vw, 47px);
-		  --seg1-color: #f3f1f1;       /* same as your --c12 */
-		}
+	  /* Flash-free + hidden until each segment starts */
+	  .draw-final{
+		fill: none;
+		stroke-width: var(--stroke-w);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke: currentColor;
+		stroke-dasharray: .02 1;
+		stroke-dashoffset: 1;
+		visibility: hidden;
+		will-change: stroke-dasharray, stroke-dashoffset, visibility;
+		shape-rendering: geometricPrecision;
+	  }
 
-		/* Base stroke setup shared by all segments you apply this to */
-		.draw-seq{
-		  fill: none;
-		  stroke-width: var(--stroke-w);
-		  stroke-linecap: round;
-		  stroke-linejoin: round;
-		  stroke: currentColor;
+	  .seg1 { color: var(--c12); }
+	  .seg2 { color: var(--c12); }
+	  .seg3 { color: var(--c34); }
+	  .seg4 { color: var(--c34); }
+	  .seg5 { color: var(--c34); }
 
-		  /* start fully hidden: tiny dash placed off the end */
-		  stroke-dasharray: .02 1;
-		  stroke-dashoffset: 1;
+	  .seg1.draw-final {
+		--segX-dur: var(--seg1-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg1-start) forwards,
+		  final-grow-dash var(--seg1-final-dur) ease-in var(--seg1-start) forwards;
+	  }
+	  .seg2.draw-final {
+		--segX-dur: var(--seg2-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg2-start) forwards,
+		  final-grow-dash var(--seg2-final-dur) ease-out var(--seg2-start) forwards;
+	  }
+	  .seg3.draw-final {
+		--segX-dur: var(--seg3-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg3-start) forwards,
+		  final-grow-dash var(--seg3-final-dur) ease-in var(--seg3-start) forwards;
+	  }
+	  .seg4.draw-final {
+		--segX-dur: var(--seg4-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg4-start) forwards,
+		  final-grow-dash var(--seg4-final-dur) ease-out var(--seg4-start) forwards;
+	  }
+	  .seg5.draw-final {
+		--segX-dur: var(--seg5-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg5-start) forwards,
+		  final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
+	  }
 
-		  /* prevent pre-start nub */
-		  visibility: hidden;
-
-		  will-change: stroke-dasharray, stroke-dashoffset, visibility;
-		  shape-rendering: geometricPrecision;
-		}
-
-		/* Color for seg1 */
-		.seg1 { color: var(--seg1-color); }
-
-		/* SEG1 timeline */
-		.seg1.draw-seq{
-		  animation:
-			reveal 0s step-end var(--seg1-start) forwards,
-
-			draw2  var(--seg1-draw2-dur)
-				   ease-in
-				   calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap) + var(--seg1-erase-dur) + var(--seg1-draw2-gap)) forwards;
-		}
-
-		/* === Keyframes === */
-
-		/* Just flips visibility on to avoid pre-start flash */
-		@keyframes reveal {
-		  to { visibility: visible; }
-		}
-
-		/* Draw to full and stay visible (uses a slight epsilon to avoid endpoint cap flicker) */
-		@keyframes draw1 {
-		  0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
-		  100% { stroke-dasharray: 1.02 0; stroke-dashoffset: -0.02; }
-		}
-
-		/* Erase by shrinking to a tiny dash and sliding it off the end -> back to fully hidden */
-		@keyframes erase1 {
-		  0%   { stroke-dasharray: 1.02 0; stroke-dashoffset: -0.02; }
-		  100% { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
-		}
-
-		/* Final draw and stay (same end state as draw1) */
-		@keyframes draw2 {
-		  0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
-		  100% { stroke-dasharray: 1.02 0; stroke-dashoffset: -0.02; }
-		}
+	  @keyframes reveal { to { visibility: visible; } }
+	  @keyframes final-grow-dash{
+		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
+		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
+	  }
 
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
@@ -529,7 +531,11 @@
 
 			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
 			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)"><use href="#p1" class="draw-seq seg1"/></g>
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
+				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
+				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
+				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
+				<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
 			  </g>
 			</svg>
 		  </div>
