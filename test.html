@@ -1,56 +1,79 @@
 <style>
-/* SVG stroke “draw-on” animation (works with your pathLength="1") */
-/* Drop this CSS anywhere after your SVG or in your stylesheet */
+/* SVG stroke “draw, pause, then push off-path” animation
+   Works with your <path pathLength="1"> setup */
 
-/* Base styling for animated stroke */
-svg .draw-once {
+/* ---------- Defaults & reusable animation class ---------- */
+svg .draw-then-push {
   /* Visuals */
-  stroke: currentColor;           /* inherits from text color, customize if needed */
-  stroke-width: 6;                /* adjust to taste */
-  stroke-linecap: round;          /* smoother ends */
+  stroke: currentColor;
+  stroke-width: 6;
+  stroke-linecap: round;
   fill: none;
-
-  /* Keep stroke width consistent if SVG scales */
   vector-effect: non-scaling-stroke;
 
-  /* Dash setup: with pathLength="1", a dash of 1 spans the entire path */
-  --dash: 1;
+  /* Core dash config (pathLength=1 => units are normalized) */
+  --dash: 1;                 /* whole path length */
+  --epsilon: 0.0001;         /* tiny >0 value for robust interpolation */
+
+  /* Timings you can customize per element */
+  --initial-delay: 0ms;      /* delay before the draw begins */
+  --draw-duration: 2s;       /* how long the draw takes */
+  --post-draw-delay: 400ms;  /* pause after the draw finishes */
+  --push-duration: 1.6s;     /* how long the push-off takes */
+
+  /* Easing (customize as you like) */
+  --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --push-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Start fully hidden (dash equals whole path, offset = whole path) */
   stroke-dasharray: var(--dash);
   stroke-dashoffset: var(--dash);
 
-  /* Animation controls (override per-segment if you like) */
-  --draw-duration: 2.5s;
-  --draw-delay: 0ms;
-  --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Two-phase animation: draw → (pause) → push */
+  animation:
+    svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
+    svg-stroke-push var(--push-duration) var(--push-ease)
+      calc(var(--initial-delay) + var(--draw-duration) + var(--post-draw-delay)) forwards;
 
-  /* Animate once and keep the final state */
-  animation: svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards;
-
-  /* Small perf hint */
-  will-change: stroke-dashoffset;
+  will-change: stroke-dashoffset, stroke-dasharray;
 }
 
-/* Example: customize timing per segment (your SVG has .seg1) */
+/* Example: tune timings on your single segment (.seg1) */
 svg .seg1 {
-  --draw-duration: 2s;
-  --draw-delay: 100ms;
+  /* Customize these to taste */
+  --initial-delay: 150ms;     /* wait before starting the draw */
+  --draw-duration: 2.0s;      /* speed of draw */
+  --post-draw-delay: 500ms;   /* pause after draw */
+  --push-duration: 1.8s;      /* speed of push */
 }
 
-/* The actual animation: moves the dash to reveal the stroke */
+/* Phase 1: reveal the stroke by moving the dash into place */
 @keyframes svg-stroke-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Phase 2: “push” the stroke forward until it disappears.
+   We shrink the visible dash (dasharray: 1 → ~0) while moving it forward
+   (dashoffset: 0 → -1), so the leading edge advances and the trail vanishes. */
+@keyframes svg-stroke-push {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
   to {
+    stroke-dasharray: var(--epsilon);
+    stroke-dashoffset: calc(-1 + var(--epsilon));
+  }
+}
+
+/* Reduced motion: show the path statically, no animation */
+@media (prefers-reduced-motion: reduce) {
+  svg .draw-then-push {
+    animation: none;
+    stroke-dasharray: 1;
     stroke-dashoffset: 0;
   }
 }
-
-/* Optional: pause/disable motion for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  svg .draw-once {
-    animation: none;
-    stroke-dashoffset: 0; /* show the path immediately */
-  }
-}
-
 </style>
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
@@ -65,6 +88,8 @@ svg .seg1 {
 
   <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
   <g style="shape-rendering:geometricPrecision">
-	<g clip-path="url(#clip1)"><use href="#p1" class="draw-once seg1"/></g>
+	<g clip-path="url(#clip1)">
+		<use href="#p1" class="draw-then-push seg1"/>
+	  </g>
   </g>
 </svg>
