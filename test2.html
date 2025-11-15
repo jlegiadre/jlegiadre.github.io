@@ -1,0 +1,104 @@
+<style>
+  /* ===== Global defaults you can override at :root or per-stroke ===== */
+  :root {
+    /* Defaults (per-stroke can override) */
+    --snake-duration: 2.5s;              /* speed */
+    --snake-delay: 0s;                    /* delay before drawing begins */
+    --snake-easing: ease;                 /* timing fn (ease, ease-in, ease-out, cubic-bezier...) */
+    --snake-segment: 22;                  /* visible % of the path (0–100) */
+    --snake-cap: round;                   /* butt | round | square (per-stroke OK) */
+    --snake-join: round;                  /* miter | round | bevel (per-stroke OK) */
+  }
+
+  /* ===== Component styles ===== */
+  .snake-logo {
+    display: inline-block;
+    inline-size: min(100%, 500px);
+    block-size: auto;
+    color: black; /* stroke color via currentColor; change here or on a wrapper */
+  }
+
+  .snake-logo svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* The moving “snake” stroke */
+  .snake-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 47px; /* universal width as requested */
+    stroke-linecap: var(--cap, var(--snake-cap));
+    stroke-linejoin: var(--join, var(--snake-join));
+
+    /* Keep a single visible segment followed by the remaining gap */
+    /* With pathLength=100, these are percentage-like numbers */
+    stroke-dasharray: var(--segment, var(--snake-segment)) calc(100 - var(--segment, var(--snake-segment)));
+
+    /* Start fully off the path to avoid initial flash */
+    stroke-dashoffset: 100;
+
+    /* Animate once, finish “off canvas” (tail exits) and stay there */
+    animation-name: snake-move;
+    animation-duration: var(--duration, var(--snake-duration));
+    animation-delay: var(--delay, var(--snake-delay));
+    animation-timing-function: var(--easing, var(--snake-easing));
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+
+    /* Minor perf hint */
+    will-change: stroke-dashoffset;
+  }
+
+  @keyframes snake-move {
+    /* From: segment is entirely off the start of the path */
+    from { stroke-dashoffset: 100; }
+    /* To: segment has fully moved past the end; add a tiny buffer (-0.5)
+       so the head clears the last clipped pixel before we freeze */
+    to   { stroke-dashoffset: calc(-1 * var(--segment, var(--snake-segment)) - 0.5); }
+  }
+
+  /* Optional: maximize edge crispness inside the clip */
+  .snake-logo [clip-path] .snake-stroke {
+    shape-rendering: geometricPrecision;
+  }
+</style>
+
+<div class="snake-logo">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 500 500"
+       preserveAspectRatio="xMidYMid meet"
+       aria-hidden="true" focusable="false">
+    <defs>
+      <!-- Centerline path (normalized to 100 for % math in CSS) -->
+      <path id="p1" pathLength="100"
+            d="M161.6,181.1l40.3-38.4c53.8,223.9-4.5,308.4-60.3,317.8" />
+
+      <!-- Outline used ONLY for clipping the fat stroke -->
+      <path id="op1"
+            d="M206.5,141.6l-2.6-8.2c-13.8,15.3-29,32.1-42.3,47.7c11.8-9.2,24.8-19.6,36.9-29.4
+               c12,77.8,25.2,192.4-15.6,259.2c-10,16.4-25.9,30-44.2,33l5.8,33.2c18.1-3.2,35.1-12.3,48-25.7
+               C263.1,377,234.5,229.5,206.5,141.6z" />
+
+      <clipPath id="clip1" clipPathUnits="userSpaceOnUse">
+        <use href="#op1" />
+      </clipPath>
+    </defs>
+
+    <!-- Clipped “snake” stroke. Control each stroke via inline CSS vars. -->
+    <!-- Example settings shown; copy this <use> for additional strokes and tweak vars. -->
+    <g clip-path="url(#clip1)">
+      <use href="#p1"
+           class="snake-stroke seg-1"
+           style="
+             --delay: 0s;
+             --duration: 2.8s;
+             --easing: cubic-bezier(.25,.1,.25,1); /* ease */
+             --segment: 22;                         /* visible % of path */
+             --cap: round;                          /* butt | round | square */
+             --join: bevel;                         /* miter | round | bevel */
+           " />
+    </g>
+  </svg>
+</div>
