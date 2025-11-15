@@ -54,27 +54,18 @@ svg .seg1 {
 /* Phase 1: Draw (grow a single dash from 0 → 1; gap stays huge so no repeats) */
 @keyframes svg-stroke-draw {
   from { stroke-dasharray: 0 var(--gap); }
-  to   { stroke-dasharray: 1 var(--gap); }
+  to   { stroke-dasharray: 1.02 var(--gap); }
 }
 
 /* Phase 2: Push (keep dash length = 1, slide it along by +1 = forward off-path) */
 @keyframes svg-stroke-push {
   from {
-    stroke-dasharray: 1 var(--gap);
+    stroke-dasharray: 1.02 var(--gap);
     stroke-dashoffset: 0;
   }
   to {
-    stroke-dasharray: 1 var(--gap);
+    stroke-dasharray: 1.02 var(--gap);
     stroke-dashoffset: var(--push-distance);
-  }
-}
-
-/* Reduced motion: show the final state instantly */
-@media (prefers-reduced-motion: reduce) {
-  svg .draw-then-push {
-    animation: none;
-    stroke-dasharray: 1 var(--gap);
-    stroke-dashoffset: 0;
   }
 }
 </style>
