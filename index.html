@@ -450,21 +450,17 @@
 		/* SEG1 timeline */
 		.seg1.draw-seq{
 		  animation:
-			/* 1) Unhide right at start time (no visual change, just allows stroke to render) */
 			reveal 0s step-end var(--seg1-start) forwards,
 
-			/* 2) Draw #1 (draws to full and stays visible) */
 			draw1  var(--seg1-draw1-dur) ease-in var(--seg1-start) forwards,
 
-			/* 3) Erase (returns to hidden state) */
-			erase1 var(--seg1-erase-dur)
+			/*erase1 var(--seg1-erase-dur)
 				   ease-in
 				   calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap)) forwards,
 
-			/* 4) Draw #2 (final draw and stay) */
 			draw2  var(--seg1-draw2-dur)
 				   ease-in
-				   calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap) + var(--seg1-erase-dur) + var(--seg1-draw2-gap)) forwards;
+				   calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap) + var(--seg1-erase-dur) + var(--seg1-draw2-gap)) forwards;*/
 		}
 
 		/* === Keyframes === */
