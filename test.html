@@ -1,93 +1,99 @@
 <style>
-/* ===== Root controls ===== */
+/* === Root controls you can tweak in DevTools === */
 :root {
   /* Timings */
-  --initial-delay: 0ms;          /* wait before draw begins */
-  --draw-duration: 2s;           /* length of the draw */
-  --push-duration: 1.6s;         /* length of the push */
+  --initial-delay: 0ms;            /* wait before draw begins */
+  --draw-duration: 2s;             /* how long the draw grows the dash */
+  --push-duration: 1.6s;           /* how long the push runs */
 
-  /* Overlap controls */
-  --push-start-frac: 0.70;       /* 0..1: when (as a fraction of draw) push begins */
-  --push-extra-delay: 0ms;       /* additional fixed delay before push starts */
+  /* Overlap controls (start push while draw is still running) */
+  --push-start-frac: 0.70;         /* 0..1 fraction of draw when push begins */
+  --push-extra-delay: 0ms;         /* fixed extra delay before push */
+
+  /* When to start shrinking the dash during the push (as fraction of push) */
+  --shrink-start-frac: 0.80;       /* 0..1 */
 
   /* Easing */
   --draw-ease: cubic-bezier(0.42, 0, 1, 1);
   --push-ease: cubic-bezier(0.42, 0, 1, 1);
+  --shrink-ease: cubic-bezier(0.42, 0, 1, 1);
 
   /* Stroke visuals */
   --stroke-width: 47;
   --stroke-color: currentColor;
 
   /* Dash mechanics (pathLength="1" normalizes units) */
-  --gap: 1000;                   /* huge gap ⇒ only one dash visible */
-  --push-distance: -1;           /* -1 for your path direction */
-  --overshoot: 0.02;             /* small extra push to clear any residual */
-  --shrink-start-frac: 0.80;     /* when (as fraction of push) to start shrinking to 0 */
+  --gap: 1000;                     /* huge gap ⇒ only one dash exists */
+  --direction: -1;                  /* set to -1 (your case) or 1 (opposite) */
+  --overshoot: 0.02;               /* tiny extra travel to avoid any tail */
 }
 
-/* ===== Attach to your <use> (e.g., <use href="#p1" class="draw-then-push seg1"/>) ===== */
+/* Make a numeric custom property that can animate */
+@property --dash-len {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* === Attach to your <use> (e.g., <use href="#p1" class="draw-then-push seg1"/>) === */
 svg .draw-then-push {
   stroke: var(--stroke-color);
   stroke-width: var(--stroke-width);
-  stroke-linecap: round;
+  stroke-linecap: round;   /* use 'butt' if you want a crisp cutoff */
   fill: none;
   vector-effect: non-scaling-stroke;
 
-  /* Start hidden: one zero-length dash + huge gap (prevents “mini dashes”) */
-  stroke-dasharray: 0 var(--gap);
+  /* Start hidden: zero-length single dash + huge gap */
+  --dash-len: 0;
+  stroke-dasharray: var(--dash-len) var(--gap);
   stroke-dashoffset: 0;
 
-  /* Draw starts at initial delay; push starts partway through the draw */
+  /* === Three coordinated animations ===
+     1) Draw: grow --dash-len from 0 → 1
+     2) Push: move dash along the path (offset 0 → direction*(1+overshoot))
+     3) Shrink: collapse --dash-len to 0 near the end of the push
+  */
   animation:
-    svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
-    svg-stroke-push var(--push-duration) var(--push-ease)
+    dash-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
+    dash-push var(--push-duration) var(--push-ease)
+      calc(var(--initial-delay) + (var(--draw-duration) * var(--push-start-frac)) + var(--push-extra-delay)) forwards,
+    dash-shrink calc(var(--push-duration) * (1 - var(--shrink-start-frac))) var(--shrink-ease)
       calc(
         var(--initial-delay)
         + (var(--draw-duration) * var(--push-start-frac))
         + var(--push-extra-delay)
+        + (var(--push-duration) * var(--shrink-start-frac))
       ) forwards;
 
   will-change: stroke-dasharray, stroke-dashoffset;
 }
 
-/* (Optional) per-element overrides */
-/*
-svg .seg1 {
-  --push-start-frac: 0.6;
-  --push-duration: 1.4s;
-}
-*/
+/* ===== Keyframes (no variables in selectors) ===== */
 
-/* ===== Keyframes ===== */
-
-/* Phase 1: Draw — grow the single dash from 0 → 1; gap stays huge */
-@keyframes svg-stroke-draw {
-  from { stroke-dasharray: 0 var(--gap); }
-  to   { stroke-dasharray: 1 var(--gap); }
+/* 1) Draw: animate the dash length via custom property */
+@keyframes dash-draw {
+  from { --dash-len: 0; }
+  to   { --dash-len: 1; }
 }
 
-/* Phase 2: Push — move the dash forward; shrink to 0 near the end + overshoot */
-@keyframes svg-stroke-push {
-  0% {
-    stroke-dasharray: 1 var(--gap);
-    stroke-dashoffset: 0;
-  }
-  /* Keep full dash length until shrink phase kicks in */
-  calc(var(--shrink-start-frac) * 100%) {
-    stroke-dasharray: 1 var(--gap);
-    stroke-dashoffset: calc(var(--push-distance) * var(--shrink-start-frac));
-  }
-  100% {
-    stroke-dasharray: 0 var(--gap); /* collapse to eliminate any tail */
-    stroke-dashoffset: calc(var(--push-distance) * (1 + var(--overshoot)));
-  }
+/* 2) Push: move the dash forward/back along the path */
+@keyframes dash-push {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: calc(var(--direction) * (1 + var(--overshoot))); }
 }
 
-/* Accessibility: skip motion if requested */
+/* 3) Shrink: collapse the dash length to eliminate any residual sliver */
+@keyframes dash-shrink {
+  from { --dash-len: 1; }
+  to   { --dash-len: 0; }
+}
+
+/* Reduced motion: show static end state */
 @media (prefers-reduced-motion: reduce) {
   svg .draw-then-push {
     animation: none;
-    stroke-dasharray: 1 var(--gap);
+    --dash-len: 1;
+    stroke-dasharray: var(--dash-len) var(--gap);
     stroke-dashoffset: 0;
   }
 }
