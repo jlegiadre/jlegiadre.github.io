@@ -1,66 +1,53 @@
 <style>
-/* --- Corrected version: Draw + Chase forward off-path --- */
+/* SVG stroke “draw-on” animation (works with your pathLength="1") */
+/* Drop this CSS anywhere after your SVG or in your stylesheet */
 
+/* Base styling for animated stroke */
 svg .draw-once {
-  stroke: currentColor;
-  stroke-width: 6;
-  stroke-linecap: round;
+  /* Visuals */
+  stroke: currentColor;           /* inherits from text color, customize if needed */
+  stroke-width: 6;                /* adjust to taste */
+  stroke-linecap: round;          /* smoother ends */
   fill: none;
+
+  /* Keep stroke width consistent if SVG scales */
   vector-effect: non-scaling-stroke;
 
-  /* Define a partial dash (e.g., 30% of path visible at once) */
-  --dash-visible: 0.3;
-  --dash-gap: 0.7;
-  stroke-dasharray: var(--dash-visible) var(--dash-gap);
-  stroke-dashoffset: calc(var(--dash-visible) + var(--dash-gap));
+  /* Dash setup: with pathLength="1", a dash of 1 spans the entire path */
+  --dash: 1;
+  stroke-dasharray: var(--dash);
+  stroke-dashoffset: var(--dash);
 
-  /* Timing vars */
+  /* Animation controls (override per-segment if you like) */
   --draw-duration: 2.5s;
   --draw-delay: 0ms;
   --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
-  --push-delay: calc(var(--draw-duration) + var(--draw-delay) + 1s);
-  --push-duration: 2s;
-  --push-ease: ease-in-out;
 
-  /* Sequence: draw, then chase forward */
-  animation:
-    svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards,
-    svg-stroke-push-forward var(--push-duration) var(--push-ease) var(--push-delay) forwards;
+  /* Animate once and keep the final state */
+  animation: svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards;
 
+  /* Small perf hint */
   will-change: stroke-dashoffset;
 }
 
-/* Per-segment tweak (optional) */
+/* Example: customize timing per segment (your SVG has .seg1) */
 svg .seg1 {
   --draw-duration: 2s;
   --draw-delay: 100ms;
 }
 
-/* 1) Draws stroke in (dash offset moves from full to 0) */
+/* The actual animation: moves the dash to reveal the stroke */
 @keyframes svg-stroke-draw {
-  from {
-    stroke-dashoffset: calc(var(--dash-visible) + var(--dash-gap));
-  }
   to {
     stroke-dashoffset: 0;
   }
 }
 
-/* 2) Pushes the visible segment forward off the path */
-@keyframes svg-stroke-push-forward {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: calc(-1 * (var(--dash-visible) + var(--dash-gap)));
-  }
-}
-
-/* Accessibility */
+/* Optional: pause/disable motion for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   svg .draw-once {
     animation: none;
-    stroke-dashoffset: 0;
+    stroke-dashoffset: 0; /* show the path immediately */
   }
 }
 
