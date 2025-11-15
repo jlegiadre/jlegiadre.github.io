@@ -1,5 +1,5 @@
 <style>
-/* Root-level controls (tweak in DevTools) */
+/* Root-level controls */
 :root {
   /* Timings */
   --initial-delay: 0ms;        /* wait before the draw starts */
@@ -16,11 +16,12 @@
   --stroke-color: currentColor;
 
   /* Dash mechanics (pathLength="1" normalizes units) */
-  --gap: 1000;                 /* very large gap ensures only ONE dash is visible */
-  --push-distance: -1;          /* 1 = forward off-path, -1 = backward */
+  --gap: 1000;                 /* huge gap => only one dash is ever visible */
+  --push-distance: -1;         /* you said -1 was correct for your path direction */
+  --overshoot: 0.02;           /* tiny extra push beyond the end (tweak 0.01–0.06) */
 }
 
-/* Attach this class to your <use> element */
+/* Attach this class to your <use> element (e.g., <use href="#p1" class="draw-then-push seg1"/>) */
 svg .draw-then-push {
   stroke: var(--stroke-color);
   stroke-width: var(--stroke-width);
@@ -28,11 +29,11 @@ svg .draw-then-push {
   fill: none;
   vector-effect: non-scaling-stroke;
 
-  /* Start with zero-length dash (hidden), plus a huge gap so we don’t repeat */
+  /* Start hidden: zero-length dash + huge gap */
   stroke-dasharray: 0 var(--gap);
   stroke-dashoffset: 0;
 
-  /* Sequence: draw → (pause) → push */
+  /* draw → (pause) → push */
   animation:
     svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
     svg-stroke-push var(--push-duration) var(--push-ease)
@@ -41,31 +42,43 @@ svg .draw-then-push {
   will-change: stroke-dasharray, stroke-dashoffset;
 }
 
-/* Optional per-element overrides if you want a different tempo for a segment */
-/*
-svg .seg1 {
-  --draw-duration: 2.2s;
-  --post-draw-delay: 600ms;
-  --push-duration: 1.4s;
-  --push-distance: 1;  // set to -1 to push the other way
-}
-*/
-
 /* Phase 1: Draw (grow a single dash from 0 → 1; gap stays huge so no repeats) */
 @keyframes svg-stroke-draw {
   from { stroke-dasharray: 0 var(--gap); }
-  to   { stroke-dasharray: 1.02 var(--gap); }
+  to   { stroke-dasharray: 1 var(--gap); }
 }
 
-/* Phase 2: Push (keep dash length = 1, slide it along by +1 = forward off-path) */
+/* Phase 2: Push
+   - First, slide the full-length dash off the end (to 1 * push-direction).
+   - Then, during the final 20%, also shrink the dash to 0 and overshoot slightly.
+   This eliminates the tiny residual you saw from round caps/AA. */
 @keyframes svg-stroke-push {
-  from {
-    stroke-dasharray: 1.02 var(--gap);
+  0% {
+    stroke-dasharray: 1 var(--gap);
     stroke-dashoffset: 0;
   }
-  to {
-    stroke-dasharray: 1.02 var(--gap);
+  80% {
+    stroke-dasharray: 1 var(--gap);
     stroke-dashoffset: var(--push-distance);
+  }
+  100% {
+    stroke-dasharray: 0 var(--gap); /* dash fully collapsed */
+    stroke-dashoffset: calc(var(--push-distance) * (1 + var(--overshoot)));
+  }
+}
+
+/* Optional: if you prefer a crisp cutoff at the tail,
+   switch to square ends (comment out to keep round) */
+/*
+svg .draw-then-push { stroke-linecap: butt; }
+*/
+
+/* Reduced motion: show the final state instantly */
+@media (prefers-reduced-motion: reduce) {
+  svg .draw-then-push {
+    animation: none;
+    stroke-dasharray: 1 var(--gap);
+    stroke-dashoffset: 0;
   }
 }
 </style>
