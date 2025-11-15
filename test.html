@@ -1,34 +1,28 @@
 <style>
-/* SVG stroke “draw-on” + “chase forward off-path” sequence
-   Works with your pathLength="1" setup. Paste into your stylesheet. */
+/* --- Corrected version: Draw + Chase forward off-path --- */
 
-/* Base styling for animated stroke */
 svg .draw-once {
-  /* Visuals */
-  stroke: currentColor;      /* inherits from text color */
+  stroke: currentColor;
   stroke-width: 6;
   stroke-linecap: round;
   fill: none;
-
-  /* Keep stroke width consistent on scale */
   vector-effect: non-scaling-stroke;
 
-  /* Dash setup: with pathLength="1", a dash of 1 spans the entire path */
-  --dash: 1;
-  stroke-dasharray: var(--dash);
-  stroke-dashoffset: var(--dash);
+  /* Define a partial dash (e.g., 30% of path visible at once) */
+  --dash-visible: 0.3;
+  --dash-gap: 0.7;
+  stroke-dasharray: var(--dash-visible) var(--dash-gap);
+  stroke-dashoffset: calc(var(--dash-visible) + var(--dash-gap));
 
-  /* Timing vars you can override per segment */
+  /* Timing vars */
   --draw-duration: 2.5s;
   --draw-delay: 0ms;
   --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
-
-  /* After drawing finishes, wait 1s, then push “forward” (negative offset) */
   --push-delay: calc(var(--draw-duration) + var(--draw-delay) + 1s);
-  --push-duration: 1.5s;
+  --push-duration: 2s;
   --push-ease: ease-in-out;
 
-  /* Sequence: 1) draw, 2) chase-forward push off the path */
+  /* Sequence: draw, then chase forward */
   animation:
     svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--draw-delay) forwards,
     svg-stroke-push-forward var(--push-duration) var(--push-ease) var(--push-delay) forwards;
@@ -36,30 +30,37 @@ svg .draw-once {
   will-change: stroke-dashoffset;
 }
 
-/* Example per-segment overrides (your SVG has .seg1) */
+/* Per-segment tweak (optional) */
 svg .seg1 {
   --draw-duration: 2s;
   --draw-delay: 100ms;
-  /* push inherits the 1s gap automatically via --push-delay */
 }
 
-/* 1) Draw on: reveal the full stroke by moving the dash into place */
+/* 1) Draws stroke in (dash offset moves from full to 0) */
 @keyframes svg-stroke-draw {
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: calc(var(--dash-visible) + var(--dash-gap));
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-/* 2) Push forward: move the dash in the *path direction* so it chases itself
-      and exits at the end (negative offset advances along the path) */
+/* 2) Pushes the visible segment forward off the path */
 @keyframes svg-stroke-push-forward {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: calc(-1 * var(--dash)); }
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: calc(-1 * (var(--dash-visible) + var(--dash-gap)));
+  }
 }
 
-/* Respect user motion preferences */
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   svg .draw-once {
     animation: none;
-    stroke-dashoffset: 0; /* show immediately, no motion */
+    stroke-dashoffset: 0;
   }
 }
 
