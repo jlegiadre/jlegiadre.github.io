@@ -1,189 +1,189 @@
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Personal & Professional Portfoio Site of Jonathan Legiadre</title>
-	<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal & Professional Portfoio Site of Jonathan Legiadre</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-	<!-- Viewport height -->
-	<script>
+  <!-- Viewport height -->
+  <script>
+    (function () {
+      function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      document.addEventListener('DOMContentLoaded', setVH);
+      window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
+      if (window.visualViewport) {
+        let last = window.visualViewport.height;
+        window.visualViewport.addEventListener('resize', () => {
+          const now = window.visualViewport.height;
+          if (now < last - 120) setVH();
+          last = now;
+        });
+      }
+    })();
+  </script>
+
+  <!-- Hamburger / mega menu -->
+  <script>
+    (function () {
+      const qs  = (sel, root = document) => root.querySelector(sel);
+      const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      function trapFocus(container, e) {
+        const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
+          .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
+        if (!focusables.length) return;
+        const first = focusables[0], last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+
+      function openMenu(hamburger, menu) {
+        document.body.classList.add('menu-open');
+        menu.classList.remove('not-active');
+        menu.classList.add('is-active');
+        hamburger.classList.add('is-active');
+        hamburger.setAttribute('aria-expanded', 'true');
+        const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
+      }
+      function closeMenu(hamburger, menu, restoreTo) {
+        document.body.classList.remove('menu-open');
+        menu.classList.remove('is-active');
+        menu.classList.add('not-active');
+        hamburger.classList.remove('is-active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        if (restoreTo) restoreTo.focus();
+      }
+      function toggleMenu(hamburger, menu) {
+        menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
+                                             : openMenu(hamburger, menu);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const hamburger = qs('#hamburger');
+        const megaMenu  = qs('#mega-menu');
+        if (!megaMenu || !hamburger) return;
+
+        if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+          megaMenu.classList.add('not-active');
+        }
+        hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+
+        megaMenu.addEventListener('click', (e) => {
+          const link = e.target.closest('a');
+          if (link) closeMenu(hamburger, megaMenu, hamburger);
+        });
+        megaMenu.addEventListener('click', (e) => {
+          if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (!megaMenu.classList.contains('is-active')) return;
+          if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
+          if (e.key === 'Tab') { trapFocus(megaMenu, e); }
+        });
+      });
+    })();
+  </script>
+
+  <!-- Arrow fade on scroll -->
+  <script>
+    (function () {
+      let ticking = false;
+      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+      function onScroll(arrowFade) {
+        const y = window.scrollY || window.pageYOffset || 0;
+        arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
+        ticking = false;
+      }
+      function requestTick(arrowFade) {
+        if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        const arrowFade = document.querySelector('.arrow-fade');
+        if (!arrowFade) return;
+        onScroll(arrowFade);
+        window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
+      });
+    })();
+  </script>
+
+  <!-- Logo animation replay (double-click/tap) -->
+  <script>
+    (function () {
+      function enableLogoReplay() {
+        const logo = document.querySelector('.logo');
+        if (!logo) return;
+        logo.addEventListener('dblclick', () => {
+          const svg = logo.querySelector('svg');
+          if (!svg) return;
+          const clone = svg.cloneNode(true);
+          if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
+          if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
+          svg.replaceWith(clone);
+        }, { passive: true });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
+      else enableLogoReplay();
+    })();
+  </script>
+
+  <!-- HAMBURGER COLOR SCROLL TOGGLE -->
+  <script>
 	(function () {
-	function setVH() {
-	const vh = window.innerHeight * 0.01;
-	document.documentElement.style.setProperty('--vh', `${vh}px`);
-	}
-	document.addEventListener('DOMContentLoaded', setVH);
-	window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
-	if (window.visualViewport) {
-	let last = window.visualViewport.height;
-	window.visualViewport.addEventListener('resize', () => {
-	  const now = window.visualViewport.height;
-	  if (now < last - 120) setVH();
-	  last = now;
-	});
-	}
-	})();
-	</script>
+	  // How many pixels *before* the hero ends the switch should happen
+	  const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
 
-	<!-- Hamburger / mega menu -->
-	<script>
-	(function () {
-	const qs  = (sel, root = document) => root.querySelector(sel);
-	const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+	  function setupHamburgerColorSwitch() {
+		const hero = document.querySelector('.nav-center-screen');
+		if (!hero) return;
 
-	function trapFocus(container, e) {
-	const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
-	  .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
-	if (!focusables.length) return;
-	const first = focusables[0], last = focusables[focusables.length - 1];
-	if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-	else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-	}
+		// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
+		let sentinel = hero.querySelector('.hero-sentinel');
+		if (!sentinel) {
+		  sentinel = document.createElement('div');
+		  sentinel.className = 'hero-sentinel';
+		  hero.appendChild(sentinel);
+		}
 
-	function openMenu(hamburger, menu) {
-	document.body.classList.add('menu-open');
-	menu.classList.remove('not-active');
-	menu.classList.add('is-active');
-	hamburger.classList.add('is-active');
-	hamburger.setAttribute('aria-expanded', 'true');
-	const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
-	}
-	function closeMenu(hamburger, menu, restoreTo) {
-	document.body.classList.remove('menu-open');
-	menu.classList.remove('is-active');
-	menu.classList.add('not-active');
-	hamburger.classList.remove('is-active');
-	hamburger.setAttribute('aria-expanded', 'false');
-	if (restoreTo) restoreTo.focus();
-	}
-	function toggleMenu(hamburger, menu) {
-	menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
-										 : openMenu(hamburger, menu);
-	}
+		// Inline styles so this works without relying on extra CSS
+		Object.assign(sentinel.style, {
+		  position: 'absolute',
+		  left: '0',
+		  right: '0',
+		  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
+		  height: '1px',
+		  pointerEvents: 'none'
+		  // For quick debugging, uncomment the next line to *see* the sentinel:
+		  // ,background: 'rgba(255,0,0,.3)'
+		});
 
-	document.addEventListener('DOMContentLoaded', () => {
-	const hamburger = qs('#hamburger');
-	const megaMenu  = qs('#mega-menu');
-	if (!megaMenu || !hamburger) return;
+		// Ensure the hero is a positioning context
+		const heroComputed = getComputedStyle(hero);
+		if (heroComputed.position === 'static') {
+		  hero.style.position = 'relative';
+		}
 
-	if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-	  megaMenu.classList.add('not-active');
-	}
-	hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+		// Observe the sentinel: when it leaves the viewport, we’re past the hero.
+		const io = new IntersectionObserver((entries) => {
+		  const entry = entries[0];
+		  if (entry.isIntersecting) {
+			// Sentinel is visible -> we're still within the hero
+			document.body.classList.remove('hamburger-on-light');
+		  } else {
+			// Sentinel scrolled out -> we're into the light section
+			document.body.classList.add('hamburger-on-light');
+		  }
+		}, { threshold: 0 });
 
-	megaMenu.addEventListener('click', (e) => {
-	  const link = e.target.closest('a');
-	  if (link) closeMenu(hamburger, megaMenu, hamburger);
-	});
-	megaMenu.addEventListener('click', (e) => {
-	  if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
-	});
-
-	document.addEventListener('keydown', (e) => {
-	  if (!megaMenu.classList.contains('is-active')) return;
-	  if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
-	  if (e.key === 'Tab') { trapFocus(megaMenu, e); }
-	});
-	});
-	})();
-	</script>
-
-	<!-- Arrow fade on scroll -->
-	<script>
-	(function () {
-	let ticking = false;
-	const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-	function onScroll(arrowFade) {
-	const y = window.scrollY || window.pageYOffset || 0;
-	arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
-	ticking = false;
-	}
-	function requestTick(arrowFade) {
-	if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
-	}
-	document.addEventListener('DOMContentLoaded', () => {
-	const arrowFade = document.querySelector('.arrow-fade');
-	if (!arrowFade) return;
-	onScroll(arrowFade);
-	window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
-	});
-	})();
-	</script>
-
-	<!-- Logo animation replay (double-click/tap) -->
-	<script>
-	(function () {
-	function enableLogoReplay() {
-	const logo = document.querySelector('.logo');
-	if (!logo) return;
-	logo.addEventListener('dblclick', () => {
-	  const svg = logo.querySelector('svg');
-	  if (!svg) return;
-	  const clone = svg.cloneNode(true);
-	  if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
-	  if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
-	  svg.replaceWith(clone);
-	}, { passive: true });
-	}
-	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
-	else enableLogoReplay();
-	})();
-	</script>
-
-	<!-- HAMBURGER COLOR SCROLL TOGGLE -->
-	<script>
-	(function () {
-	// How many pixels *before* the hero ends the switch should happen
-	const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
-
-	function setupHamburgerColorSwitch() {
-	const hero = document.querySelector('.nav-center-screen');
-	if (!hero) return;
-
-	// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
-	let sentinel = hero.querySelector('.hero-sentinel');
-	if (!sentinel) {
-	  sentinel = document.createElement('div');
-	  sentinel.className = 'hero-sentinel';
-	  hero.appendChild(sentinel);
-	}
-
-	// Inline styles so this works without relying on extra CSS
-	Object.assign(sentinel.style, {
-	  position: 'absolute',
-	  left: '0',
-	  right: '0',
-	  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
-	  height: '1px',
-	  pointerEvents: 'none'
-	  // For quick debugging, uncomment the next line to *see* the sentinel:
-	  // ,background: 'rgba(255,0,0,.3)'
-	});
-
-	// Ensure the hero is a positioning context
-	const heroComputed = getComputedStyle(hero);
-	if (heroComputed.position === 'static') {
-	  hero.style.position = 'relative';
-	}
-
-	// Observe the sentinel: when it leaves the viewport, we’re past the hero.
-	const io = new IntersectionObserver((entries) => {
-	  const entry = entries[0];
-	  if (entry.isIntersecting) {
-		// Sentinel is visible -> we're still within the hero
-		document.body.classList.remove('hamburger-on-light');
-	  } else {
-		// Sentinel scrolled out -> we're into the light section
-		document.body.classList.add('hamburger-on-light');
+		io.observe(sentinel);
 	  }
-	}, { threshold: 0 });
 
-	io.observe(sentinel);
-	}
-
-	if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
-	} else {
-	setupHamburgerColorSwitch();
-	}
+	  if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
+	  } else {
+		setupHamburgerColorSwitch();
+	  }
 	})();
 	</script>
 </head>
@@ -410,112 +410,80 @@
 	  }
 	  /* Fill the capped box height to avoid crop in landscape */
 	  .logo svg { width: 100%; height: 100%; display: block; }
-	</style>
-	
-	<style>
-  /* --- Logo animation (single pass with reveal; push shaped by easing + magnitude) --- */
-  :root{
-    --stroke-w: clamp(10px, 6vw, 47px);
-    --c12: #f3f1f1;
-    --c34: #4F8ABA;
 
-    /* per-segment controls */
-    /* seg1 */
-    --seg1-start: 0s;
-    --seg1-dur:   1s;
-    --seg1-push:  0.02;
-    --seg1-ease:  cubic-bezier(.33,0,.17,1);
+	  :root{
+		--seg1-start: 0s;
+		--seg2-start: 0.6s;
+		--seg3-start: 0.9s;
+		--seg4-start: 1.25s;
+		--seg5-start: 1.4s;
+		--stroke-w: clamp(10px, 6vw, 47px);
+		--c12: #f3f1f1;
+		--c34: #4F8ABA;
+		--seg1-final-dur: 1s;
+		--seg2-final-dur: 0.9s;
+		--seg3-final-dur: 0.6s;
+		--seg4-final-dur: 0.8s;
+		--seg5-final-dur: 1.2s;
+	  }
 
-    /* seg2 */
-    --seg2-start: 0.6s;
-    --seg2-dur:   0.9s;
-    --seg2-push:  0.02;
-    --seg2-ease:  cubic-bezier(.2,0,0,1);
+	  /* Flash-free + hidden until each segment starts */
+	  .draw-final{
+		fill: none;
+		stroke-width: var(--stroke-w);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke: currentColor;
+		stroke-dasharray: .02 1;
+		stroke-dashoffset: 1;
+		visibility: hidden;
+		will-change: stroke-dasharray, stroke-dashoffset, visibility;
+		shape-rendering: geometricPrecision;
+	  }
 
-    /* seg3 */
-    --seg3-start: 0.9s;
-    --seg3-dur:   0.6s;
-    --seg3-push:  0.02;
-    --seg3-ease:  cubic-bezier(.4,0,.2,1);
+	  .seg1 { color: var(--c12); }
+	  .seg2 { color: var(--c12); }
+	  .seg3 { color: var(--c34); }
+	  .seg4 { color: var(--c34); }
+	  .seg5 { color: var(--c34); }
 
-    /* seg4 */
-    --seg4-start: 1.25s;
-    --seg4-dur:   0.8s;
-    --seg4-push:  0.02;
-    --seg4-ease:  cubic-bezier(.3,0,.1,1);
+	  .seg1.draw-final {
+		--segX-dur: var(--seg1-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg1-start) forwards,
+		  final-grow-dash var(--seg1-final-dur) ease-in var(--seg1-start) forwards;
+	  }
+	  .seg2.draw-final {
+		--segX-dur: var(--seg2-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg2-start) forwards,
+		  final-grow-dash var(--seg2-final-dur) ease-out var(--seg2-start) forwards;
+	  }
+	  .seg3.draw-final {
+		--segX-dur: var(--seg3-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg3-start) forwards,
+		  final-grow-dash var(--seg3-final-dur) ease-in var(--seg3-start) forwards;
+	  }
+	  .seg4.draw-final {
+		--segX-dur: var(--seg4-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg4-start) forwards,
+		  final-grow-dash var(--seg4-final-dur) ease-out var(--seg4-start) forwards;
+	  }
+	  .seg5.draw-final {
+		--segX-dur: var(--seg5-final-dur);
+		animation:
+		  reveal 0s step-end var(--seg5-start) forwards,
+		  final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
+	  }
 
-    /* seg5 */
-    --seg5-start: 1.4s;
-    --seg5-dur:   1.2s;
-    --seg5-push:  0.02;
-    --seg5-ease:  cubic-bezier(.25,0,.15,1);
-  }
+	  @keyframes reveal { to { visibility: visible; } }
+	  @keyframes final-grow-dash{
+		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
+		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
+	  }
 
-  /* Hidden until start; avoid edge flash */
-  .draw-final{
-    fill: none;
-    stroke-width: var(--stroke-w);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke: currentColor;
-    stroke-dasharray: .02 1;
-    stroke-dashoffset: 1;
-    visibility: hidden;
-    will-change: stroke-dasharray, stroke-dashoffset, visibility;
-    shape-rendering: geometricPrecision;
-    /* default push so keyframes always have a value */
-    --push: 0.02;
-  }
-
-  .seg1 { color: var(--c12); }
-  .seg2 { color: var(--c12); }
-  .seg3 { color: var(--c34); }
-  .seg4 { color: var(--c34); }
-  .seg5 { color: var(--c34); }
-
-  /* Reveal → Draw (single animation phase for draw) */
-  .seg1.draw-final {
-    --push: var(--seg1-push);
-    animation:
-      reveal            0s           step-end var(--seg1-start) forwards,
-      final-grow-dash   var(--seg1-dur) var(--seg1-ease) var(--seg1-start) forwards;
-  }
-  .seg2.draw-final {
-    --push: var(--seg2-push);
-    animation:
-      reveal            0s           step-end var(--seg2-start) forwards,
-      final-grow-dash   var(--seg2-dur) var(--seg2-ease) var(--seg2-start) forwards;
-  }
-  .seg3.draw-final {
-    --push: var(--seg3-push);
-    animation:
-      reveal            0s           step-end var(--seg3-start) forwards,
-      final-grow-dash   var(--seg3-dur) var(--seg3-ease) var(--seg3-start) forwards;
-  }
-  .seg4.draw-final {
-    --push: var(--seg4-push);
-    animation:
-      reveal            0s           step-end var(--seg4-start) forwards,
-      final-grow-dash   var(--seg4-dur) var(--seg4-ease) var(--seg4-start) forwards;
-  }
-  .seg5.draw-final {
-    --push: var(--seg5-push);
-    animation:
-      reveal            0s           step-end var(--seg5-start) forwards,
-      final-grow-dash   var(--seg5-dur) var(--seg5-ease) var(--seg5-start) forwards;
-  }
-
-  @keyframes reveal { to { visibility: visible; } }
-
-  /* Draw to full length with tiny “push” past the end for a clean cap */
-  @keyframes final-grow-dash{
-    0%   { stroke-dasharray: .02 1;         stroke-dashoffset: 1; }
-    100% { stroke-dasharray: calc(1 + var(--push)) 1;
-           stroke-dashoffset: calc(0 - var(--push)); }
-  }
-</style>
-	
-	<style>
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
 		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
@@ -563,12 +531,11 @@
 
 			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
 			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)">
-					<use href="#p1" class="draw-final seg1"/></g>
-<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
+				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
+				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
+				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
+				<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
 			  </g>
 			</svg>
 		  </div>
