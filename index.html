@@ -476,8 +476,9 @@
   }
   @keyframes jl_draw_once {
     /* Draw from nothing to fully visible and stay there */
-    0%   { stroke-dasharray: .02 1; stroke-dashoffset: 1; }
-    100% { stroke-dasharray: none; stroke-dashoffset: 0; } /* solid stroke, no dash left to “push” */
+    to {
+		stroke-dashoffset: 0;
+	  }
   }
 
   /* Reduced motion */
