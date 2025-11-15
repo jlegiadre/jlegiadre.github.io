@@ -411,78 +411,138 @@
 	  /* Fill the capped box height to avoid crop in landscape */
 	  .logo svg { width: 100%; height: 100%; display: block; }
 
-	  :root{
-		--seg1-start: 0s;
-		--seg2-start: 0.6s;
-		--seg3-start: 0.9s;
-		--seg4-start: 1.25s;
-		--seg5-start: 1.4s;
-		--stroke-w: clamp(10px, 6vw, 47px);
-		--c12: #f3f1f1;
-		--c34: #4F8ABA;
-		--seg1-final-dur: 1s;
-		--seg2-final-dur: 0.9s;
-		--seg3-final-dur: 0.6s;
-		--seg4-final-dur: 0.8s;
-		--seg5-final-dur: 1.2s;
-	  }
+	:root{
+	  --stroke-w: clamp(10px, 6vw, 47px);
+	  --c12: #f3f1f1;    /* seg1/seg2 */
+	  --c345: #4F8ABA;   /* seg3/seg4/seg5 */
 
-	  /* Flash-free + hidden until each segment starts */
-	  .draw-final{
-		fill: none;
-		stroke-width: var(--stroke-w);
-		stroke-linecap: round;
-		stroke-linejoin: round;
-		stroke: currentColor;
-		stroke-dasharray: .02 1;
-		stroke-dashoffset: 1;
-		visibility: hidden;
-		will-change: stroke-dasharray, stroke-dashoffset, visibility;
-		shape-rendering: geometricPrecision;
-	  }
+	  /* seg1 */
+	  --seg1-start:       0.00s;
+	  --seg1-draw1-dur:   0.90s;
+	  --seg1-erase-gap:   0.25s;
+	  --seg1-erase-dur:   0.70s;
+	  --seg1-draw2-gap:   0.30s;
+	  --seg1-draw2-dur:   1.10s;
 
-	  .seg1 { color: var(--c12); }
-	  .seg2 { color: var(--c12); }
-	  .seg3 { color: var(--c34); }
-	  .seg4 { color: var(--c34); }
-	  .seg5 { color: var(--c34); }
+	  /* seg2 */
+	  --seg2-start:       0.55s;
+	  --seg2-draw1-dur:   0.90s;
+	  --seg2-erase-gap:   0.25s;
+	  --seg2-erase-dur:   0.70s;
+	  --seg2-draw2-gap:   0.30s;
+	  --seg2-draw2-dur:   1.10s;
 
-	  .seg1.draw-final {
-		--segX-dur: var(--seg1-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg1-start) forwards,
-		  final-grow-dash var(--seg1-final-dur) ease-in var(--seg1-start) forwards;
-	  }
-	  .seg2.draw-final {
-		--segX-dur: var(--seg2-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg2-start) forwards,
-		  final-grow-dash var(--seg2-final-dur) ease-out var(--seg2-start) forwards;
-	  }
-	  .seg3.draw-final {
-		--segX-dur: var(--seg3-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg3-start) forwards,
-		  final-grow-dash var(--seg3-final-dur) ease-in var(--seg3-start) forwards;
-	  }
-	  .seg4.draw-final {
-		--segX-dur: var(--seg4-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg4-start) forwards,
-		  final-grow-dash var(--seg4-final-dur) ease-out var(--seg4-start) forwards;
-	  }
-	  .seg5.draw-final {
-		--segX-dur: var(--seg5-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg5-start) forwards,
-		  final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
-	  }
+	  /* seg3 */
+	  --seg3-start:       1.20s;
+	  --seg3-draw1-dur:   0.90s;
+	  --seg3-erase-gap:   0.25s;
+	  --seg3-erase-dur:   0.70s;
+	  --seg3-draw2-gap:   0.30s;
+	  --seg3-draw2-dur:   1.10s;
 
-	  @keyframes reveal { to { visibility: visible; } }
-	  @keyframes final-grow-dash{
-		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
-		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
-	  }
+	  /* seg4 */
+	  --seg4-start:       1.50s;
+	  --seg4-draw1-dur:   0.90s;
+	  --seg4-erase-gap:   0.25s;
+	  --seg4-erase-dur:   0.70s;
+	  --seg4-draw2-gap:   0.30s;
+	  --seg4-draw2-dur:   1.10s;
+
+	  /* seg5 */
+	  --seg5-start:       1.90s;
+	  --seg5-draw1-dur:   0.90s;
+	  --seg5-erase-gap:   0.25s;
+	  --seg5-erase-dur:   0.70s;
+	  --seg5-draw2-gap:   0.30s;
+	  --seg5-draw2-dur:   1.10s;
+	}
+
+	.draw-seq{
+	  fill: none;
+	  stroke-width: var(--stroke-w);
+	  stroke-linecap: round;
+	  stroke-linejoin: round;
+	  stroke: currentColor;
+
+	  stroke-dasharray: .02 1;
+	  stroke-dashoffset: 1;
+
+	  visibility: hidden;
+
+	  will-change: stroke-dasharray, stroke-dashoffset, visibility;
+	  shape-rendering: geometricPrecision;
+	}
+
+	.seg1, .seg2 { color: var(--c12); }
+	.seg3, .seg4, .seg5 { color: var(--c345); }
+
+	@keyframes reveal { to { visibility: visible; } }
+
+	@keyframes draw-dash {
+	  0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
+	  100% { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
+	}
+
+	@keyframes erase-dash {
+	  0%   { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
+	  100% { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
+	}
+
+	/* seg1 */
+	.seg1.draw-seq{
+	  animation:
+		reveal 0s step-end var(--seg1-start) forwards,
+		draw-dash  var(--seg1-draw1-dur) ease-in var(--seg1-start) forwards,
+		erase-dash var(--seg1-erase-dur) ease-in
+		  calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap)) forwards,
+		draw-dash  var(--seg1-draw2-dur) ease-in
+		  calc(var(--seg1-start) + var(--seg1-draw1-dur) + var(--seg1-erase-gap) + var(--seg1-erase-dur) + var(--seg1-draw2-gap)) forwards;
+	}
+
+	/* seg2 */
+	.seg2.draw-seq{
+	  animation:
+		reveal 0s step-end var(--seg2-start) forwards,
+		draw-dash  var(--seg2-draw1-dur) ease-out var(--seg2-start) forwards,
+		erase-dash var(--seg2-erase-dur) ease-out
+		  calc(var(--seg2-start) + var(--seg2-draw1-dur) + var(--seg2-erase-gap)) forwards,
+		draw-dash  var(--seg2-draw2-dur) ease-out
+		  calc(var(--seg2-start) + var(--seg2-draw1-dur) + var(--seg2-erase-gap) + var(--seg2-erase-dur) + var(--seg2-draw2-gap)) forwards;
+	}
+
+	/* seg3 */
+	.seg3.draw-seq{
+	  animation:
+		reveal 0s step-end var(--seg3-start) forwards,
+		draw-dash  var(--seg3-draw1-dur) ease-in var(--seg3-start) forwards,
+		erase-dash var(--seg3-erase-dur) ease-in
+		  calc(var(--seg3-start) + var(--seg3-draw1-dur) + var(--seg3-erase-gap)) forwards,
+		draw-dash  var(--seg3-draw2-dur) ease-in
+		  calc(var(--seg3-start) + var(--seg3-draw1-dur) + var(--seg3-erase-gap) + var(--seg3-erase-dur) + var(--seg3-draw2-gap)) forwards;
+	}
+
+	/* seg4 */
+	.seg4.draw-seq{
+	  animation:
+		reveal 0s step-end var(--seg4-start) forwards,
+		draw-dash  var(--seg4-draw1-dur) ease-out var(--seg4-start) forwards,
+		erase-dash var(--seg4-erase-dur) ease-out
+		  calc(var(--seg4-start) + var(--seg4-draw1-dur) + var(--seg4-erase-gap)) forwards,
+		draw-dash  var(--seg4-draw2-dur) ease-out
+		  calc(var(--seg4-start) + var(--seg4-draw1-dur) + var(--seg4-erase-gap) + var(--seg4-erase-dur) + var(--seg4-draw2-gap)) forwards;
+	}
+
+	/* seg5 */
+	.seg5.draw-seq{
+	  animation:
+		reveal 0s step-end var(--seg5-start) forwards,
+		draw-dash  var(--seg5-draw1-dur) ease-in-out var(--seg5-start) forwards,
+		erase-dash var(--seg5-erase-dur) ease-in-out
+		  calc(var(--seg5-start) + var(--seg5-draw1-dur) + var(--seg5-erase-gap)) forwards,
+		draw-dash  var(--seg5-draw2-dur) ease-in-out
+		  calc(var(--seg5-start) + var(--seg5-draw1-dur) + var(--seg5-erase-gap) + var(--seg5-erase-dur) + var(--seg5-draw2-gap)) forwards;
+	}
+
 
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
@@ -531,11 +591,11 @@
 
 			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
 			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
-				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-				<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-seq seg1"/></g>
+				<g clip-path="url(#clip2)"><use href="#p2" class="draw-seq seg2"/></g>
+				<g clip-path="url(#clip3)"><use href="#p3" class="draw-seq seg3"/></g>
+				<g clip-path="url(#clip4)"><use href="#p4" class="draw-seq seg4"/></g>
+				<g clip-path="url(#clip5)"><use href="#p5" class="draw-seq seg5"/></g>
 			  </g>
 			</svg>
 		  </div>
