@@ -1,76 +1,79 @@
 <style>
-/* SVG stroke “draw, pause, then push off-path” animation
-   Works with your <path pathLength="1"> setup */
+/* Root-level controls (tweak in DevTools) */
+:root {
+  /* Timings */
+  --initial-delay: 0ms;        /* wait before the draw starts */
+  --draw-duration: 2s;         /* speed of draw */
+  --post-draw-delay: 400ms;    /* pause after draw */
+  --push-duration: 1.6s;       /* speed of push */
 
-/* ---------- Defaults & reusable animation class ---------- */
+  /* Easing */
+  --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --push-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Stroke visuals */
+  --stroke-width: 6;
+  --stroke-color: currentColor;
+
+  /* Dash mechanics (pathLength="1" normalizes units) */
+  --gap: 1000;                 /* very large gap ensures only ONE dash is visible */
+  --push-distance: 1;          /* 1 = forward off-path, -1 = backward */
+}
+
+/* Attach this class to your <use> element */
 svg .draw-then-push {
-  /* Visuals */
-  stroke: currentColor;
-  stroke-width: 6;
+  stroke: var(--stroke-color);
+  stroke-width: var(--stroke-width);
   stroke-linecap: round;
   fill: none;
   vector-effect: non-scaling-stroke;
 
-  /* Core dash config (pathLength=1 => units are normalized) */
-  --dash: 1;                 /* whole path length */
-  --epsilon: 0.0001;         /* tiny >0 value for robust interpolation */
+  /* Start with zero-length dash (hidden), plus a huge gap so we don’t repeat */
+  stroke-dasharray: 0 var(--gap);
+  stroke-dashoffset: 0;
 
-  /* Timings you can customize per element */
-  --initial-delay: 0ms;      /* delay before the draw begins */
-  --draw-duration: 2s;       /* how long the draw takes */
-  --post-draw-delay: 400ms;  /* pause after the draw finishes */
-  --push-duration: 1.6s;     /* how long the push-off takes */
-
-  /* Easing (customize as you like) */
-  --draw-ease: cubic-bezier(0.65, 0, 0.35, 1);
-  --push-ease: cubic-bezier(0.2, 0, 0, 1);
-
-  /* Start fully hidden (dash equals whole path, offset = whole path) */
-  stroke-dasharray: var(--dash);
-  stroke-dashoffset: var(--dash);
-
-  /* Two-phase animation: draw → (pause) → push */
+  /* Sequence: draw → (pause) → push */
   animation:
     svg-stroke-draw var(--draw-duration) var(--draw-ease) var(--initial-delay) forwards,
     svg-stroke-push var(--push-duration) var(--push-ease)
       calc(var(--initial-delay) + var(--draw-duration) + var(--post-draw-delay)) forwards;
 
-  will-change: stroke-dashoffset, stroke-dasharray;
+  will-change: stroke-dasharray, stroke-dashoffset;
 }
 
-/* Example: tune timings on your single segment (.seg1) */
+/* Optional per-element overrides if you want a different tempo for a segment */
+/*
 svg .seg1 {
-  /* Customize these to taste */
-  --initial-delay: 150ms;     /* wait before starting the draw */
-  --draw-duration: 2.0s;      /* speed of draw */
-  --post-draw-delay: 500ms;   /* pause after draw */
-  --push-duration: 1.8s;      /* speed of push */
+  --draw-duration: 2.2s;
+  --post-draw-delay: 600ms;
+  --push-duration: 1.4s;
+  --push-distance: 1;  // set to -1 to push the other way
 }
+*/
 
-/* Phase 1: reveal the stroke by moving the dash into place */
+/* Phase 1: Draw (grow a single dash from 0 → 1; gap stays huge so no repeats) */
 @keyframes svg-stroke-draw {
-  to { stroke-dashoffset: 0; }
+  from { stroke-dasharray: 0 var(--gap); }
+  to   { stroke-dasharray: 1 var(--gap); }
 }
 
-/* Phase 2: “push” the stroke forward until it disappears.
-   We shrink the visible dash (dasharray: 1 → ~0) while moving it forward
-   (dashoffset: 0 → -1), so the leading edge advances and the trail vanishes. */
+/* Phase 2: Push (keep dash length = 1, slide it along by +1 = forward off-path) */
 @keyframes svg-stroke-push {
   from {
-    stroke-dasharray: 1;
+    stroke-dasharray: 1 var(--gap);
     stroke-dashoffset: 0;
   }
   to {
-    stroke-dasharray: var(--epsilon);
-    stroke-dashoffset: calc(-1 + var(--epsilon));
+    stroke-dasharray: 1 var(--gap);
+    stroke-dashoffset: var(--push-distance);
   }
 }
 
-/* Reduced motion: show the path statically, no animation */
+/* Reduced motion: show the final state instantly */
 @media (prefers-reduced-motion: reduce) {
   svg .draw-then-push {
     animation: none;
-    stroke-dasharray: 1;
+    stroke-dasharray: 1 var(--gap);
     stroke-dashoffset: 0;
   }
 }
