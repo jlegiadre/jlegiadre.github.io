@@ -418,70 +418,73 @@
     --c12: #f3f1f1;  /* seg 1–2 */
     --c34: #4F8ABA;  /* seg 3–5 */
 
-    /* ---- TIMING (all in root) ---- */
-    /* seg1 */
-    --seg1-t0:    0s;    /* delay before draw */
-    --seg1-tDraw: 1s;    /* draw duration */
-
-    /* seg2 */
-    --seg2-t0:    0.6s;
-    --seg2-tDraw: 0.9s;
-
-    /* seg3 */
-    --seg3-t0:    0.9s;
-    --seg3-tDraw: 0.6s;
-
-    /* seg4 */
-    --seg4-t0:    1.25s;
-    --seg4-tDraw: 0.8s;
-
-    /* seg5 */
-    --seg5-t0:    1.4s;
-    --seg5-tDraw: 1.2s;
+    /* ---- TIMING (all in root, per segment) ---- */
+    --seg1-t0:    0s;    --seg1-tDraw: 1s;
+    --seg2-t0:    0.6s;  --seg2-tDraw: 0.9s;
+    --seg3-t0:    0.9s;  --seg3-tDraw: 0.6s;
+    --seg4-t0:    1.25s; --seg4-tDraw: 0.8s;
+    --seg5-t0:    1.4s;  --seg5-tDraw: 1.2s;
   }
 
-  /* Single-pass draw: starts hidden via dash, draws once, ends as a solid stroke */
-  .draw-once{
+  /* Single-pass: REVEAL → DRAW-ONCE → STOP (no push, no redraw) */
+  .draw-once {
     fill: none;
     stroke-width: var(--stroke-w);
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke: currentColor;
 
-    /* start “invisible” without flashing */
-    stroke-dasharray: .02 1;
-    stroke-dashoffset: 1;
-    visibility: visible; /* no separate reveal animation needed */
+    /* start hidden without edge flash */
+    visibility: hidden;
+    stroke-dasharray: .02 1; /* tiny dash, big gap */
+    stroke-dashoffset: 1;    /* fully off the path */
 
-    will-change: stroke-dasharray, stroke-dashoffset;
+    will-change: stroke-dasharray, stroke-dashoffset, visibility;
     shape-rendering: geometricPrecision;
 
-    /* One animation only — shorthand overrides any previously applied animations */
-    animation: jl_draw_once var(--tDraw) ease var(--t0) 1 normal both;
+    /* EXACTLY two phases; this overrides any prior animation lists */
+    animation-name:
+      jl_reveal_once,     /* only sets visibility */
+      jl_draw_once;       /* grows to a full, static stroke */
+    animation-duration:
+      0s,
+      var(--tDraw);
+    animation-delay:
+      var(--t0),
+      var(--t0);
+    animation-timing-function:
+      step-end,
+      ease;
+    animation-iteration-count:
+      1, 1;
+    animation-direction:
+      normal, normal;
+    animation-fill-mode:
+      forwards, forwards;
   }
 
-  /* Colors */
-  .seg1, .seg2 { color: var(--c12); }
-  .seg3, .seg4, .seg5 { color: var(--c34); }
+  /* Map per-segment timings from :root (all control lives in :root) */
+  .seg1 { --t0: var(--seg1-t0); --tDraw: var(--seg1-tDraw); color: var(--c12); }
+  .seg2 { --t0: var(--seg2-t0); --tDraw: var(--seg2-tDraw); color: var(--c12); }
+  .seg3 { --t0: var(--seg3-t0); --tDraw: var(--seg3-tDraw); color: var(--c34); }
+  .seg4 { --t0: var(--seg4-t0); --tDraw: var(--seg4-tDraw); color: var(--c34); }
+  .seg5 { --t0: var(--seg5-t0); --tDraw: var(--seg5-tDraw); color: var(--c34); }
 
-  /* Map per-segment root timings to the generic vars the animation uses */
-  .seg1 { --t0: var(--seg1-t0); --tDraw: var(--seg1-tDraw); }
-  .seg2 { --t0: var(--seg2-t0); --tDraw: var(--seg2-tDraw); }
-  .seg3 { --t0: var(--seg3-t0); --tDraw: var(--seg3-tDraw); }
-  .seg4 { --t0: var(--seg4-t0); --tDraw: var(--seg4-tDraw); }
-  .seg5 { --t0: var(--seg5-t0); --tDraw: var(--seg5-tDraw); }
-
-  /* Keyframes: grow the dash to full length, then normalize to a solid stroke */
+  /* Keyframes */
+  @keyframes jl_reveal_once {
+    to { visibility: visible; }
+  }
   @keyframes jl_draw_once {
-    0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
-    90%  { stroke-dasharray: 1 1;    stroke-dashoffset: 0; }   /* fully drawn */
-    100% { stroke-dasharray: none;   stroke-dashoffset: 0; }   /* lock as solid line */
+    /* Draw from nothing to fully visible and stay there */
+    0%   { stroke-dasharray: .02 1; stroke-dashoffset: 1; }
+    100% { stroke-dasharray: none; stroke-dashoffset: 0; } /* solid stroke, no dash left to “push” */
   }
 
-  /* Reduced motion: show final static stroke immediately */
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .draw-once {
       animation: none !important;
+      visibility: visible;
       stroke-dasharray: none;
       stroke-dashoffset: 0;
     }
