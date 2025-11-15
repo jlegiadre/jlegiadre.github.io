@@ -418,9 +418,26 @@
     --c12: #f3f1f1; /* seg 1–2 */
     --c34: #4F8ABA; /* seg 3–5 */
 
-    /* global defaults (you can override per segment) */
-    --t0: 0s;     /* delay before drawing */
-    --tDraw: 1s;  /* draw speed */
+    /* ---- TIMING (all in root) ---- */
+    /* seg1 */
+    --seg1-t0:   0s;
+    --seg1-tDraw: 1s;
+
+    /* seg2 */
+    --seg2-t0:   0.6s;
+    --seg2-tDraw: 0.9s;
+
+    /* seg3 */
+    --seg3-t0:   0.9s;
+    --seg3-tDraw: 0.6s;
+
+    /* seg4 */
+    --seg4-t0:   1.25s;
+    --seg4-tDraw: 0.8s;
+
+    /* seg5 */
+    --seg5-t0:   1.4s;
+    --seg5-tDraw: 1.2s;
   }
 
   /* Base stroke for a single draw that remains visible */
@@ -439,7 +456,7 @@
     will-change: stroke-dasharray, stroke-dashoffset, visibility;
     shape-rendering: geometricPrecision;
 
-    /* Phase chain: reveal (visibility) → draw → stop */
+    /* reveal (visibility) → draw → stop */
     animation-name:
       jl_reveal_once,
       jl_draw_once;
@@ -460,26 +477,23 @@
       forwards, forwards;
   }
 
-  /* Colors per segment */
-  .seg1 { color: var(--c12); }
-  .seg2 { color: var(--c12); }
-  .seg3 { color: var(--c34); }
-  .seg4 { color: var(--c34); }
-  .seg5 { color: var(--c34); }
+  /* Colors */
+  .seg1, .seg2 { color: var(--c12); }
+  .seg3, .seg4, .seg5 { color: var(--c34); }
 
-  /* Optional stagger / per-segment overrides */
-  .seg1 { --t0: 0s;    --tDraw: 1s;   }
-  .seg2 { --t0: 0.6s;  --tDraw: 0.9s; }
-  .seg3 { --t0: 0.9s;  --tDraw: 0.6s; }
-  .seg4 { --t0: 1.25s; --tDraw: 0.8s; }
-  .seg5 { --t0: 1.4s;  --tDraw: 1.2s; }
+  /* Map per-segment root timings to the generic vars the animation uses */
+  .seg1 { --t0: var(--seg1-t0); --tDraw: var(--seg1-tDraw); }
+  .seg2 { --t0: var(--seg2-t0); --tDraw: var(--seg2-tDraw); }
+  .seg3 { --t0: var(--seg3-t0); --tDraw: var(--seg3-tDraw); }
+  .seg4 { --t0: var(--seg4-t0); --tDraw: var(--seg4-tDraw); }
+  .seg5 { --t0: var(--seg5-t0); --tDraw: var(--seg5-tDraw); }
 
   /* Keyframes */
   @keyframes jl_reveal_once {
     to { visibility: visible; }
   }
   @keyframes jl_draw_once {
-    /* Use 1.02 / -0.02 for a slightly cleaner cap; switch to 1 / 0 if you prefer exact endpoints */
+    /* For perfectly flush endpoints, change to: 100% { stroke-dasharray: 1 1; stroke-dashoffset: 0; } */
     0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
     100% { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
   }
