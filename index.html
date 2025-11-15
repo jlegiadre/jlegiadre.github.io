@@ -1,189 +1,189 @@
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Personal & Professional Portfoio Site of Jonathan Legiadre</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Personal & Professional Portfoio Site of Jonathan Legiadre</title>
+	<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Viewport height -->
-  <script>
-    (function () {
-      function setVH() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-      }
-      document.addEventListener('DOMContentLoaded', setVH);
-      window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
-      if (window.visualViewport) {
-        let last = window.visualViewport.height;
-        window.visualViewport.addEventListener('resize', () => {
-          const now = window.visualViewport.height;
-          if (now < last - 120) setVH();
-          last = now;
-        });
-      }
-    })();
-  </script>
-
-  <!-- Hamburger / mega menu -->
-  <script>
-    (function () {
-      const qs  = (sel, root = document) => root.querySelector(sel);
-      const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
-      function trapFocus(container, e) {
-        const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
-          .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
-        if (!focusables.length) return;
-        const first = focusables[0], last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-
-      function openMenu(hamburger, menu) {
-        document.body.classList.add('menu-open');
-        menu.classList.remove('not-active');
-        menu.classList.add('is-active');
-        hamburger.classList.add('is-active');
-        hamburger.setAttribute('aria-expanded', 'true');
-        const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
-      }
-      function closeMenu(hamburger, menu, restoreTo) {
-        document.body.classList.remove('menu-open');
-        menu.classList.remove('is-active');
-        menu.classList.add('not-active');
-        hamburger.classList.remove('is-active');
-        hamburger.setAttribute('aria-expanded', 'false');
-        if (restoreTo) restoreTo.focus();
-      }
-      function toggleMenu(hamburger, menu) {
-        menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
-                                             : openMenu(hamburger, menu);
-      }
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const hamburger = qs('#hamburger');
-        const megaMenu  = qs('#mega-menu');
-        if (!megaMenu || !hamburger) return;
-
-        if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-          megaMenu.classList.add('not-active');
-        }
-        hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
-
-        megaMenu.addEventListener('click', (e) => {
-          const link = e.target.closest('a');
-          if (link) closeMenu(hamburger, megaMenu, hamburger);
-        });
-        megaMenu.addEventListener('click', (e) => {
-          if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
-        });
-
-        document.addEventListener('keydown', (e) => {
-          if (!megaMenu.classList.contains('is-active')) return;
-          if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
-          if (e.key === 'Tab') { trapFocus(megaMenu, e); }
-        });
-      });
-    })();
-  </script>
-
-  <!-- Arrow fade on scroll -->
-  <script>
-    (function () {
-      let ticking = false;
-      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-      function onScroll(arrowFade) {
-        const y = window.scrollY || window.pageYOffset || 0;
-        arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
-        ticking = false;
-      }
-      function requestTick(arrowFade) {
-        if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
-      }
-      document.addEventListener('DOMContentLoaded', () => {
-        const arrowFade = document.querySelector('.arrow-fade');
-        if (!arrowFade) return;
-        onScroll(arrowFade);
-        window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
-      });
-    })();
-  </script>
-
-  <!-- Logo animation replay (double-click/tap) -->
-  <script>
-    (function () {
-      function enableLogoReplay() {
-        const logo = document.querySelector('.logo');
-        if (!logo) return;
-        logo.addEventListener('dblclick', () => {
-          const svg = logo.querySelector('svg');
-          if (!svg) return;
-          const clone = svg.cloneNode(true);
-          if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
-          if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
-          svg.replaceWith(clone);
-        }, { passive: true });
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
-      else enableLogoReplay();
-    })();
-  </script>
-
-  <!-- HAMBURGER COLOR SCROLL TOGGLE -->
-  <script>
+	<!-- Viewport height -->
+	<script>
 	(function () {
-	  // How many pixels *before* the hero ends the switch should happen
-	  const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
+	function setVH() {
+	const vh = window.innerHeight * 0.01;
+	document.documentElement.style.setProperty('--vh', `${vh}px`);
+	}
+	document.addEventListener('DOMContentLoaded', setVH);
+	window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
+	if (window.visualViewport) {
+	let last = window.visualViewport.height;
+	window.visualViewport.addEventListener('resize', () => {
+	  const now = window.visualViewport.height;
+	  if (now < last - 120) setVH();
+	  last = now;
+	});
+	}
+	})();
+	</script>
 
-	  function setupHamburgerColorSwitch() {
-		const hero = document.querySelector('.nav-center-screen');
-		if (!hero) return;
+	<!-- Hamburger / mega menu -->
+	<script>
+	(function () {
+	const qs  = (sel, root = document) => root.querySelector(sel);
+	const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-		// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
-		let sentinel = hero.querySelector('.hero-sentinel');
-		if (!sentinel) {
-		  sentinel = document.createElement('div');
-		  sentinel.className = 'hero-sentinel';
-		  hero.appendChild(sentinel);
-		}
+	function trapFocus(container, e) {
+	const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
+	  .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
+	if (!focusables.length) return;
+	const first = focusables[0], last = focusables[focusables.length - 1];
+	if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+	else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+	}
 
-		// Inline styles so this works without relying on extra CSS
-		Object.assign(sentinel.style, {
-		  position: 'absolute',
-		  left: '0',
-		  right: '0',
-		  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
-		  height: '1px',
-		  pointerEvents: 'none'
-		  // For quick debugging, uncomment the next line to *see* the sentinel:
-		  // ,background: 'rgba(255,0,0,.3)'
-		});
+	function openMenu(hamburger, menu) {
+	document.body.classList.add('menu-open');
+	menu.classList.remove('not-active');
+	menu.classList.add('is-active');
+	hamburger.classList.add('is-active');
+	hamburger.setAttribute('aria-expanded', 'true');
+	const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
+	}
+	function closeMenu(hamburger, menu, restoreTo) {
+	document.body.classList.remove('menu-open');
+	menu.classList.remove('is-active');
+	menu.classList.add('not-active');
+	hamburger.classList.remove('is-active');
+	hamburger.setAttribute('aria-expanded', 'false');
+	if (restoreTo) restoreTo.focus();
+	}
+	function toggleMenu(hamburger, menu) {
+	menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
+										 : openMenu(hamburger, menu);
+	}
 
-		// Ensure the hero is a positioning context
-		const heroComputed = getComputedStyle(hero);
-		if (heroComputed.position === 'static') {
-		  hero.style.position = 'relative';
-		}
+	document.addEventListener('DOMContentLoaded', () => {
+	const hamburger = qs('#hamburger');
+	const megaMenu  = qs('#mega-menu');
+	if (!megaMenu || !hamburger) return;
 
-		// Observe the sentinel: when it leaves the viewport, we’re past the hero.
-		const io = new IntersectionObserver((entries) => {
-		  const entry = entries[0];
-		  if (entry.isIntersecting) {
-			// Sentinel is visible -> we're still within the hero
-			document.body.classList.remove('hamburger-on-light');
-		  } else {
-			// Sentinel scrolled out -> we're into the light section
-			document.body.classList.add('hamburger-on-light');
-		  }
-		}, { threshold: 0 });
+	if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+	  megaMenu.classList.add('not-active');
+	}
+	hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-		io.observe(sentinel);
-	  }
+	megaMenu.addEventListener('click', (e) => {
+	  const link = e.target.closest('a');
+	  if (link) closeMenu(hamburger, megaMenu, hamburger);
+	});
+	megaMenu.addEventListener('click', (e) => {
+	  if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
+	});
 
-	  if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
+	document.addEventListener('keydown', (e) => {
+	  if (!megaMenu.classList.contains('is-active')) return;
+	  if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
+	  if (e.key === 'Tab') { trapFocus(megaMenu, e); }
+	});
+	});
+	})();
+	</script>
+
+	<!-- Arrow fade on scroll -->
+	<script>
+	(function () {
+	let ticking = false;
+	const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+	function onScroll(arrowFade) {
+	const y = window.scrollY || window.pageYOffset || 0;
+	arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
+	ticking = false;
+	}
+	function requestTick(arrowFade) {
+	if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
+	}
+	document.addEventListener('DOMContentLoaded', () => {
+	const arrowFade = document.querySelector('.arrow-fade');
+	if (!arrowFade) return;
+	onScroll(arrowFade);
+	window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
+	});
+	})();
+	</script>
+
+	<!-- Logo animation replay (double-click/tap) -->
+	<script>
+	(function () {
+	function enableLogoReplay() {
+	const logo = document.querySelector('.logo');
+	if (!logo) return;
+	logo.addEventListener('dblclick', () => {
+	  const svg = logo.querySelector('svg');
+	  if (!svg) return;
+	  const clone = svg.cloneNode(true);
+	  if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
+	  if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
+	  svg.replaceWith(clone);
+	}, { passive: true });
+	}
+	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
+	else enableLogoReplay();
+	})();
+	</script>
+
+	<!-- HAMBURGER COLOR SCROLL TOGGLE -->
+	<script>
+	(function () {
+	// How many pixels *before* the hero ends the switch should happen
+	const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
+
+	function setupHamburgerColorSwitch() {
+	const hero = document.querySelector('.nav-center-screen');
+	if (!hero) return;
+
+	// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
+	let sentinel = hero.querySelector('.hero-sentinel');
+	if (!sentinel) {
+	  sentinel = document.createElement('div');
+	  sentinel.className = 'hero-sentinel';
+	  hero.appendChild(sentinel);
+	}
+
+	// Inline styles so this works without relying on extra CSS
+	Object.assign(sentinel.style, {
+	  position: 'absolute',
+	  left: '0',
+	  right: '0',
+	  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
+	  height: '1px',
+	  pointerEvents: 'none'
+	  // For quick debugging, uncomment the next line to *see* the sentinel:
+	  // ,background: 'rgba(255,0,0,.3)'
+	});
+
+	// Ensure the hero is a positioning context
+	const heroComputed = getComputedStyle(hero);
+	if (heroComputed.position === 'static') {
+	  hero.style.position = 'relative';
+	}
+
+	// Observe the sentinel: when it leaves the viewport, we’re past the hero.
+	const io = new IntersectionObserver((entries) => {
+	  const entry = entries[0];
+	  if (entry.isIntersecting) {
+		// Sentinel is visible -> we're still within the hero
+		document.body.classList.remove('hamburger-on-light');
 	  } else {
-		setupHamburgerColorSwitch();
+		// Sentinel scrolled out -> we're into the light section
+		document.body.classList.add('hamburger-on-light');
 	  }
+	}, { threshold: 0 });
+
+	io.observe(sentinel);
+	}
+
+	if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
+	} else {
+	setupHamburgerColorSwitch();
+	}
 	})();
 	</script>
 </head>
@@ -410,80 +410,131 @@
 	  }
 	  /* Fill the capped box height to avoid crop in landscape */
 	  .logo svg { width: 100%; height: 100%; display: block; }
+	</style>
+	<style>
+  :root{
+    /* visuals */
+    --stroke-w: clamp(10px, 6vw, 47px);
+    --c12: #f3f1f1; /* seg 1–2 */
+    --c34: #4F8ABA; /* seg 3–5 */
 
-	  :root{
-		--seg1-start: 0s;
-		--seg2-start: 0.6s;
-		--seg3-start: 0.9s;
-		--seg4-start: 1.25s;
-		--seg5-start: 1.4s;
-		--stroke-w: clamp(10px, 6vw, 47px);
-		--c12: #f3f1f1;
-		--c34: #4F8ABA;
-		--seg1-final-dur: 1s;
-		--seg2-final-dur: 0.9s;
-		--seg3-final-dur: 0.6s;
-		--seg4-final-dur: 0.8s;
-		--seg5-final-dur: 1.2s;
-	  }
+    /* default timings – tweak globally, then override per segment below */
+    --t0: 0s;                 /* delay before first draw */
+    --tDraw1: 1s;             /* first draw speed */
+    --tHoldBeforePush: 0.25s; /* pause after first draw */
+    --tPush: 0.8s;            /* push-out duration */
+    --tHoldBeforeRedraw: 0.25s; /* pause before 2nd draw */
+    --tDraw2: 1s;             /* second draw speed */
+  }
 
-	  /* Flash-free + hidden until each segment starts */
-	  .draw-final{
-		fill: none;
-		stroke-width: var(--stroke-w);
-		stroke-linecap: round;
-		stroke-linejoin: round;
-		stroke: currentColor;
-		stroke-dasharray: .02 1;
-		stroke-dashoffset: 1;
-		visibility: hidden;
-		will-change: stroke-dasharray, stroke-dashoffset, visibility;
-		shape-rendering: geometricPrecision;
-	  }
+  /* Base stroke + “invisible until we start” */
+  .draw-2pass{
+    fill: none;
+    stroke-width: var(--stroke-w);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: currentColor;
+    stroke-dasharray: .02 1;  /* tiny dash to start (looks like nothing) */
+    stroke-dashoffset: 1;     /* start fully hidden */
+    visibility: hidden;       /* no flash before reveal */
+    will-change: stroke-dasharray, stroke-dashoffset, visibility;
+    shape-rendering: geometricPrecision;
 
-	  .seg1 { color: var(--c12); }
-	  .seg2 { color: var(--c12); }
-	  .seg3 { color: var(--c34); }
-	  .seg4 { color: var(--c34); }
-	  .seg5 { color: var(--c34); }
+    /* 1) reveal (visibility only)
+       2) first draw (grow dash + slide slightly to -0.02)
+       3) push-out (slide dash out of view to -1.02)
+       4) second draw (jump back to start, draw again)
+    */
+    animation:
+      reveal              0s           step-end var(--t0)                                                   forwards,
+      draw-pass           var(--tDraw1)       ease   var(--t0)                                              forwards,
+      push-out            var(--tPush)        ease   calc(var(--t0) + var(--tDraw1) + var(--tHoldBeforePush)) forwards,
+      draw-pass-again     var(--tDraw2)       ease   calc(var(--t0) + var(--tDraw1) + var(--tHoldBeforePush) + var(--tPush) + var(--tHoldBeforeRedraw)) forwards;
+  }
 
-	  .seg1.draw-final {
-		--segX-dur: var(--seg1-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg1-start) forwards,
-		  final-grow-dash var(--seg1-final-dur) ease-in var(--seg1-start) forwards;
-	  }
-	  .seg2.draw-final {
-		--segX-dur: var(--seg2-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg2-start) forwards,
-		  final-grow-dash var(--seg2-final-dur) ease-out var(--seg2-start) forwards;
-	  }
-	  .seg3.draw-final {
-		--segX-dur: var(--seg3-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg3-start) forwards,
-		  final-grow-dash var(--seg3-final-dur) ease-in var(--seg3-start) forwards;
-	  }
-	  .seg4.draw-final {
-		--segX-dur: var(--seg4-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg4-start) forwards,
-		  final-grow-dash var(--seg4-final-dur) ease-out var(--seg4-start) forwards;
-	  }
-	  .seg5.draw-final {
-		--segX-dur: var(--seg5-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg5-start) forwards,
-		  final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
-	  }
+  /* Colors per segment (same as yours) */
+  .seg1 { color: var(--c12); }
+  .seg2 { color: var(--c12); }
+  .seg3 { color: var(--c34); }
+  .seg4 { color: var(--c34); }
+  .seg5 { color: var(--c34); }
 
-	  @keyframes reveal { to { visibility: visible; } }
-	  @keyframes final-grow-dash{
-		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
-		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
-	  }
+  /* Stagger + per-segment timing overrides (sample values; adjust freely) */
+  .seg1 {
+    --t0: 0s;
+    --tDraw1: 1s;
+    --tHoldBeforePush: 0.2s;
+    --tPush: 0.8s;
+    --tHoldBeforeRedraw: 0.2s;
+    --tDraw2: 1.2s;
+  }
+  .seg2 {
+    --t0: 0.6s;
+    --tDraw1: 0.9s;
+    --tHoldBeforePush: 0.2s;
+    --tPush: 0.75s;
+    --tHoldBeforeRedraw: 0.2s;
+    --tDraw2: 1s;
+  }
+  .seg3 {
+    --t0: 0.9s;
+    --tDraw1: 0.6s;
+    --tHoldBeforePush: 0.15s;
+    --tPush: 0.7s;
+    --tHoldBeforeRedraw: 0.2s;
+    --tDraw2: 0.9s;
+  }
+  .seg4 {
+    --t0: 1.25s;
+    --tDraw1: 0.8s;
+    --tHoldBeforePush: 0.15s;
+    --tPush: 0.8s;
+    --tHoldBeforeRedraw: 0.2s;
+    --tDraw2: 1s;
+  }
+  .seg5 {
+    --t0: 1.4s;
+    --tDraw1: 1.2s;
+    --tHoldBeforePush: 0.25s;
+    --tPush: 0.9s;
+    --tHoldBeforeRedraw: 0.25s;
+    --tDraw2: 1.1s;
+  }
 
+  /* Keyframes */
+  @keyframes reveal {
+    to { visibility: visible; }
+  }
+
+  /* First draw: grow the dash and slightly advance so end-cap finishes cleanly */
+  @keyframes draw-pass {
+    0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
+    100% { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
+  }
+
+  /* Push-out: slide the full dash out of view to the left */
+  @keyframes push-out {
+    0%   { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
+    100% { stroke-dasharray: 1.02 1; stroke-dashoffset: -1.02; }
+  }
+
+  /* Second draw: jump back to start (reset values) and draw again */
+  @keyframes draw-pass-again {
+    0%   { stroke-dasharray: .02 1;  stroke-dashoffset: 1; }
+    100% { stroke-dasharray: 1.02 1; stroke-dashoffset: -0.02; }
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .draw-2pass {
+      animation: none !important;
+      visibility: visible;
+      stroke-dasharray: none;
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+	<style>
 	  /* Landscape size controls */
 	  @media (orientation: landscape) and (max-height: 480px) {
 		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
@@ -531,11 +582,11 @@
 
 			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
 			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
-				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-				<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
+				<g clip-path="url(#clip1)"><use href="#p1" class="draw-2pass seg1"/></g>
+<g clip-path="url(#clip2)"><use href="#p2" class="draw-2pass seg2"/></g>
+<g clip-path="url(#clip3)"><use href="#p3" class="draw-2pass seg3"/></g>
+<g clip-path="url(#clip4)"><use href="#p4" class="draw-2pass seg4"/></g>
+<g clip-path="url(#clip5)"><use href="#p5" class="draw-2pass seg5"/></g>
 			  </g>
 			</svg>
 		  </div>
