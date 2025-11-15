@@ -1,616 +1,616 @@
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Personal & Professional Portfoio Site of Jonathan Legiadre</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Viewport height -->
-  <script>
-    (function () {
-      function setVH() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-      }
-      document.addEventListener('DOMContentLoaded', setVH);
-      window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
-      if (window.visualViewport) {
-        let last = window.visualViewport.height;
-        window.visualViewport.addEventListener('resize', () => {
-          const now = window.visualViewport.height;
-          if (now < last - 120) setVH();
-          last = now;
-        });
-      }
-    })();
-  </script>
+<!-- Viewport height -->
+<script>
+(function () {
+function setVH() {
+const vh = window.innerHeight * 0.01;
+document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+document.addEventListener('DOMContentLoaded', setVH);
+window.addEventListener('orientationchange', () => setTimeout(setVH, 250));
+if (window.visualViewport) {
+let last = window.visualViewport.height;
+window.visualViewport.addEventListener('resize', () => {
+const now = window.visualViewport.height;
+if (now < last - 120) setVH();
+last = now;
+});
+}
+})();
+</script>
 
-  <!-- Hamburger / mega menu -->
-  <script>
-    (function () {
-      const qs  = (sel, root = document) => root.querySelector(sel);
-      const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+<!-- Hamburger / mega menu -->
+<script>
+(function () {
+const qs  = (sel, root = document) => root.querySelector(sel);
+const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-      function trapFocus(container, e) {
-        const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
-          .filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
-        if (!focusables.length) return;
-        const first = focusables[0], last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
+function trapFocus(container, e) {
+const focusables = qsa('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
+.filter(el => !el.hasAttribute('inert') && !el.closest('[inert]'));
+if (!focusables.length) return;
+const first = focusables[0], last = focusables[focusables.length - 1];
+if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
 
-      function openMenu(hamburger, menu) {
-        document.body.classList.add('menu-open');
-        menu.classList.remove('not-active');
-        menu.classList.add('is-active');
-        hamburger.classList.add('is-active');
-        hamburger.setAttribute('aria-expanded', 'true');
-        const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
-      }
-      function closeMenu(hamburger, menu, restoreTo) {
-        document.body.classList.remove('menu-open');
-        menu.classList.remove('is-active');
-        menu.classList.add('not-active');
-        hamburger.classList.remove('is-active');
-        hamburger.setAttribute('aria-expanded', 'false');
-        if (restoreTo) restoreTo.focus();
-      }
-      function toggleMenu(hamburger, menu) {
-        menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
-                                             : openMenu(hamburger, menu);
-      }
+function openMenu(hamburger, menu) {
+document.body.classList.add('menu-open');
+menu.classList.remove('not-active');
+menu.classList.add('is-active');
+hamburger.classList.add('is-active');
+hamburger.setAttribute('aria-expanded', 'true');
+const firstLink = menu.querySelector('a'); if (firstLink) firstLink.focus();
+}
+function closeMenu(hamburger, menu, restoreTo) {
+document.body.classList.remove('menu-open');
+menu.classList.remove('is-active');
+menu.classList.add('not-active');
+hamburger.classList.remove('is-active');
+hamburger.setAttribute('aria-expanded', 'false');
+if (restoreTo) restoreTo.focus();
+}
+function toggleMenu(hamburger, menu) {
+menu.classList.contains('is-active') ? closeMenu(hamburger, menu, hamburger)
+: openMenu(hamburger, menu);
+}
 
-      document.addEventListener('DOMContentLoaded', () => {
-        const hamburger = qs('#hamburger');
-        const megaMenu  = qs('#mega-menu');
-        if (!megaMenu || !hamburger) return;
+document.addEventListener('DOMContentLoaded', () => {
+const hamburger = qs('#hamburger');
+const megaMenu  = qs('#mega-menu');
+if (!megaMenu || !hamburger) return;
 
-        if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
-          megaMenu.classList.add('not-active');
-        }
-        hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
+if (!megaMenu.classList.contains('is-active') && !megaMenu.classList.contains('not-active')) {
+megaMenu.classList.add('not-active');
+}
+hamburger.addEventListener('click', () => toggleMenu(hamburger, megaMenu));
 
-        megaMenu.addEventListener('click', (e) => {
-          const link = e.target.closest('a');
-          if (link) closeMenu(hamburger, megaMenu, hamburger);
-        });
-        megaMenu.addEventListener('click', (e) => {
-          if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
-        });
+megaMenu.addEventListener('click', (e) => {
+const link = e.target.closest('a');
+if (link) closeMenu(hamburger, megaMenu, hamburger);
+});
+megaMenu.addEventListener('click', (e) => {
+if (e.target === megaMenu) closeMenu(hamburger, megaMenu, hamburger);
+});
 
-        document.addEventListener('keydown', (e) => {
-          if (!megaMenu.classList.contains('is-active')) return;
-          if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
-          if (e.key === 'Tab') { trapFocus(megaMenu, e); }
-        });
-      });
-    })();
-  </script>
+document.addEventListener('keydown', (e) => {
+if (!megaMenu.classList.contains('is-active')) return;
+if (e.key === 'Escape') { e.preventDefault(); closeMenu(hamburger, megaMenu, hamburger); return; }
+if (e.key === 'Tab') { trapFocus(megaMenu, e); }
+});
+});
+})();
+</script>
 
-  <!-- Arrow fade on scroll -->
-  <script>
-    (function () {
-      let ticking = false;
-      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-      function onScroll(arrowFade) {
-        const y = window.scrollY || window.pageYOffset || 0;
-        arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
-        ticking = false;
-      }
-      function requestTick(arrowFade) {
-        if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
-      }
-      document.addEventListener('DOMContentLoaded', () => {
-        const arrowFade = document.querySelector('.arrow-fade');
-        if (!arrowFade) return;
-        onScroll(arrowFade);
-        window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
-      });
-    })();
-  </script>
+<!-- Arrow fade on scroll -->
+<script>
+(function () {
+let ticking = false;
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+function onScroll(arrowFade) {
+const y = window.scrollY || window.pageYOffset || 0;
+arrowFade.style.opacity = String(clamp(1 - y / 300, 0, 1));
+ticking = false;
+}
+function requestTick(arrowFade) {
+if (!ticking) { ticking = true; requestAnimationFrame(() => onScroll(arrowFade)); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+const arrowFade = document.querySelector('.arrow-fade');
+if (!arrowFade) return;
+onScroll(arrowFade);
+window.addEventListener('scroll', () => requestTick(arrowFade), { passive: true });
+});
+})();
+</script>
 
-  <!-- Logo animation replay (double-click/tap) -->
-  <script>
-    (function () {
-      function enableLogoReplay() {
-        const logo = document.querySelector('.logo');
-        if (!logo) return;
-        logo.addEventListener('dblclick', () => {
-          const svg = logo.querySelector('svg');
-          if (!svg) return;
-          const clone = svg.cloneNode(true);
-          if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
-          if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
-          svg.replaceWith(clone);
-        }, { passive: true });
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
-      else enableLogoReplay();
-    })();
-  </script>
+<!-- Logo animation replay (double-click/tap) -->
+<script>
+(function () {
+function enableLogoReplay() {
+const logo = document.querySelector('.logo');
+if (!logo) return;
+logo.addEventListener('dblclick', () => {
+const svg = logo.querySelector('svg');
+if (!svg) return;
+const clone = svg.cloneNode(true);
+if (svg.hasAttribute('aria-hidden')) clone.setAttribute('aria-hidden', svg.getAttribute('aria-hidden'));
+if (svg.hasAttribute('focusable'))   clone.setAttribute('focusable',   svg.getAttribute('focusable'));
+svg.replaceWith(clone);
+}, { passive: true });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enableLogoReplay);
+else enableLogoReplay();
+})();
+</script>
 
-  <!-- HAMBURGER COLOR SCROLL TOGGLE -->
-  <script>
-	(function () {
-	  // How many pixels *before* the hero ends the switch should happen
-	  const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
+<!-- HAMBURGER COLOR SCROLL TOGGLE -->
+<script>
+(function () {
+// How many pixels *before* the hero ends the switch should happen
+const SWITCH_OFFSET = 50; // tweak this number: bigger = earlier switch
 
-	  function setupHamburgerColorSwitch() {
-		const hero = document.querySelector('.nav-center-screen');
-		if (!hero) return;
+function setupHamburgerColorSwitch() {
+const hero = document.querySelector('.nav-center-screen');
+if (!hero) return;
 
-		// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
-		let sentinel = hero.querySelector('.hero-sentinel');
-		if (!sentinel) {
-		  sentinel = document.createElement('div');
-		  sentinel.className = 'hero-sentinel';
-		  hero.appendChild(sentinel);
-		}
+// Create (or reuse) a 1px sentinel inside the hero, positioned up from the bottom.
+let sentinel = hero.querySelector('.hero-sentinel');
+if (!sentinel) {
+sentinel = document.createElement('div');
+sentinel.className = 'hero-sentinel';
+hero.appendChild(sentinel);
+}
 
-		// Inline styles so this works without relying on extra CSS
-		Object.assign(sentinel.style, {
-		  position: 'absolute',
-		  left: '0',
-		  right: '0',
-		  bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
-		  height: '1px',
-		  pointerEvents: 'none'
-		  // For quick debugging, uncomment the next line to *see* the sentinel:
-		  // ,background: 'rgba(255,0,0,.3)'
-		});
+// Inline styles so this works without relying on extra CSS
+Object.assign(sentinel.style, {
+position: 'absolute',
+left: '0',
+right: '0',
+bottom: `${SWITCH_OFFSET}px`, // move this value by editing SWITCH_OFFSET above
+height: '1px',
+pointerEvents: 'none'
+// For quick debugging, uncomment the next line to *see* the sentinel:
+// ,background: 'rgba(255,0,0,.3)'
+});
 
-		// Ensure the hero is a positioning context
-		const heroComputed = getComputedStyle(hero);
-		if (heroComputed.position === 'static') {
-		  hero.style.position = 'relative';
-		}
+// Ensure the hero is a positioning context
+const heroComputed = getComputedStyle(hero);
+if (heroComputed.position === 'static') {
+hero.style.position = 'relative';
+}
 
-		// Observe the sentinel: when it leaves the viewport, we’re past the hero.
-		const io = new IntersectionObserver((entries) => {
-		  const entry = entries[0];
-		  if (entry.isIntersecting) {
-			// Sentinel is visible -> we're still within the hero
-			document.body.classList.remove('hamburger-on-light');
-		  } else {
-			// Sentinel scrolled out -> we're into the light section
-			document.body.classList.add('hamburger-on-light');
-		  }
-		}, { threshold: 0 });
+// Observe the sentinel: when it leaves the viewport, we’re past the hero.
+const io = new IntersectionObserver((entries) => {
+const entry = entries[0];
+if (entry.isIntersecting) {
+// Sentinel is visible -> we're still within the hero
+document.body.classList.remove('hamburger-on-light');
+} else {
+// Sentinel scrolled out -> we're into the light section
+document.body.classList.add('hamburger-on-light');
+}
+}, { threshold: 0 });
 
-		io.observe(sentinel);
-	  }
+io.observe(sentinel);
+}
 
-	  if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
-	  } else {
-		setupHamburgerColorSwitch();
-	  }
-	})();
-	</script>
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', setupHamburgerColorSwitch);
+} else {
+setupHamburgerColorSwitch();
+}
+})();
+</script>
 </head>
 <html lang="en">
 
-	<style>
-	  /* Theme tokens */
-	  :root { --burger: #dcb24c; }                /* default mustard on hero */
-	  body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
+<style>
+/* Theme tokens */
+:root { --burger: #dcb24c; }                /* default mustard on hero */
+body.hamburger-on-light { --burger: #0f273f; } /* dark blue when over light background */
 
-	  html { scrollbar-gutter: stable both-edges; }
-	  * { scrollbar-width: thin; }
-	  *::-webkit-scrollbar { width: 8px; height: 8px; }
-	  *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
-	  *::-webkit-scrollbar-track { background: transparent; }
+html { scrollbar-gutter: stable both-edges; }
+* { scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
 
-	  body.menu-open { overflow: hidden; }
-	  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
-	  a, a:visited, a:active, a:hover { text-decoration: none; }
-	  *, *:after, *:before { box-sizing: border-box; }
+body.menu-open { overflow: hidden; }
+body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
+a, a:visited, a:active, a:hover { text-decoration: none; }
+*, *:after, *:before { box-sizing: border-box; }
 
-	  /* Branding utilities */
-	  .off-white { color: #f3f1f1; }
-	  .light-blue { color: #4F8ABA; }
-	  .dark-blue { color: #0f273f; }
-	  .mustard  { color: #dcb24c; }
-	  .font-mont { font-family: 'Montserrat', sans-serif; }
-	  .font-bitter { font-family: 'Bitter', serif; }
+/* Branding utilities */
+.off-white { color: #f3f1f1; }
+.light-blue { color: #4F8ABA; }
+.dark-blue { color: #0f273f; }
+.mustard  { color: #dcb24c; }
+.font-mont { font-family: 'Montserrat', sans-serif; }
+.font-bitter { font-family: 'Bitter', serif; }
 
-	  /* Hamburger */
-	  #hamburger {
-		position: fixed; top: 12px; right: 12px; z-index: 4;
-		display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
-		padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
-		overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
-		opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
-	  }
-	  #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
-	  #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
+/* Hamburger */
+#hamburger {
+position: fixed; top: 12px; right: 12px; z-index: 4;
+display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
+overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
+opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
+}
+#hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
+#hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
 
-	  .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
-	  .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
-	  /* Base transitions: keep transform timings, color transitions get overridden per state to add delays */
-	  .hamburger-inner,
-	  .hamburger-inner::before,
-	  .hamburger-inner::after {
-		width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
-		transition: transform 0.15s ease 0s, background-color .25s ease 0s;
-	  }
-	  .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
-	  .hamburger-inner::before { top: -10px; }  
-	  .hamburger-inner::after  { bottom: -10px; }
-	  .hamburger-label {
-		font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
-		color: var(--burger);
-		transition: color .25s ease 0s; /* delay overridden per state below */
-	  }
+.hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
+.hamburger-inner { display: block; top: 50%; margin-top: -2px; }
+/* Base transitions: keep transform timings, color transitions get overridden per state to add delays */
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
+transition: transform 0.15s ease 0s, background-color .25s ease 0s;
+}
+.hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
+.hamburger-inner::before { top: -10px; }  
+.hamburger-inner::after  { bottom: -10px; }
+.hamburger-label {
+font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
+color: var(--burger);
+transition: color .25s ease 0s; /* delay overridden per state below */
+}
 
-	  .hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
-	  .hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; }
-	  .hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; }
-	  .hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
-	  .hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
-	  .hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
+.hamburger--spin .hamburger-inner { transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); }
+.hamburger--spin .hamburger-inner::before { transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; }
+.hamburger--spin .hamburger-inner::after  { transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; }
+.hamburger--spin.is-active .hamburger-inner { transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); }
+.hamburger--spin.is-active .hamburger-inner::before { top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; }
+.hamburger--spin.is-active .hamburger-inner::after  { bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); }
 
-	  #hamburger.is-active .hamburger-inner,
-	  #hamburger.is-active .hamburger-inner::before,
-	  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
-	  #hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
+#hamburger.is-active .hamburger-inner,
+#hamburger.is-active .hamburger-inner::before,
+#hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
+#hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
 
 
-	  body.hamburger-on-light #hamburger .hamburger-label {
-		transition: color .25s ease 0ms;
-	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner::after { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner::before { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
-	  }
+body.hamburger-on-light #hamburger .hamburger-label {
+transition: color .25s ease 0ms;
+}
+body.hamburger-on-light #hamburger .hamburger-inner::after { 
+transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+}
+body.hamburger-on-light #hamburger .hamburger-inner { 
+transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+}
+body.hamburger-on-light #hamburger .hamburger-inner::before { 
+transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
+}
 
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
-	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
-		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-label {  
-		transition: color .25s ease 240ms;
-	  }
+body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
+transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
+}
+body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
+transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
+}
+body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
+transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
+}
+body:not(.hamburger-on-light) #hamburger .hamburger-label {  
+transition: color .25s ease 240ms;
+}
 
-	  /* Menu overlay */
-	  #mega-menu {
-		position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
-		opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
-		transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
-	  }
-	  #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
-	  #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
+/* Menu overlay */
+#mega-menu {
+position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
+opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
+transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
+}
+#mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
+#mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
-	  .menu-item {
-		display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
-		color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
-		border-bottom: 2px solid #f3f1f1; outline: none;
-	  }
-	  .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
+.menu-item {
+display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
+color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
+border-bottom: 2px solid #f3f1f1; outline: none;
+}
+.menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
 
-	  /* Title Screen */
-	  .nav-center-screen {
-		width: 100%;
-		display: flex; flex-direction: column; justify-content: center; align-items: center;
-		text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
-		border-bottom: 10px solid rgba(90,145,191,0);
-		height: calc(100svh - env(safe-area-inset-bottom, 0px));
-		padding-bottom: env(safe-area-inset-bottom, 0px);
-	  }
-	  @supports not (height: 100svh) {
-		.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
-	  }
-		
-	  .hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
+/* Title Screen */
+.nav-center-screen {
+width: 100%;
+display: flex; flex-direction: column; justify-content: center; align-items: center;
+text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
+border-bottom: 10px solid rgba(90,145,191,0);
+height: calc(100svh - env(safe-area-inset-bottom, 0px));
+padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@supports not (height: 100svh) {
+.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
+}
 
-	  .logo-name { 
-		  font-size: clamp(32px, 7.5vw, 85px); 
-		  letter-spacing: 1.2; 
-		  line-height: 0.9; 
-		  font-weight: 600; 
-		  text-transform: uppercase; 
-		  margin: 0.5% auto; 
-		  text-align: center;
-		}
-	  .logo-title { 
-		  font-size: clamp(14px, 3.25vw, 25px); 
-		  color: #dcb24c; 
-		  line-height: 1.2; 
-		  letter-spacing: 2; 
-		  font-weight: 400; 
-		  font-style: italic; 
-		  text-transform: capitalize; 
-		  text-align: center;
-		  opacity: 0; 
-		}
-	  @keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
+.hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
 
-	  .arrow { position: absolute; bottom: 0; left: 50%; margin-left: -20px; width: 40px; height: 40px; opacity: 0;}
-	  .arrow svg { width: 40px; height: 40px; display: block; }
-	  .arrow path { fill: #f3f1f1; }
-	  @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-25px); } 60% { transform: translateY(-15px); } }
-		
-		
-		@keyframes appear { 
-			0% {opacity: 0;} 
-			100% {opacity: 1;} 
-		}
+.logo-name { 
+font-size: clamp(32px, 7.5vw, 85px); 
+letter-spacing: 1.2; 
+line-height: 0.9; 
+font-weight: 600; 
+text-transform: uppercase; 
+margin: 0.5% auto; 
+text-align: center;
+}
+.logo-title { 
+font-size: clamp(14px, 3.25vw, 25px); 
+color: #dcb24c; 
+line-height: 1.2; 
+letter-spacing: 2; 
+font-weight: 400; 
+font-style: italic; 
+text-transform: capitalize; 
+text-align: center;
+opacity: 0; 
+}
+@keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
 
-		:root {
-		  --firstName-delay: 1s;
-		  --lastName-delay: 1.6s;
-		  --title-delay: 2s;
-		  --arrow-delay: 2.5s;         
-		  --fade-dur: 1s;
-		}
+.arrow { position: absolute; bottom: 0; left: 50%; margin-left: -20px; width: 40px; height: 40px; opacity: 0;}
+.arrow svg { width: 40px; height: 40px; display: block; }
+.arrow path { fill: #f3f1f1; }
+@keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-25px); } 60% { transform: translateY(-15px); } }
 
-		/* first name */
-		.first-name {
-			opacity: 0;
-		  animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
-		}
 
-		/* last name */
-		.last-name {
-			opacity: 0;
-		  animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
-		}
+@keyframes appear { 
+0% {opacity: 0;} 
+100% {opacity: 1;} 
+}
 
-		/* title */
-		.logo-title {
-		  animation: appear var(--fade-dur) ease-in var(--title-delay) forwards;
-		}
+:root {
+--firstName-delay: 1s;
+--lastName-delay: 1.6s;
+--title-delay: 2s;
+--arrow-delay: 2.5s;         
+--fade-dur: 1s;
+}
 
-		/* arrow */
-		.arrow {
-		  animation:
-			bounce 2s infinite,
-			appear var(--fade-dur) ease-in var(--arrow-delay) forwards;
-		}
+/* first name */
+.first-name {
+opacity: 0;
+animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
+}
 
-	  .below { height: 0; overflow: hidden; background-color: #f3f1f1; animation: showcontent 1s ease-in 3s forwards; }
-	  @keyframes showcontent { 100% { height: auto; } }
+/* last name */
+.last-name {
+opacity: 0;
+animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
+}
 
-	  /** PORTFOLIO STYLES **/
-	  .work-wrapper { width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; }
-	  .work-item { width: 80%; margin-bottom: 9%; }
-	  .portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
-	  .portfolio-info::before { content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%; }
-	  .project-name { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1; color: #3D729E; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%; }
-	  .project-role { text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f; font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2; }
+/* title */
+.logo-title {
+animation: appear var(--fade-dur) ease-in var(--title-delay) forwards;
+}
 
-	  @media (max-width: 767px) { #mega-menu { padding: 76px 30px; } .menu-item { margin-bottom: 12%; } }
-	  @media (min-width: 768px) {
-		.work-item { width: 45%; margin-bottom: 3%; }
-		.project-name { font-size: clamp(18px, 1.75vw, 22px); }
-		.project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
-		.menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
-	  }
-	  @media (min-width: 1024px) { .work-item { width: 28%; } }
-	</style>
+/* arrow */
+.arrow {
+animation:
+bounce 2s infinite,
+appear var(--fade-dur) ease-in var(--arrow-delay) forwards;
+}
 
-	<!-- Logo animation styles -->
-	<style>
-	  .logo {
-		display: inline-block;
-		width: clamp(200px, 60vw, 420px);
-		max-width: 100%;
-		overflow: hidden;
-		user-select: none; -webkit-user-select: none;
-		cursor: pointer;
-	  }
-	  /* Fill the capped box height to avoid crop in landscape */
-	  .logo svg { width: 100%; height: 100%; display: block; }
+.below { height: 0; overflow: hidden; background-color: #f3f1f1; animation: showcontent 1s ease-in 3s forwards; }
+@keyframes showcontent { 100% { height: auto; } }
 
-	  :root{
-		--seg1-start: 0s;
-		--seg2-start: 0.6s;
-		--seg3-start: 0.9s;
-		--seg4-start: 1.25s;
-		--seg5-start: 1.4s;
-		--stroke-w: clamp(10px, 6vw, 47px);
-		--c12: #f3f1f1;
-		--c34: #4F8ABA;
-		--seg1-final-dur: 1s;
-		--seg2-final-dur: 0.9s;
-		--seg3-final-dur: 0.6s;
-		--seg4-final-dur: 0.8s;
-		--seg5-final-dur: 1.2s;
-	  }
+/** PORTFOLIO STYLES **/
+.work-wrapper { width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; }
+.work-item { width: 80%; margin-bottom: 9%; }
+.portfolio-info { width: 100%; text-align: left; padding: 2% 0% 4%; }
+.portfolio-info::before { content: ""; display: block; position: relative; top: 0; right: 0; height: 2px; background: #dcb24c; width: 50%; }
+.project-name { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1; color: #3D729E; font-size: clamp(18px, 3.75vw, 22px); margin-top: 2%; }
+.project-role { text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic; color: #0f273f; font-size: clamp(12px, 2.5vw, 14.66px); letter-spacing: 2; }
 
-	  /* Flash-free + hidden until each segment starts */
-	  .draw-final{
-		fill: none;
-		stroke-width: var(--stroke-w);
-		stroke-linecap: round;
-		stroke-linejoin: round;
-		stroke: currentColor;
-		stroke-dasharray: .02 1;
-		stroke-dashoffset: 1;
-		visibility: hidden;
-		will-change: stroke-dasharray, stroke-dashoffset, visibility;
-		shape-rendering: geometricPrecision;
-	  }
+@media (max-width: 767px) { #mega-menu { padding: 76px 30px; } .menu-item { margin-bottom: 12%; } }
+@media (min-width: 768px) {
+.work-item { width: 45%; margin-bottom: 3%; }
+.project-name { font-size: clamp(18px, 1.75vw, 22px); }
+.project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
+.menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
+}
+@media (min-width: 1024px) { .work-item { width: 28%; } }
+</style>
 
-	  .seg1 { color: var(--c12); }
-	  .seg2 { color: var(--c12); }
-	  .seg3 { color: var(--c34); }
-	  .seg4 { color: var(--c34); }
-	  .seg5 { color: var(--c34); }
+<!-- Logo animation styles -->
+<style>
+.logo {
+display: inline-block;
+width: clamp(200px, 60vw, 420px);
+max-width: 100%;
+overflow: hidden;
+user-select: none; -webkit-user-select: none;
+cursor: pointer;
+}
+/* Fill the capped box height to avoid crop in landscape */
+.logo svg { width: 100%; height: 100%; display: block; }
 
-	  .seg1.draw-final {
-		--segX-dur: var(--seg1-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg1-start) forwards,
-		  final-grow-dash var(--seg1-final-dur) ease-in var(--seg1-start) forwards;
-	  }
-	  .seg2.draw-final {
-		--segX-dur: var(--seg2-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg2-start) forwards,
-		  final-grow-dash var(--seg2-final-dur) ease-out var(--seg2-start) forwards;
-	  }
-	  .seg3.draw-final {
-		--segX-dur: var(--seg3-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg3-start) forwards,
+:root{
+--seg1-start: 0s;
+--seg2-start: 0.58125s;
+--seg3-start: 0.9s;
+--seg4-start: 1.125s;
+--seg5-start: 1.4s;
+--stroke-w: clamp(10px, 6vw, 47px);
+--c12: #f3f1f1;
+--c34: #4F8ABA;
+--seg1-final-dur: 1.6s;
+--seg2-final-dur: 1.6s;
+--seg3-final-dur: 0.6s;
+--seg4-final-dur: 0.6s;
+--seg5-final-dur: 1.2s;
+}
+
+/* Flash-free + hidden until each segment starts */
+.draw-final{
+fill: none;
+stroke-width: var(--stroke-w);
+stroke-linecap: round;
+stroke-linejoin: round;
+stroke: currentColor;
+stroke-dasharray: .02 1;
+stroke-dashoffset: 1;
+visibility: hidden;
+will-change: stroke-dasharray, stroke-dashoffset, visibility;
+shape-rendering: geometricPrecision;
+}
+
+.seg1 { color: var(--c12); }
+.seg2 { color: var(--c12); }
+.seg3 { color: var(--c34); }
+.seg4 { color: var(--c34); }
+.seg5 { color: var(--c34); }
+
+.seg1.draw-final {
+--segX-dur: var(--seg1-final-dur);
+animation:
+reveal 0s step-end var(--seg1-start) forwards,
+final-grow-dash var(--seg1-final-dur) ease-in-out var(--seg1-start) forwards;
+}
+.seg2.draw-final {
+--segX-dur: var(--seg2-final-dur);
+animation:
+reveal 0s step-end var(--seg2-start) forwards,
+final-grow-dash var(--seg2-final-dur) ease-in-out var(--seg2-start) forwards;
+}
+.seg3.draw-final {
+--segX-dur: var(--seg3-final-dur);
+animation:
+reveal 0s step-end var(--seg3-start) forwards,
+		  final-grow-dash var(--seg3-final-dur) ease-in-out var(--seg3-start) forwards;
 		  final-grow-dash var(--seg3-final-dur) ease-in var(--seg3-start) forwards;
-	  }
-	  .seg4.draw-final {
-		--segX-dur: var(--seg4-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg4-start) forwards,
+}
+.seg4.draw-final {
+--segX-dur: var(--seg4-final-dur);
+animation:
+reveal 0s step-end var(--seg4-start) forwards,
+		  final-grow-dash var(--seg4-final-dur) ease-in-out var(--seg4-start) forwards;
 		  final-grow-dash var(--seg4-final-dur) ease-out var(--seg4-start) forwards;
-	  }
-	  .seg5.draw-final {
-		--segX-dur: var(--seg5-final-dur);
-		animation:
-		  reveal 0s step-end var(--seg5-start) forwards,
-		  final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
-	  }
+}
+.seg5.draw-final {
+--segX-dur: var(--seg5-final-dur);
+animation:
+reveal 0s step-end var(--seg5-start) forwards,
+final-grow-dash var(--seg5-final-dur) ease-in-out var(--seg5-start) forwards;
+}
 
-	  @keyframes reveal { to { visibility: visible; } }
-	  @keyframes final-grow-dash{
-		0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
-		100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
-	  }
+@keyframes reveal { to { visibility: visible; } }
+@keyframes final-grow-dash{
+0%   { stroke-dasharray: .02 1;   stroke-dashoffset: 1; }
+100% { stroke-dasharray: 1.02 1;  stroke-dashoffset: -0.02; }
+}
 
-	  /* Landscape size controls */
-	  @media (orientation: landscape) and (max-height: 480px) {
-		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
-		.logo { max-height: min(42vh, 44svh); width: auto; }
-		.logo svg { width: auto; height: 100%; }
-		.logo-name { font-size: clamp(24px, 6vh, 48px); }
-		.logo-title { font-size: clamp(12px, 3.5vh, 20px); }
-		.arrow { transform: scale(0.85); transform-origin: center bottom; }
-	  }
-	</style>
+/* Landscape size controls */
+@media (orientation: landscape) and (max-height: 480px) {
+.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
+.logo { max-height: min(42vh, 44svh); width: auto; }
+.logo svg { width: auto; height: 100%; }
+.logo-name { font-size: clamp(24px, 6vh, 48px); }
+.logo-title { font-size: clamp(12px, 3.5vh, 20px); }
+.arrow { transform: scale(0.85); transform-origin: center bottom; }
+}
+</style>
 
-	<div class="page">
-	  <button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
-		<span class="hamburger-box" aria-hidden="true"><span class="hamburger-inner"></span></span>
-		<span class="hamburger-label">Menu</span>
-	  </button>
+<div class="page">
+<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
+<span class="hamburger-box" aria-hidden="true"><span class="hamburger-inner"></span></span>
+<span class="hamburger-label">Menu</span>
+</button>
 
-	  <div class="nav-center-screen">
-		<!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
-		<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
+<div class="nav-center-screen">
+<!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
+<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
 
-		<div class="w-100 text-center">
-		  <div class="logo">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-			  <defs>
-				<!-- Centerline paths -->
-				<path id="p1" pathLength="1" d="M161.6,181.1l40.3-38.4c53.8,223.9-4.5,308.4-60.3,317.8" />
-				<path id="p2" pathLength="1" d="M175.4,444.5C83.1,521.1-76.1,318.5,340.1,197" />
-				<path id="p3" pathLength="1" d="M228.4,215.5C331.2,160.9,391,46.4,340.1,30.4c-32.7-10.3-63.9,34.8-76.7,113.9" />
-				<path id="p4" pathLength="1" d="M269.6,114c-9.8,39-14.6,89.6-11.5,148.1c6.2,114-9.3,136.6-29.7,148.8" />
-				<path id="p5" pathLength="1" d="M178.7,405.7c-17-19.6-21.3-44.3-8.8-66.7c45.2-78.7,232-85.4,289.7-70.9" />
-				<!-- Outline clips -->
-				<path id="op1" d="M206.5,141.6l-2.6-8.2c-13.8,15.3-29,32.1-42.3,47.7c11.8-9.2,24.8-19.6,36.9-29.4c12,77.8,25.2,192.4-15.6,259.2  c-10,16.4-25.9,30-44.2,33l5.8,33.2c18.1-3.2,35.1-12.3,48-25.7C263.1,377,234.5,229.5,206.5,141.6z" />
-				<path id="op2" d="M212.3,255.6c26-14.4,53.1-27.1,80.3-38.8c15.7-6.8,31.6-13.3,47.5-19.8c-25.4,4.7-50.6,10.9-75.4,18.4  c-41.8,12.7-82.5,29.3-119.9,52.1c-38.7,24.3-76.6,56.9-90.3,102.2c-12.9,43.4,6.5,88.8,50.2,104.2c28.8,10.1,60.6,1.9,83-17.9  l-24.5-23.1c-13.4,10.1-30.1,14.9-47.4,8.8c-12-4-22.1-13-27.3-24.5c-15.4-34.5,8.9-71.6,33.5-96.6  C148.1,294.2,179.7,273.7,212.3,255.6z" />
-				<path id="op3" d="M351.5,18c-14.4-7.5-32-6.5-45.7,1.7c-33.1,19.9-47.8,67.1-55.3,102.3c-1.6,8-3,16.1-4.1,24.1l34-3.5  c6.1-32.6,15.9-63.3,31.3-84.2c5.7-7,12.2-13.6,20.7-13.2c2.8,0.2,6.2,1.3,8,3.2c5.3,6.6,3,18,0.9,26.6c-5,18.7-14.9,36.3-25.7,52.6  c-23.4,34.4-53.4,63.6-87.3,87.8c53.1-20.3,102.5-61,130.6-110.8c7.6-14,13.9-29.6,14.5-46.1C374.3,42.1,367,25.8,351.5,18z" />
-				<path id="op4" d="M250.5,121.9c-8.7,42.9-9.7,86.6-6.2,130c1.8,20.6,4.3,42,5.3,62.7c1,20.5,1.8,41.3-1.7,61.5c-2.4,13.8-8,26-19.5,34.7  c6.7-2.8,12.8-7.1,17.5-12.7c26-31.6,24.9-106.8,25.1-147.2c0.3-38.2,3.7-93.3,16.5-138.7l-35.7,3.6  C251.4,117.9,250.9,119.9,250.5,121.9z" />
-				<path id="op5" d="M178.7,405.7c-22.2-13.3-31.9-41.7-23.2-66.4c6.7-19.4,22.9-35.5,39.7-46.5c34.1-21.4,80.3-31.2,119.7-34.8   c40.5-3.2,81.2-2.6,121.2,4.3c7.9,1.5,15.8,3.2,23.5,5.7c-7.9-1.4-15.9-1.9-23.8-2.2c-63.8-1.8-148.8,11.4-205.4,40.6   c-23.3,12.7-49.4,30.1-57.1,56.2C169.4,376.4,172.9,392.4,178.7,405.7L178.7,405.7z" />
+<div class="w-100 text-center">
+<div class="logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+<defs>
+<!-- Centerline paths -->
+<path id="p1" pathLength="1" d="M161.6,181.1c0,0,40.3-38.4,40.3-38.4c72.8,324.2-76.5,356.7-121.3,292.8" />
+<path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
+<path id="p3" pathLength="1" d="M228.4,215.5C461,62.8,323-44.6,274.8,94.2c-4.9,14.1-8.9,30.7-11.4,50.1" />
+<path id="p4" pathLength="1" d="M269.2,113.3c-2.9,11.7-5.2,24.7-6.8,39.2c-12.4,115.2,11.2,229.5-34,258.3" />
+<path id="p5" pathLength="1" d="M178.7,405.7c-17-19.6-21.3-44.3-8.8-66.7c45.2-78.7,232-85.4,289.7-70.9" />
+<!-- Outline clips -->
+<path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4c0,0-4.9,5.3-4.9,5.3   c-12,13-25.7,28.1-37.4,41.5c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1   c0.6,13.5,0.7,26.9,0.4,40.4c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.6-8.1-42.9-22.1l-22.1,20.5   c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
+<path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
+<path id="op3" d="M365.3,31.6c-9.6-14.4-27.7-19.1-43.7-14.4c-20.9,6-36.2,23.2-46.8,41c-15,25.9-22.1,55.5-25.5,85l28.3,2  c5-32.1,14.2-63.7,33.4-86.5c11-13,33.5-24.9,34.9,1c0.5,23.7-15.3,48.9-29.4,67.9c-12.8,17-27.3,32.4-42.5,47.1  c-9,8.7-18.3,17.1-27.8,25.3c-5.9,5.2-11.9,10.3-17.8,15.4c6-3,11.9-6.1,17.8-9.4c9-5,17.9-10.3,26.5-16  c21.6-14.2,41.8-30.5,59.5-49.2c20.3-22.3,39.8-49.5,40.9-81.4C373.2,49.9,371.1,40,365.3,31.6z" />
+<path id="op4" d="M254.8,110.4c-4.2,18.2-6.4,36.8-7.4,55.1c-0.7,11.5-1.1,23.1-1.2,34.6c0,2,0,4,0,6c0,14.9,0.3,29.7,0.9,44.5  c1,35.1,4.3,69.5,2.3,104.3c-1.6,20-4.5,42.4-20.9,55.9c19.8-10.2,27.2-34.1,31.6-54.4c4.3-21,5.9-42.3,7.2-63.6  c1.5-26.6,2.4-57.2,4.1-83.8c0.4-6.1,0.8-12.4,1.3-18.9c0.4-5,0.8-10.1,1.3-15.3c1.8-19.4,4.6-39.6,9.6-58.6L254.8,110.4z" />
+<path id="op5" d="M178.7,405.7c-22.2-13.3-31.9-41.7-23.2-66.4c6.7-19.4,22.9-35.5,39.7-46.5c34.1-21.4,80.3-31.2,119.7-34.8   c40.5-3.2,81.2-2.6,121.2,4.3c7.9,1.5,15.8,3.2,23.5,5.7c-7.9-1.4-15.9-1.9-23.8-2.2c-63.8-1.8-148.8,11.4-205.4,40.6   c-23.3,12.7-49.4,30.1-57.1,56.2C169.4,376.4,172.9,392.4,178.7,405.7L178.7,405.7z" />
 
-				<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
-				<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
-				<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
-				<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
-				<clipPath id="clip5" clipPathUnits="userSpaceOnUse"><use href="#op5"/></clipPath>
-			  </defs>
+<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
+<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
+<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
+<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
+<clipPath id="clip5" clipPathUnits="userSpaceOnUse"><use href="#op5"/></clipPath>
+</defs>
 
-			  <!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
-			  <g style="shape-rendering:geometricPrecision">
-				<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
-				<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-				<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-				<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-				<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
-			  </g>
-			</svg>
-		  </div>
-		</div>
+<!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
+<g style="shape-rendering:geometricPrecision">
+<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
+<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
+<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
+<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
+<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
+</g>
+</svg>
+</div>
+</div>
 
-		  <div class="logo-name font-mont">
-			  <span class="first-name off-white">Jonathan</span>
-			  <span class="last-name light-blue">Legiadre</span>
-			</div>
-		<div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
+<div class="logo-name font-mont">
+<span class="first-name off-white">Jonathan</span>
+<span class="last-name light-blue">Legiadre</span>
+</div>
+<div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
 
-		<div class="arrow-fade">
-		  <div class="arrow" aria-hidden="true">
-			<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-			  <path d="M12 16a1 1 0 0 1-.7-.29l-7-7a1 1 0 1 1 1.4-1.42L12 13.59l6.3-6.3a1 1 0 1 1 1.4 1.42l-7 7A1 1 0 0 1 12 16z"/>
-			</svg>
-		  </div>
-		</div>
-	  </div>
+<div class="arrow-fade">
+<div class="arrow" aria-hidden="true">
+<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+<path d="M12 16a1 1 0 0 1-.7-.29l-7-7a1 1 0 1 1 1.4-1.42L12 13.59l6.3-6.3a1 1 0 1 1 1.4 1.42l-7 7A1 1 0 0 1 12 16z"/>
+</svg>
+</div>
+</div>
+</div>
 
-	  <nav id="mega-menu" aria-label="Primary">
-		<a class="menu-item" href="#work">Work</a>
-		<a class="menu-item" href="#about">About</a>
-		<a class="menu-item" href="#contact">Contact</a>
-	  </nav>
+<nav id="mega-menu" aria-label="Primary">
+<a class="menu-item" href="#work">Work</a>
+<a class="menu-item" href="#about">About</a>
+<a class="menu-item" href="#contact">Contact</a>
+</nav>
 
-	  <div class="below">
-		<div id="work"></div>
-		<div class="work-wrapper">
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		  <div class="work-item">
-			<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
-			<div class="portfolio-info">
-			  <div class="project-name">typezero</div>
-			  <div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
-			</div>
-		  </div>
-		</div>
-		<div id="about"></div>
-		<div id="contact"></div>
-	  </div>
-	</div>
-	
-</html>
+<div class="below">
+<div id="work"></div>
+<div class="work-wrapper">
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero1.png" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero1.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+<div class="work-item">
+<img src="imgs/portfolio-previews/typezero2.jpg" width="100%" alt="TypeZero" loading="lazy" decoding="async">
+<div class="portfolio-info">
+<div class="project-name">typezero</div>
+<div class="project-role">Art Direction, Brand Identity, Package Design, Web Design &amp; Development</div>
+</div>
+</div>
+</div>
+<div id="about"></div>
+<div id="contact"></div>
+</div>
+</div>
