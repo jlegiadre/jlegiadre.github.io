@@ -190,134 +190,134 @@
 <html lang="en">
 
 	<style>
-	  :root { --burger: #dcb24c; }            
-	  body.hamburger-on-light { --burger: #0f273f; } 
+		:root { --burger: #dcb24c; }            
+		body.hamburger-on-light { --burger: #0f273f; } 
 
-	  html { scrollbar-gutter: stable both-edges; }
-	  * { scrollbar-width: thin; }
-	  *::-webkit-scrollbar { width: 8px; height: 8px; }
-	  *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
-	  *::-webkit-scrollbar-track { background: transparent; }
+		html { scrollbar-gutter: stable both-edges; }
+		* { scrollbar-width: thin; }
+		*::-webkit-scrollbar { width: 8px; height: 8px; }
+		*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
+		*::-webkit-scrollbar-track { background: transparent; }
 
-	  body.menu-open { overflow: hidden; }
-	  body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
-	  a, a:visited, a:active, a:hover { text-decoration: none; }
-	  *, *:after, *:before { box-sizing: border-box; }
+		body.menu-open { overflow: hidden; }
+		body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
+		a, a:visited, a:active, a:hover { text-decoration: none; }
+		*, *:after, *:before { box-sizing: border-box; }
 
-	  /* Branding utilities */
-	  .off-white { color: #f3f1f1; }
-	  .light-blue { color: #4F8ABA; }
-	  .dark-blue { color: #0f273f; }
-	  .mustard  { color: #dcb24c; }
-	  .font-mont { font-family: 'Montserrat', sans-serif; }
-	  .font-bitter { font-family: 'Bitter', serif; }
+	  	/* Branding utilities */
+	  	.off-white { color: #f3f1f1; }
+	  	.light-blue { color: #4F8ABA; }
+	  	.dark-blue { color: #0f273f; }
+	  	.mustard  { color: #dcb24c; }
+		.font-mont { font-family: 'Montserrat', sans-serif; }
+	  	.font-bitter { font-family: 'Bitter', serif; }
 
-	  /* Hamburger */
-	  #hamburger {
-		position: fixed; top: 12px; right: 12px; z-index: 4;
-		display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
-		padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
-		overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
-		opacity: 0; -webkit-animation: appear 1s ease-in-out 4s forwards; animation: appear 1s ease-in-out 4s forwards;
-	  }
-	  #hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
-	  #hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
+	  	/* Hamburger */
+	  	#hamburger {
+			position: fixed; top: 12px; right: 12px; z-index: 4;
+			display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+			padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
+			overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
+			opacity: 0; -webkit-animation: appear 1s ease-in-out 3s forwards; animation: appear 1s ease-in-out 3s forwards;
+	  	}
+	  	#hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
+	  	#hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
 
-	  .hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
-	  .hamburger-inner { display: block; top: 50%; margin-top: -2px; }
-	  .hamburger-inner,
-	  .hamburger-inner::before,
-	  .hamburger-inner::after {
+	  	.hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
+	  	.hamburger-inner { display: block; top: 50%; margin-top: -2px; }
+	  	.hamburger-inner,
+	  	.hamburger-inner::before,
+	  	.hamburger-inner::after {
 		width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
 		transition: transform 0.15s ease 0s, background-color .25s ease 0s;
 	  }
-	  .hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
-	  .hamburger-inner::before { top: -10px; }  
-	  .hamburger-inner::after  { bottom: -10px; }
-	  .hamburger-label {
+	  	.hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
+	  	.hamburger-inner::before { top: -10px; }  
+		.hamburger-inner::after  { bottom: -10px; }
+	  	.hamburger-label {
 		font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
 		color: var(--burger);
 		transition: color .25s ease 0s; 
 	  }
 
-	  .hamburger--spin .hamburger-inner { 
+	  	.hamburger--spin .hamburger-inner { 
 		  transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); 
 		}
-	  .hamburger--spin .hamburger-inner::before { 
+	  	.hamburger--spin .hamburger-inner::before { 
 		  transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; 
 		}
-	  .hamburger--spin .hamburger-inner::after  { 
+	  	.hamburger--spin .hamburger-inner::after  { 
 		  transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; 
 		}
-	  .hamburger--spin.is-active .hamburger-inner { 
+	  	.hamburger--spin.is-active .hamburger-inner { 
 		  transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); 
 		}
-	  .hamburger--spin.is-active .hamburger-inner::before { 
+	  	.hamburger--spin.is-active .hamburger-inner::before { 
 		  top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; 
 		}
-	  .hamburger--spin.is-active .hamburger-inner::after  { 
+	  	.hamburger--spin.is-active .hamburger-inner::after  { 
 		  bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); 
 		}
 
-	  #hamburger.is-active .hamburger-inner,
-	  #hamburger.is-active .hamburger-inner::before,
-	  #hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
-	  #hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
+	  	#hamburger.is-active .hamburger-inner,
+	  	#hamburger.is-active .hamburger-inner::before,
+	  	#hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
+	  	#hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
 
 
-	  body.hamburger-on-light #hamburger .hamburger-label {
+	  	body.hamburger-on-light #hamburger .hamburger-label {
 		transition: color .25s ease 0ms;
 	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner::after { 
+	  	body.hamburger-on-light #hamburger .hamburger-inner::after { 
 		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
 	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner { 
+	  	body.hamburger-on-light #hamburger .hamburger-inner { 
 		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
 	  }
-	  body.hamburger-on-light #hamburger .hamburger-inner::before { 
+	  	body.hamburger-on-light #hamburger .hamburger-inner::before { 
 		transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
 	  }
 
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
 		transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
 	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
 		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
 	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
 		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
 	  }
-	  body:not(.hamburger-on-light) #hamburger .hamburger-label {  
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-label {  
 		transition: color .25s ease 240ms;
 	  }
 
 	  /* Menu overlay */
-	  #mega-menu {
+		#mega-menu {
 		position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
 		opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
 		transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
 	  }
-	  #mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
-	  #mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
+		#mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
+		#mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
 
-	  .menu-item {
+		.menu-item {
 		display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
 		color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
 		border-bottom: 2px solid #f3f1f1; outline: none;
 	  }
-	  .menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
+		.menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
 
 		/* Title Screen */
 		.nav-center-screen {
-		width: 100%;
-		display: flex; flex-direction: column; justify-content: center; align-items: center;
-		text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
-		border-bottom: 10px solid rgba(90,145,191,0);
-		height: calc(100svh - env(safe-area-inset-bottom, 0px));
-		padding-bottom: env(safe-area-inset-bottom, 0px);
+			width: 100%;
+			display: flex; flex-direction: column; justify-content: center; align-items: center;
+			text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
+			border-bottom: 10px solid rgba(90,145,191,0);
+			height: calc(100svh - env(safe-area-inset-bottom, 0px));
+			padding-bottom: env(safe-area-inset-bottom, 0px);
 		}
 		@supports not (height: 100svh) {
-		.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
+			.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
 		}
 
 		.hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
@@ -332,8 +332,17 @@
 		  text-align: center;
 		}
 		.logo-title { 
+		  font-size: clamp(14px, 3.25vw, 32px); 
+		  line-height: 1.2; 
+		  letter-spacing: 2; 
+		  font-weight: 400; 
+		  font-style: italic; 
+		  text-transform: capitalize; 
+		  text-align: center;
+		  opacity: 0; 
+		}
+		.logo-subtitle { 
 		  font-size: clamp(14px, 3.25vw, 25px); 
-		  color: #dcb24c; 
 		  line-height: 1.2; 
 		  letter-spacing: 2; 
 		  font-weight: 400; 
@@ -374,39 +383,35 @@
 		  --firstName-delay: 1s;
 		  --lastName-delay: 1.6s;
 		  --title-delay: 2s;
-		  --arrow-delay: 2.5s;         
+		  --subtitle-delay: 2.5s;
+		  --arrow-delay: 3s;         
 		  --fade-dur: 0.75s;
 		}
 
-		/* first name */
 		.first-name {
 			opacity: 0;
 			animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
 		}
-
-		/* last name */
 		.last-name {
 			opacity: 0;
 			animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
 		}
-
-		/* title */
 		.logo-title {
 			animation: appear var(--fade-dur) ease-in var(--title-delay) forwards;
 		}
-
-		/* arrow */
+		.logo-subtitle {
+			animation: appear var(--fade-dur) ease-in var(--subtitle-delay) forwards;
+		}
 		.arrow {
 			animation:
 			bounce 2s infinite,
 			appear var(--fade-dur) ease-in var(--arrow-delay) forwards;
 		}
-
 		.below { 
 			height: 0; 
 			overflow: hidden; 
 			background-color: #f3f1f1; 
-			animation: showcontent 1s ease-in 3s forwards; 
+			animation: showcontent 0s ease-in 3s forwards; 
 		}
 		@keyframes showcontent { 100% { height: auto; } }
 
@@ -567,9 +572,9 @@
 	@media (orientation: landscape) and (max-height: 480px) {
 		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
 		.logo { max-height: min(42vh, 44svh); width: auto; }
-		.logo svg { width: auto; height: 100%; }
 		.logo-name { font-size: clamp(24px, 6vh, 48px); }
 		.logo-title { font-size: clamp(12px, 3.5vh, 20px); }
+		.logo-subtitle { font-size: clamp(12px, 3.5vh, 20px); }
 		.arrow { transform: scale(0.85); transform-origin: center bottom; }
 	}
 </style>
@@ -586,47 +591,54 @@
 			<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
 
 			<div class="w-100 text-center">
-			<div class="logo">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-					<defs>
-						<!-- Centerline paths -->
-						<path id="p1" pathLength="1" d="M161.6,181.1c0,0,40.3-38.4,40.3-38.4c72.8,324.2-76.5,356.7-121.3,292.8" />
-						<path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
-						<path id="p3" pathLength="1" d="M228.4,215.5C461,62.8,323-44.6,274.8,94.2c-4.9,14.1-8.9,30.7-11.4,50.1" />
-						<path id="p4" pathLength="1" d="M269.2,113.3c-2.9,11.7-5.2,24.7-6.8,39.2c-12.4,115.2,11.2,229.5-34,258.3" />
-						<path id="p5" pathLength="1" d="M178.7,405.7c-17-19.6-21.3-44.3-8.8-66.7c45.2-78.7,232-85.4,289.7-70.9" />
+				<div class="logo">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+						<defs>
+							<!-- Centerline paths -->
+							<path id="p1" pathLength="1" d="M161.6,181.1c0,0,40.3-38.4,40.3-38.4c72.8,324.2-76.5,356.7-121.3,292.8" />
+							<path id="p2" pathLength="1" d="M115.7,460.3C43.3,440.8,12,289.5,340.1,197" />
+							<path id="p3" pathLength="1" d="M228.4,215.5C461,62.8,323-44.6,274.8,94.2c-4.9,14.1-8.9,30.7-11.4,50.1" />
+							<path id="p4" pathLength="1" d="M269.2,113.3c-2.9,11.7-5.2,24.7-6.8,39.2c-12.4,115.2,11.2,229.5-34,258.3" />
+							<path id="p5" pathLength="1" d="M178.7,405.7c-17-19.6-21.3-44.3-8.8-66.7c45.2-78.7,232-85.4,289.7-70.9" />
 
-						<!-- Outline clips -->
-						<path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4l-4.9,5.3c-12,13-25.7,28.1-37.4,41.5  c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1c0.6,13.5,0.7,26.9,0.4,40.4  c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.7-8.1-43-22.1l0,0c-0.2-0.1-10.4-2.6-17.4,4.4  c-7,7-4.6,16.1-4.6,16.2l0,0c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
-						<path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
-						<path id="op3" d="M365.3,31.6c-9.6-14.4-27.7-19.1-43.7-14.4c-20.9,6-36.2,23.2-46.8,41c-15,25.9-22.1,55.5-25.5,85c0,0,3.4,7.4,13.3,8.4  s15-6.4,15-6.4c5-32.1,14.2-63.7,33.4-86.5c11-13,33.5-24.9,34.9,1c0.5,23.7-15.3,48.9-29.4,67.9c-12.8,17-27.3,32.4-42.5,47.1  c-9,8.7-18.3,17.1-27.8,25.3c-5.9,5.2-11.9,10.3-17.8,15.4c6-3,11.9-6.1,17.8-9.4c9-5,17.9-10.3,26.5-16  c21.6-14.2,41.8-30.5,59.5-49.2c20.3-22.3,39.8-49.5,40.9-81.4C373.2,49.9,371.1,40,365.3,31.6z" />
-						<path id="op4" d="M254.8,110.4c-4.2,18.2-6.4,36.8-7.4,55.1c-0.7,11.5-1.1,23.1-1.2,34.6c0,2,0,4,0,6c0,14.9,0.3,29.7,0.9,44.5  c1,35.1,4.3,69.5,2.3,104.3c-1.6,20-4.5,42.4-20.9,55.9c19.8-10.2,27.2-34.1,31.6-54.4c4.3-21,5.9-42.3,7.2-63.6  c1.5-26.6,2.4-57.2,4.1-83.8c0.4-6.1,0.8-12.4,1.3-18.9c0.4-5,0.8-10.1,1.3-15.3c1.8-19.4,4.6-39.6,9.6-58.6L254.8,110.4z" />
-						<path id="op5" d="M178.7,405.7c-22.2-13.3-31.9-41.7-23.2-66.4c6.7-19.4,22.9-35.5,39.7-46.5c34.1-21.4,80.3-31.2,119.7-34.8   c40.5-3.2,81.2-2.6,121.2,4.3c7.9,1.5,15.8,3.2,23.5,5.7c-7.9-1.4-15.9-1.9-23.8-2.2c-63.8-1.8-148.8,11.4-205.4,40.6   c-23.3,12.7-49.4,30.1-57.1,56.2C169.4,376.4,172.9,392.4,178.7,405.7L178.7,405.7z" />
+							<!-- Outline clips -->
+							<path id="op1" d="M228.4,245c-0.7-5.4-1.5-10.8-2.4-16.1c-5.3-32.6-12.8-62.9-20-87l-2.2-7.4l-4.9,5.3c-12,13-25.7,28.1-37.4,41.5  c11.9-9.5,25.2-20.3,37.3-30.4c4.3,28.3,7.8,56.6,9.8,85c0.4,6.4,0.8,12.7,1.1,19.1c0.6,13.5,0.7,26.9,0.4,40.4  c-0.9,32.3-4.8,66.1-16.4,96.2c-9.8,25.7-30,54.1-59.1,55.9c-17.8,1.2-33.7-8.1-43-22.1l0,0c-0.2-0.1-10.4-2.6-17.4,4.4  c-7,7-4.6,16.1-4.6,16.2l0,0c2.6,3.5,5.6,6.9,8.9,10.1c27.7,27.1,71.3,28.4,101.4,4.5C234.8,416.2,239.4,325.8,228.4,245z" />
+							<path id="op2" d="M289.8,208.4c-19.9,5.3-41.7,12-63.7,20.4c-5.8,2.2-11.6,4.5-17.4,6.9c-61.6,25.7-122,64.5-146.4,120.6   c-14.5,33-10.9,73.7,16.2,99.4c8.8,8.6,19.2,14.6,30.2,18l14.1-27.2c-22.1-4.3-38.8-24.7-39.8-48.1   c-1.2-61.8,68.4-111.8,126.7-143.7c6.4-3.5,12.7-6.8,18.7-9.9c6-3,11.7-5.9,17.1-8.4c30.7-14.6,62.4-27.2,94.5-39.5   C323.2,200.2,306.4,204,289.8,208.4z" />
+							<path id="op3" d="M365.3,31.6c-9.6-14.4-27.7-19.1-43.7-14.4c-20.9,6-36.2,23.2-46.8,41c-15,25.9-22.1,55.5-25.5,85c0,0,3.4,7.4,13.3,8.4  s15-6.4,15-6.4c5-32.1,14.2-63.7,33.4-86.5c11-13,33.5-24.9,34.9,1c0.5,23.7-15.3,48.9-29.4,67.9c-12.8,17-27.3,32.4-42.5,47.1  c-9,8.7-18.3,17.1-27.8,25.3c-5.9,5.2-11.9,10.3-17.8,15.4c6-3,11.9-6.1,17.8-9.4c9-5,17.9-10.3,26.5-16  c21.6-14.2,41.8-30.5,59.5-49.2c20.3-22.3,39.8-49.5,40.9-81.4C373.2,49.9,371.1,40,365.3,31.6z" />
+							<path id="op4" d="M254.8,110.4c-4.2,18.2-6.4,36.8-7.4,55.1c-0.7,11.5-1.1,23.1-1.2,34.6c0,2,0,4,0,6c0,14.9,0.3,29.7,0.9,44.5  c1,35.1,4.3,69.5,2.3,104.3c-1.6,20-4.5,42.4-20.9,55.9c19.8-10.2,27.2-34.1,31.6-54.4c4.3-21,5.9-42.3,7.2-63.6  c1.5-26.6,2.4-57.2,4.1-83.8c0.4-6.1,0.8-12.4,1.3-18.9c0.4-5,0.8-10.1,1.3-15.3c1.8-19.4,4.6-39.6,9.6-58.6L254.8,110.4z" />
+							<path id="op5" d="M178.7,405.7c-22.2-13.3-31.9-41.7-23.2-66.4c6.7-19.4,22.9-35.5,39.7-46.5c34.1-21.4,80.3-31.2,119.7-34.8   c40.5-3.2,81.2-2.6,121.2,4.3c7.9,1.5,15.8,3.2,23.5,5.7c-7.9-1.4-15.9-1.9-23.8-2.2c-63.8-1.8-148.8,11.4-205.4,40.6   c-23.3,12.7-49.4,30.1-57.1,56.2C169.4,376.4,172.9,392.4,178.7,405.7L178.7,405.7z" />
 
-						<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
-						<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
-						<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
-						<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
-						<clipPath id="clip5" clipPathUnits="userSpaceOnUse"><use href="#op5"/></clipPath>
-					</defs>
+							<clipPath id="clip1" clipPathUnits="userSpaceOnUse"><use href="#op1"/></clipPath>
+							<clipPath id="clip2" clipPathUnits="userSpaceOnUse"><use href="#op2"/></clipPath>
+							<clipPath id="clip3" clipPathUnits="userSpaceOnUse"><use href="#op3"/></clipPath>
+							<clipPath id="clip4" clipPathUnits="userSpaceOnUse"><use href="#op4"/></clipPath>
+							<clipPath id="clip5" clipPathUnits="userSpaceOnUse"><use href="#op5"/></clipPath>
+						</defs>
 
-					<!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
-					<g style="shape-rendering:geometricPrecision">
-						<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
-						<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
-						<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
-						<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
-						<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
-					</g>
-				</svg>
+						<!-- Hidden until each segment’s reveal; no start flash, no endpoint flicker -->
+						<g style="shape-rendering:geometricPrecision">
+							<g clip-path="url(#clip1)"><use href="#p1" class="draw-final seg1"/></g>
+							<g clip-path="url(#clip2)"><use href="#p2" class="draw-final seg2"/></g>
+							<g clip-path="url(#clip3)"><use href="#p3" class="draw-final seg3"/></g>
+							<g clip-path="url(#clip4)"><use href="#p4" class="draw-final seg4"/></g>
+							<g clip-path="url(#clip5)"><use href="#p5" class="draw-final seg5"/></g>
+						</g>
+					</svg>
+				</div>
 			</div>
-		</div>
 
 			<div class="logo-name font-mont">
 				<span class="first-name off-white">Jonathan</span>
 				<span class="last-name light-blue">Legiadre</span>
 			</div>
-				<div class="logo-title font-bitter">Graphic Designer + Front-End Developer</div>
+			<div class="logo-title font-bitter mustard">
+				<!--Graphic Designer + Front-End Developer-->
+				<span class=""></span>
+				Designer <span class="">+</span> Developer <span class="">+</span> Brand Builder
+			</div>
+			<div class="logo-subtitle font-bitter mustard">
+				From Print to Pixel
+			</div>
 
 			<div class="arrow-fade">
 				<div class="arrow" aria-hidden="true">
