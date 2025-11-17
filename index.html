@@ -206,19 +206,50 @@
 	</script>
 </head>
 <html lang="en">
-
 	<style>
-		:root { --burger: #dcb24c; }            
-		body.hamburger-on-light { --burger: #0f273f; } 
+		:root { 
+			--burger: #dcb24c;
+			
+			/* logo start delays */
+			--seg1-start: 0s;
+			--seg2-start: 0.71s;
+			--seg3-start: 0.9s;
+			--seg4-start: 1.33s;
+			--seg5-start: 1.75s;
+
+			/* logo stroke durations  */
+			--seg1-final-dur: 1.25s;
+			--seg2-final-dur: 1s;
+			--seg3-final-dur: 0.75s;
+			--seg4-final-dur: 0.75s;
+			--seg5-final-dur: 0.75s;
+
+			/* logo stroke settings */
+			--stroke-w: clamp(10px, 6vw, 47px);
+			--c12: #f3f1f1;
+			--c34: #4F8ABA;
+			--fill-dash: 1.02;  
+			--fill-off-start: 1.02; 
+			--fill-off-end:  -0.02;
+	
+			/* Name & Title settings */
+			--firstName-delay: 1s;
+			--lastName-delay: 1.6s;
+			--split-delay: 1s;
+			--stagger: 0.6s;  
+			--title-delay: 2s;
+			--subtitle-delay: 2.5s;
+			--arrow-delay: 3s;         
+			--fade-dur: 0.75s;
+			--hamburger-delay: 3s;
+			--below-delay: 3s;
+		}
+	          
 
 		html { scrollbar-gutter: stable both-edges; }
-		* { scrollbar-width: thin; }
-		*::-webkit-scrollbar { width: 8px; height: 8px; }
-		*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius: 8px; }
-		*::-webkit-scrollbar-track { background: transparent; }
 
 		body.menu-open { overflow: hidden; }
-		body { margin: 0; padding: 0; text-align: center; background-color: #0f273f; }
+		body { margin: 0; padding: 0; background-color: #0f273f; }
 		a, a:visited, a:active, a:hover { text-decoration: none; }
 		*, *:after, *:before { box-sizing: border-box; }
 
@@ -229,183 +260,207 @@
 	  	.mustard  { color: #dcb24c; }
 		.font-mont { font-family: 'Montserrat', sans-serif; }
 	  	.font-bitter { font-family: 'Bitter', serif; }
+		@keyframes appear { 
+			0% {opacity:0;} 
+			100% {opacity:1;} 
+		}
 
 	  	/* Hamburger */
 	  	#hamburger {
-			position: fixed; top: 12px; right: 12px; z-index: 4;
-			display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
-			padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; background: transparent; border: none; margin: 0;
-			overflow: visible; transition: opacity 0.15s linear, filter 0.15s linear;
-			opacity: 0; -webkit-animation: appear 1s ease-in-out 3s forwards; animation: appear 1s ease-in-out 3s forwards;
+			position: fixed; 
+			top: 12px; 
+			right: 12px; 
+			z-index: 4;
+			display: inline-flex; 
+			flex-direction: column; 
+			align-items: center; 
+			gap: 6px;
+			padding: 10px 12px; 
+			cursor: pointer; 
+			font: inherit; 
+			color: inherit; 
+			background: transparent; 
+			border: none; 
+			margin: 0;
+			overflow: visible; 
+			transition: opacity 0.15s linear, filter 0.15s linear;
+			opacity: 0; 
+			-webkit-animation: appear 1s ease-in-out var(--hamburger-delay) forwards; 
+			animation: appear 1s ease-in-out var(--hamburger-delay) forwards;
 	  	}
-	  	#hamburger:focus { outline: 2px solid #dcb24c; outline-offset: 4px; }
-	  	#hamburger:hover, #hamburger.is-active:hover { opacity: 0.7; }
+	  	#hamburger:focus { 
+			outline: 2px solid #dcb24c; 
+			outline-offset: 4px; 
+		}
+	  	#hamburger:hover, #hamburger.is-active:hover { 
+			opacity: 0.7; 
+		}
 
-	  	.hamburger-box { width: 40px; height: 24px; display: inline-block; position: relative; }
-	  	.hamburger-inner { display: block; top: 50%; margin-top: -2px; }
+	  	.hamburger-box { 
+			width: 40px; 
+			height: 24px; 
+			display: inline-block; 
+			position: relative; 
+		}
+	  	.hamburger-inner { 
+			display: block; 
+			top: 50%; 
+			margin-top: -2px; 
+		}
 	  	.hamburger-inner,
 	  	.hamburger-inner::before,
 	  	.hamburger-inner::after {
-		width: 40px; height: 4px; background-color: var(--burger); border-radius: 4px; position: absolute;
-		transition: transform 0.15s ease 0s, background-color .25s ease 0s;
-	  }
-	  	.hamburger-inner::before, .hamburger-inner::after { content: ""; display: block; }
+			width: 40px; 
+			height: 4px; 
+			background-color: var(--burger); 
+			border-radius: 4px; 
+			position: absolute;
+			transition: transform 0.15s ease 0s, background-color .25s ease 0s;
+		}
+	  	.hamburger-inner::before, .hamburger-inner::after { 
+			content: ""; 
+			display: block; 
+		}
 	  	.hamburger-inner::before { top: -10px; }  
 		.hamburger-inner::after  { bottom: -10px; }
 	  	.hamburger-label {
-		font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px;
-		color: var(--burger);
-		transition: color .25s ease 0s; 
-	  }
+			font-family: 'Montserrat', sans-serif; 
+			font-weight: 700; 
+			text-transform: uppercase; 
+			font-size: 12px;
+			color: var(--burger);
+			transition: color .25s ease 0s; 
+		}
 
 	  	.hamburger--spin .hamburger-inner { 
-		  transition-duration: 0.22s; transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); 
+			transition-duration: 0.22s; 
+			transition-timing-function: cubic-bezier(0.55,0.055,0.675,0.19); 
 		}
 	  	.hamburger--spin .hamburger-inner::before { 
-		  transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; 
+			transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in, background-color .25s ease 0s, transform 0.15s ease 0s; 
 		}
 	  	.hamburger--spin .hamburger-inner::after  { 
-		  transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; 
+			transition: bottom 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55,0.055,0.675,0.19), background-color .25s ease 0s; 
 		}
 	  	.hamburger--spin.is-active .hamburger-inner { 
-		  transform: rotate(225deg); transition-delay: 0.12s; transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); 
+			transform: rotate(225deg); 
+			transition-delay: 0.12s; 
+			transition-timing-function: cubic-bezier(0.215,0.61,0.355,1); 
 		}
 	  	.hamburger--spin.is-active .hamburger-inner::before { 
-		  top: 0; opacity: 0; transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; 
+			top: 0; 
+			opacity: 0; 
+			transition: top 0.1s ease-out, opacity 0.1s 0.12s ease-out; 
 		}
 	  	.hamburger--spin.is-active .hamburger-inner::after  { 
-		  bottom: 0; transform: rotate(-90deg); transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); 
+			bottom: 0; 
+			transform: rotate(-90deg); 
+			transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215,0.61,0.355,1); 
 		}
 
 	  	#hamburger.is-active .hamburger-inner,
 	  	#hamburger.is-active .hamburger-inner::before,
-	  	#hamburger.is-active .hamburger-inner::after { background-color: #f3f1f1 !important; }
+	  	#hamburger.is-active .hamburger-inner::after { 
+			background-color: #f3f1f1 !important; 
+		}
 	  	#hamburger.is-active .hamburger-label { color: #f3f1f1 !important; }
 
+		/** HAMBURGER COLOR CHANGE **/
+		body.hamburger-on-light { --burger: #0f273f; } 
+	  	body.hamburger-on-light #hamburger .hamburger-label {transition: color .25s ease 0ms;}
+	  	body.hamburger-on-light #hamburger .hamburger-inner::after {transition: transform 0.15s ease 0s, background-color .25s ease 80ms;}
+	  	body.hamburger-on-light #hamburger .hamburger-inner {transition: transform 0.15s ease 0s, background-color .25s ease 160ms; }
+	  	body.hamburger-on-light #hamburger .hamburger-inner::before {transition: transform 0.15s ease 0s, background-color .25s ease 240ms;}
 
-	  	body.hamburger-on-light #hamburger .hamburger-label {
-		transition: color .25s ease 0ms;
-	  }
-	  	body.hamburger-on-light #hamburger .hamburger-inner::after { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-	  }
-	  	body.hamburger-on-light #hamburger .hamburger-inner { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-	  }
-	  	body.hamburger-on-light #hamburger .hamburger-inner::before { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 240ms;
-	  }
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::before {transition: transform 0.15s ease 0s, background-color .25s ease 0ms;}
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner {transition: transform 0.15s ease 0s, background-color .25s ease 80ms;}
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {transition: transform 0.15s ease 0s, background-color .25s ease 160ms;}
+	  	body:not(.hamburger-on-light) #hamburger .hamburger-label {transition: color .25s ease 240ms;}
 
-	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::before { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 0ms;
-	  }
-	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner { 
-		transition: transform 0.15s ease 0s, background-color .25s ease 80ms;
-	  }
-	  	body:not(.hamburger-on-light) #hamburger .hamburger-inner::after {
-		transition: transform 0.15s ease 0s, background-color .25s ease 160ms;
-	  }
-	  	body:not(.hamburger-on-light) #hamburger .hamburger-label {  
-		transition: color .25s ease 240ms;
-	  }
+		.hero-sentinel { 
+			position: absolute; 
+			left: 0; 
+			right: 0; 
+			bottom: 0;
+			height: 1px; 
+			pointer-events: none; 
+		}
 
-	  /* Menu overlay */
+		/* Menu overlay */
 		#mega-menu {
-		position: fixed; inset: 0; background-color: #0f273f; padding: 76px; z-index: 3;
-		opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03);
-		transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
-	  }
-		#mega-menu.is-active { opacity: 1; pointer-events: auto; transform: none; }
-		#mega-menu.not-active { opacity: 0; pointer-events: none; transform: translateZ(0) scale(1.03); }
+			position: fixed; 
+			inset: 0; 
+			background-color: #0f273f; 
+			padding: 76px; 
+			z-index: 3;
+			opacity: 0; 
+			pointer-events: none; 
+			transform: translateZ(0) scale(1.03);
+			transition: opacity .35s ease, transform .35s ease; 
+			will-change: opacity, transform;
+		}
+		#mega-menu.is-active { 
+			opacity: 1; 
+			pointer-events: auto; 
+			transform: none; 
+		}
+		#mega-menu.not-active { 
+			opacity: 0; 
+			pointer-events: none; 
+			transform: translateZ(0) scale(1.03); 
+		}
 
 		.menu-item {
-		display: block; text-transform: capitalize; font-family: 'Bitter', serif; font-weight: 400; font-style: italic;
-		color: #dcb24c; font-size: clamp(24px, 8vw, 64px); margin-bottom: 6%; text-align: left; width: 100%;
-		border-bottom: 2px solid #f3f1f1; outline: none;
-	  }
-		.menu-item:focus-visible { outline: 2px solid #f3f1f1; outline-offset: 4px; }
+			display: block; 
+			text-transform: capitalize; 
+			font-family: 'Bitter', serif; 
+			font-weight: 400; 
+			font-style: italic;
+			color: #dcb24c; 
+			font-size: clamp(24px, 8vw, 64px); 
+			margin-bottom: 6%; 
+			text-align: left; 
+			width: 100%;
+			border-bottom: 2px solid #f3f1f1; outline: none;
+		}
+		.menu-item:focus-visible {
+			outline: 2px solid #f3f1f1; 
+			outline-offset: 4px; 
+		}
 
-		/* Title Screen */
+		/* TITLE SCREEN */
 		.nav-center-screen {
 			width: 100%;
-			display: flex; flex-direction: column; justify-content: center; align-items: center;
-			text-align: center; background-color: #0f273f; overflow: hidden; position: relative; margin: 0 auto;
+			display: flex; 
+			flex-direction: column; 
+			justify-content: center; 
+			align-items: center;
+			text-align: center; 
+			background-color: #0f273f; 
+			overflow: hidden; 
+			position: relative; 
+			margin: 0 auto;
 			border-bottom: 10px solid rgba(90,145,191,0);
 			height: calc(100svh - env(safe-area-inset-bottom, 0px));
 			padding-bottom: env(safe-area-inset-bottom, 0px);
 		}
 		@supports not (height: 100svh) {
-			.nav-center-screen { height: calc(var(--vh, 1vh) * 100); padding-bottom: 0; }
+			.nav-center-screen { 
+				height: calc(var(--vh, 1vh) * 100); 
+				padding-bottom: 0; 
+			}
 		}
-
-		.hero-sentinel { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; }
-
+		
+		/** NAME **/
 		.logo-name { 
-		  font-size: clamp(32px, 7.5vw, 85px); 
-		  letter-spacing: 1.2; 
-		  line-height: 0.9; 
-		  font-weight: 600; 
-		  text-transform: uppercase; 
-		  margin: 0.5% auto; 
-		  text-align: center;
+			font-size: clamp(32px, 7.5vw, 85px); 
+			letter-spacing: 1.2; 
+			line-height: 0.9; 
+			font-weight: 600; 
+			text-transform: uppercase; 
+			margin: 0.5% auto; 
+			text-align: center;
 		}
-		.logo-title { 
-		  font-size: clamp(14px, 3.25vw, 25px); 
-		  line-height: 1.2; 
-		  letter-spacing: 2; 
-		  font-weight: 400; 
-		  font-style: italic; 
-		  text-transform: capitalize; 
-		  text-align: center;
-		  opacity: 0; 
-		}
-		.logo-subtitle { 
-		  font-size: clamp(14px, 3.25vw, 25px); 
-		  line-height: 1.2; 
-		  letter-spacing: 2; 
-		  font-weight: 400; 
-		  font-style: italic; 
-		  text-transform: capitalize; 
-		  text-align: center;
-		  opacity: 0; 
-		}
-		@keyframes appear { 0% {opacity:0;} 100% {opacity:1;} }
-
-		.arrow { 
-		  position: absolute; 
-		  bottom: 0; 
-		  left: 50%; 
-		  margin-left: -20px; 
-		  width: 40px; 
-		  height: 40px; 
-		  opacity: 0;
-		}
-		.arrow svg { 
-		  width: 40px; 
-		  height: 40px; 
-		  display: block; 
-		}
-		.arrow path { fill: #f3f1f1; }
-		@keyframes bounce { 
-		  0%,20%,50%,80%,100% {transform: translateY(0);} 
-		  40% {transform: translateY(-25px);} 
-		  60% {transform: translateY(-15px);} 
-		}
-			
-		@keyframes appear { 
-			0% {opacity: 0;} 
-			100% {opacity: 1;} 
-		}
-
-		:root {
-		  --firstName-delay: 1s;
-		  --lastName-delay: 1.6s;
-		  --title-delay: 2s;
-		  --subtitle-delay: 2.5s;
-		  --arrow-delay: 3s;         
-		  --fade-dur: 0.75s;
-		}
-
 		.first-name {
 			opacity: 0;
 			animation: appear var(--fade-dur) ease-in var(--firstName-delay) forwards;
@@ -414,22 +469,100 @@
 			opacity: 0;
 			animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
 		}
+		
+		/** SLIDING NAME **/
+		.split-text-container {
+			display: flex;
+			font-size: 5rem;
+			font-weight: bold;
+			text-transform: uppercase;
+			color: #fff;
+			overflow: hidden;
+		}
+		.text-part {
+			display: inline-block;
+			position: relative;
+			transform: translateX(0);
+			animation-duration: 2s;
+			animation-timing-function: ease-out;
+			animation-fill-mode: forwards;
+		}
+		.text-part.left {
+			transform: translateX(-200%);
+			animation-name: slide-in-left;
+			animation-delay: var(--split-delay);
+			margin-right: 2px;
+		}
+		.text-part.right {
+			transform: translateX(200%);
+			animation-name: slide-in-right;
+			animation-delay: calc(var(--split-delay) + var(--stagger));
+			margin-left: 2px;
+		}
+		@keyframes slide-in-left {
+			0%   { transform: translateX(-200%); }
+			100% { transform: translateX(0); }
+		}
+		@keyframes slide-in-right {
+			0%   { transform: translateX(200%); }
+			100% { transform: translateX(0); }
+		}
+		
+		/** TITLE **/
 		.logo-title {
+			font-size: clamp(14px, 3.25vw, 25px); 
+			line-height: 1.2; 
+			letter-spacing: 2; 
+			font-weight: 400; 
+			font-style: italic; 
+			text-transform: capitalize; 
+			text-align: center;
+			opacity: 0; 
 			animation: appear var(--fade-dur) ease-in var(--title-delay) forwards;
 		}
 		.logo-subtitle {
+			font-size: clamp(14px, 3.25vw, 25px); 
+			line-height: 1.2; 
+			letter-spacing: 2; 
+			font-weight: 400; 
+			font-style: italic; 
+			text-transform: capitalize; 
+			text-align: center;
+			opacity: 0; 
 			animation: appear var(--fade-dur) ease-in var(--subtitle-delay) forwards;
 		}
-		.arrow {
+
+		/** ARROW **/
+		.arrow { 
+			position: absolute; 
+			bottom: 0; 
+			left: 50%; 
+			margin-left: -20px; 
+			width: 40px; 
+			height: 40px; 
+			opacity: 0;
 			animation:
 			bounce 2s infinite,
 			appear var(--fade-dur) ease-in var(--arrow-delay) forwards;
 		}
+		.arrow svg { 
+			width: 40px; 
+			height: 40px; 
+			display: block; 
+		}
+		.arrow path { fill: #f3f1f1; }
+		@keyframes bounce { 
+			0%,20%,50%,80%,100% {transform: translateY(0);} 
+			40% {transform: translateY(-25px);} 
+			60% {transform: translateY(-15px);} 
+		}
+		
+		/** BELOW **/
 		.below { 
 			height: 0; 
 			overflow: hidden; 
 			background-color: #f3f1f1; 
-			animation: showcontent 0s ease-in 3s forwards; 
+			animation: showcontent 0s ease-in var(--below-delay) forwards; 
 		}
 		@keyframes showcontent { 100% { height: auto; } }
 
@@ -438,10 +571,13 @@
 			width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; 
 		}
 		.work-item { 
-			width: 80%; margin-bottom: 9%; 
+			width: 80%; 
+			margin-bottom: 9%; 
 		}
 		.portfolio-info { 
-			width: 100%; text-align: left; padding: 2% 0% 4%; 
+			width: 100%; 
+			text-align: left; 
+			padding: 2% 0% 4%; 
 		}
 		.portfolio-info::before { 
 			content: ""; 
@@ -477,126 +613,116 @@
 			.menu-item { margin-bottom: 12%; }
 		}
 		@media (min-width: 768px) {
-			.work-item { width: 45%; margin-bottom: 3%; }
-			.project-name { font-size: clamp(18px, 1.75vw, 22px); }
-			.project-role { font-size: clamp(12px, 1.25vw, 14.66px); letter-spacing: 1.5; }
-			.menu-item    { font-size: clamp(28px, 4.5vw, 64px); }
+			.work-item { 
+				width: 45%; 
+				margin-bottom: 3%; 
+			}
+			.project-name { f
+				ont-size: clamp(18px, 1.75vw, 22px); 
+			}
+			.project-role { 
+				font-size: clamp(12px, 1.25vw, 14.66px); 
+				letter-spacing: 1.5; 
+			}
+			.menu-item { 
+				font-size: clamp(28px, 4.5vw, 64px); 
+			}
 		}
-		@media (min-width: 1024px) { .work-item { width: 28%; } }
+		@media (min-width: 1024px) { 
+			.work-item { width: 28%; } 
+		}
+
+		/** LOGO **/
+		.logo {
+			display: inline-block;
+			width: clamp(200px, 60vw, 420px);
+			max-width: 100%;
+			overflow: hidden;
+			user-select: none; -webkit-user-select: none;
+			cursor: pointer;
+		}
+		.logo svg { width: 100%; height: 100%; display: block; }
+
+		.draw-final{
+			fill: none;
+			stroke-width: var(--stroke-w);
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			stroke: currentColor;
+
+			/* IMPORTANT: single-pass reveal uses a *fixed* solid dash length.
+			   We only animate the *offset* (no moving “snake” head/tail). */
+			stroke-dasharray: var(--fill-dash);
+			stroke-dashoffset: var(--fill-off-start);
+			visibility: hidden;
+
+			will-change: stroke-dashoffset, visibility;
+			shape-rendering: geometricPrecision;
+		}
+
+		.seg1 { color: var(--c12); }
+		.seg2 { color: var(--c12); }
+		.seg3 { color: var(--c34); }
+		.seg4 { color: var(--c34); }
+		.seg5 { color: var(--c34); }
+
+		@keyframes reveal { to { visibility: visible; } }
+
+		@keyframes draw-once {
+			0%   { stroke-dashoffset: var(--fill-off-start); }
+			100% { stroke-dashoffset: var(--fill-off-end); }
+		}
+
+		.seg1.draw-final {
+			animation:
+				reveal    0s step-end var(--seg1-start) forwards,
+				draw-once var(--seg1-final-dur) ease var(--seg1-start) forwards;
+		}
+		.seg2.draw-final {
+			animation:
+				reveal    0s step-end var(--seg2-start) forwards,
+				draw-once var(--seg2-final-dur) ease var(--seg2-start) forwards;
+		}
+		.seg3.draw-final {
+			animation:
+				reveal    0s step-end var(--seg3-start) forwards,
+				draw-once var(--seg3-final-dur) ease var(--seg3-start) forwards;
+		}
+		.seg4.draw-final {
+			animation:
+				reveal    0s step-end var(--seg4-start) forwards,
+				draw-once var(--seg4-final-dur) ease var(--seg4-start) forwards;
+		}
+		.seg5.draw-final {
+			animation:
+				reveal    0s step-end var(--seg5-start) forwards,
+				draw-once var(--seg5-final-dur) ease var(--seg5-start) forwards;
+		}
+
+		@media (orientation: landscape) and (max-height: 480px) {
+			.nav-center-screen { 
+				padding-top: 2vh; 
+				padding-bottom: 2vh; 
+			}
+			.logo { 
+				max-height: min(42vh, 44svh); 
+				width: auto; 
+			}
+			.logo-name { 
+				font-size: clamp(24px, 6vh, 48px); 
+			}
+			.logo-title { 
+				font-size: clamp(12px, 3.5vh, 20px); 
+			}
+			.logo-subtitle { 
+				font-size: clamp(12px, 3.5vh, 20px); 
+			}
+			.arrow { 
+				transform: scale(0.85); 
+				transform-origin: center bottom; 
+			}
+		}
 	</style>
-
-	<!-- Logo animation styles -->
-	<style>
-	/* === Single-pass draw (no snake), then stay filled === */
-
-	.logo {
-		display: inline-block;
-		width: clamp(200px, 60vw, 420px);
-		max-width: 100%;
-		overflow: hidden;
-		user-select: none; -webkit-user-select: none;
-		cursor: pointer;
-	}
-	.logo svg { width: 100%; height: 100%; display: block; }
-
-	:root{
-		--stroke-w: clamp(10px, 6vw, 47px);
-
-		--c12: #f3f1f1;
-		--c34: #4F8ABA;
-
-		/* start delays (keep yours) */
-		--seg1-start: 0s;
-		--seg2-start: 0.71s;
-		--seg3-start: 0.9s;
-		--seg4-start: 1.33s;
-		--seg5-start: 1.65s;
-
-		/* durations (keep yours) */
-		--seg1-final-dur: 1.25s;
-		--seg2-final-dur: 1s;
-		--seg3-final-dur: 0.75s;
-		--seg4-final-dur: 0.75s;
-		--seg5-final-dur: 0.75s;
-
-		/* solid-fill settings */
-		--fill-dash: 1.02;        /* a hair >1 for a clean cap under clip */
-		--fill-off-start: 1.02;   /* parked fully off at start */
-		--fill-off-end:  -0.02;   /* tiny overshoot at end */
-	}
-
-	/* Base: hidden until its start time */
-	.draw-final{
-		fill: none;
-		stroke-width: var(--stroke-w);
-		stroke-linecap: round;
-		stroke-linejoin: round;
-		stroke: currentColor;
-
-		/* IMPORTANT: single-pass reveal uses a *fixed* solid dash length.
-		   We only animate the *offset* (no moving “snake” head/tail). */
-		stroke-dasharray: var(--fill-dash);
-		stroke-dashoffset: var(--fill-off-start);
-		visibility: hidden;
-
-		will-change: stroke-dashoffset, visibility;
-		shape-rendering: geometricPrecision;
-	}
-
-	/* colors */
-	.seg1 { color: var(--c12); }
-	.seg2 { color: var(--c12); }
-	.seg3 { color: var(--c34); }
-	.seg4 { color: var(--c34); }
-	.seg5 { color: var(--c34); }
-
-	/* reveal only at the start time */
-	@keyframes reveal { to { visibility: visible; } }
-
-	/* One-and-done draw: ONLY animate the offset */
-	@keyframes draw-once {
-		0%   { stroke-dashoffset: var(--fill-off-start); }
-		100% { stroke-dashoffset: var(--fill-off-end); }
-	}
-
-	/* timelines: reveal → draw-once (forwards to persist) */
-	.seg1.draw-final {
-		animation:
-			reveal    0s step-end var(--seg1-start) forwards,
-			draw-once var(--seg1-final-dur) ease var(--seg1-start) forwards;
-	}
-	.seg2.draw-final {
-		animation:
-			reveal    0s step-end var(--seg2-start) forwards,
-			draw-once var(--seg2-final-dur) ease var(--seg2-start) forwards;
-	}
-	.seg3.draw-final {
-		animation:
-			reveal    0s step-end var(--seg3-start) forwards,
-			draw-once var(--seg3-final-dur) ease var(--seg3-start) forwards;
-	}
-	.seg4.draw-final {
-		animation:
-			reveal    0s step-end var(--seg4-start) forwards,
-			draw-once var(--seg4-final-dur) ease var(--seg4-start) forwards;
-	}
-	.seg5.draw-final {
-		animation:
-			reveal    0s step-end var(--seg5-start) forwards,
-			draw-once var(--seg5-final-dur) ease var(--seg5-start) forwards;
-	}
-
-	/* optional: landscape sizing (unchanged) */
-	@media (orientation: landscape) and (max-height: 480px) {
-		.nav-center-screen { padding-top: 2vh; padding-bottom: 2vh; }
-		.logo { max-height: min(42vh, 44svh); width: auto; }
-		.logo-name { font-size: clamp(24px, 6vh, 48px); }
-		.logo-title { font-size: clamp(12px, 3.5vh, 20px); }
-		.logo-subtitle { font-size: clamp(12px, 3.5vh, 20px); }
-		.arrow { transform: scale(0.85); transform-origin: center bottom; }
-	}
-</style>
-
 
 	<div class="page">
 		<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
@@ -605,7 +731,6 @@
 		</button>
 
 		<div class="nav-center-screen">
-			<!-- hero sentinel (1px tall) used to know when we’ve scrolled past the hero -->
 			<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>
 
 			<div class="w-100 text-center">
@@ -645,10 +770,15 @@
 				</div>
 			</div>
 
-			<div class="logo-name font-mont">
+			<!--<div class="logo-name font-mont">
 				<span class="first-name off-white">Jonathan</span>
 				<span class="last-name light-blue">Legiadre</span>
+			</div>-->
+			<div class="split-text-container">
+				<span class="text-part left font-mont off-white">Jonathan</span>
+				<span class="text-part right font-mont light-blue">Legiadre</span>
 			</div>
+
 			<div class="logo-title font-bitter mustard">
 				<!--Graphic Designer + Front-End Developer-->
 				<span class=""></span>
