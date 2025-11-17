@@ -234,13 +234,13 @@
 	
 			/* Name & Title settings */
 			--firstName-delay: 1s;
-			--lastName-delay: 1.6s;
-			--split-delay: 1s;
-			--stagger: 0.6s;  
+			--lastName-delay: 1.6s;         
+			--fade-dur: 0.75s;
 			--title-delay: 2s;
 			--subtitle-delay: 2.5s;
-			--arrow-delay: 3s;         
-			--fade-dur: 0.75s;
+			
+			/* Page settings */
+			--arrow-delay: 3s;
 			--hamburger-delay: 3s;
 			--below-delay: 3s;
 		}
@@ -468,44 +468,6 @@
 		.last-name {
 			opacity: 0;
 			animation: appear var(--fade-dur) ease-in var(--lastName-delay) forwards;
-		}
-		
-		/** SLIDING NAME **/
-		.split-text-container {
-			display: flex;
-			font-size: 5rem;
-			font-weight: bold;
-			text-transform: uppercase;
-			color: #fff;
-			overflow: hidden;
-		}
-		.text-part {
-			display: inline-block;
-			position: relative;
-			transform: translateX(0);
-			animation-duration: 2s;
-			animation-timing-function: ease-out;
-			animation-fill-mode: forwards;
-		}
-		.text-part.left {
-			transform: translateX(-200%);
-			animation-name: slide-in-left;
-			animation-delay: var(--split-delay);
-			margin-right: 2px;
-		}
-		.text-part.right {
-			transform: translateX(200%);
-			animation-name: slide-in-right;
-			animation-delay: calc(var(--split-delay) + var(--stagger));
-			margin-left: 2px;
-		}
-		@keyframes slide-in-left {
-			0%   { transform: translateX(-200%); }
-			100% { transform: translateX(0); }
-		}
-		@keyframes slide-in-right {
-			0%   { transform: translateX(200%); }
-			100% { transform: translateX(0); }
 		}
 		
 		/** TITLE **/
@@ -770,13 +732,9 @@
 				</div>
 			</div>
 
-			<!--<div class="logo-name font-mont">
+			<div class="logo-name font-mont">
 				<span class="first-name off-white">Jonathan</span>
 				<span class="last-name light-blue">Legiadre</span>
-			</div>-->
-			<div class="split-text-container">
-				<span class="text-part left font-mont off-white">Jonathan</span>
-				<span class="text-part right font-mont light-blue">Legiadre</span>
 			</div>
 
 			<div class="logo-title font-bitter mustard">
