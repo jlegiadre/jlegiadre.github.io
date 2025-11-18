@@ -694,11 +694,15 @@
 			}
 		}
 	</style>
-	<style>
+<style>
 /* ================================
-   PORTFOLIO ZONE (Dynamic Grid + Expanded View + Carousel)
+   PORTFOLIO ZONE (Dynamic Grid + Expanded View + Carousel + Animations)
    ================================ */
 
+:root {
+  --pz-duration: 400ms;
+  --pz-ease: cubic-bezier(.22,.61,.36,1);
+}
 
 /* Card layout */
 .work-item {
@@ -707,6 +711,7 @@
   cursor: pointer;
   outline: none;
   transition: transform 0.2s ease;
+  will-change: transform;
 }
 .work-item:focus-visible {
   box-shadow: 0 0 0 3px #4F8ABA;
@@ -716,6 +721,7 @@
   width: 100%;
   display: block;
   height: auto;
+  transition: transform var(--pz-duration) var(--pz-ease), opacity var(--pz-duration) var(--pz-ease);
 }
 
 /* Card text info */
@@ -723,6 +729,7 @@
   width: 100%;
   text-align: left;
   padding: 2% 0% 4%;
+  transition: opacity var(--pz-duration) var(--pz-ease), transform var(--pz-duration) var(--pz-ease);
 }
 .portfolio-info::before {
   content: "";
@@ -753,11 +760,11 @@
   letter-spacing: 2;
 }
 
-/* Expanded state */
+/* Expanded state (specificity beats responsive widths) */
 .work-wrapper .work-item.work-item--expanded {
   width: 100%;
   margin-bottom: 3%;
-  order: -1;
+  order: -1; /* bring expanded item to top and push others below */
 }
 .work-item--expanded .portfolio-info::before { width: 0; }
 
@@ -768,6 +775,13 @@
   gap: 2rem;
   align-items: start;
   background: #f3f1f1;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--pz-duration) var(--pz-ease), transform var(--pz-duration) var(--pz-ease);
+}
+.work-detail.is-enter {
+  opacity: 1;
+  transform: translateY(0);
 }
 .work-detail__media { position: relative; }
 .work-detail__meta {
@@ -794,6 +808,22 @@
   font-family: 'Bitter', serif;
   color: #0f273f;
   line-height: 1.5;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--pz-duration) var(--pz-ease), transform var(--pz-duration) var(--pz-ease);
+}
+.work-detail.is-enter .work-detail__desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Transition states for collapsed → expanded */
+.work-item.is-transitioning .portfolio-info {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.work-item.is-transitioning .work-item__cover {
+  transform: scale(1.03);
 }
 
 /* Carousel (vanilla) */
@@ -804,6 +834,13 @@
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--pz-duration) var(--pz-ease), transform var(--pz-duration) var(--pz-ease);
+}
+.work-detail.is-enter .carousel {
+  opacity: 1;
+  transform: translateY(0);
 }
 .carousel__track {
   display: grid;
@@ -811,7 +848,7 @@
   grid-auto-columns: 100%;
   height: 100%;
   transform: translateX(0%);
-  transition: transform 300ms ease;
+  transition: transform 300ms var(--pz-ease);
 }
 .carousel__slide {
   width: 100%;
@@ -821,7 +858,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain; /* prevent cropping */
-  background: #e9edf2; /* subtle backdrop around contained images */
+  background: #e9edf2;
 }
 
 /* Carousel controls */
@@ -875,13 +912,20 @@
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--pz-duration) var(--pz-ease), transform var(--pz-duration) var(--pz-ease);
+}
+.work-detail.is-enter .work-detail__close {
+  opacity: 1;
+  transform: translateY(0);
 }
 .work-detail__close:focus-visible {
   outline: 3px solid #4F8ABA;
   outline-offset: 2px;
 }
 
-/* Responsiveness */
+/* Responsive adjustments */
 @media (max-width: 767px) {
   .work-detail { grid-template-columns: 1fr; gap: 1rem; }
 }
@@ -894,7 +938,21 @@
 @media (min-width: 1700px) {
   .work-item { width: 23%; }
 }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .work-item__cover,
+  .portfolio-info,
+  .work-detail,
+  .work-detail__desc,
+  .carousel,
+  .carousel__track,
+  .work-detail__close {
+    transition: none !important;
+  }
+}
 </style>
+
 
 	<div class="page">
 		<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
@@ -982,7 +1040,6 @@
 
 <script>
 (function () {
-  // Adjust path to your JSON
   const DATA_URL = 'assets/portfolio.json';
 
   const grid = document.getElementById('portfolioGrid');
@@ -990,6 +1047,7 @@
   let expandedId = null;
 
   // ---- helpers ----
+  const DUR = 400; // keep in sync with --pz-duration
   function onEnterOrSpace(fn) {
     return function (e) {
       const code = e.code || e.key;
@@ -999,6 +1057,7 @@
       }
     };
   }
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   function renderGrid(data) {
     grid.innerHTML = '';
@@ -1026,13 +1085,13 @@
     });
   }
 
-  function expandItem(id) {
+  async function expandItem(id) {
     if (expandedId === id) return;
 
     // collapse any open one
     if (expandedId) {
       const prev = grid.querySelector(`.work-item[data-id="${expandedId}"]`);
-      if (prev) collapseItem(prev, { restoreFocus: false });
+      if (prev) await collapseItem(prev, { restoreFocus: false });
     }
 
     const card = grid.querySelector(`.work-item[data-id="${id}"]`);
@@ -1043,6 +1102,15 @@
     expandedId = id;
     card.classList.add('work-item--expanded');
     card.setAttribute('aria-expanded', 'true');
+
+    // PRE-EXPAND ANIMATION: fade out info + nudge cover
+    const cover = card.querySelector('.work-item__cover');
+    const info  = card.querySelector('.portfolio-info');
+    if (cover && info) {
+      card.classList.add('is-transitioning');
+      // let the CSS transitions play
+      await wait(DUR);
+    }
 
     // Build expanded view
     const detailId = `detail-${id}`;
@@ -1055,11 +1123,10 @@
     media.className = 'work-detail__media';
     media.setAttribute('aria-label', `${data.title} media`);
 
-    // Build carousel
     const slides = (Array.isArray(data.gallery) && data.gallery.length ? data.gallery : [data.cover]);
     const carouselId = `carousel-${id}`;
     media.innerHTML = `
-      <div class="carousel" id="${carouselId}" role="region" aria-roledescription="carousel" aria-label="${data.title} gallery">
+      <div class="carousel" id="${carouselId}" role="region" aria-roledescription="carousel" aria-label="${data.title} gallery" tabindex="0">
         <div class="carousel__track" data-track></div>
         <button class="carousel__btn carousel__btn--prev" data-prev aria-label="Previous image" type="button">‹</button>
         <button class="carousel__btn carousel__btn--next" data-next aria-label="Next image" type="button">›</button>
@@ -1078,23 +1145,35 @@
       <button class="work-detail__close" type="button" aria-label="Close ${data.title} details" data-action="close">← Back</button>
     `;
 
-    // Replace card content with expanded layout
+    // SWAP CONTENT
     card.innerHTML = '';
     card.appendChild(detail);
     detail.appendChild(media);
     detail.appendChild(meta);
 
-    // Init carousel now that DOM exists
+    // INIT CAROUSEL
     initCarousel(document.getElementById(carouselId), slides);
+
+    // ENTER ANIMATION
+    requestAnimationFrame(() => {
+      detail.classList.add('is-enter');
+    });
 
     // Move focus
     card.focus({ preventScroll: false });
   }
 
-  function collapseItem(card, opts = { restoreFocus: true }) {
+  async function collapseItem(card, opts = { restoreFocus: true }) {
     const id = card.dataset.id;
     const data = items.find(i => i.id === id);
     if (!data) return;
+
+    // EXIT ANIMATION on expanded view
+    const detail = card.querySelector('.work-detail');
+    if (detail) {
+      detail.classList.remove('is-enter');
+      await wait(DUR);
+    }
 
     expandedId = null;
     card.classList.remove('work-item--expanded');
@@ -1108,6 +1187,21 @@
         <div class="project-role">${data.role}</div>
       </div>
     `;
+
+    // FADE BACK IN the compact info
+    const info = card.querySelector('.portfolio-info');
+    const cover = card.querySelector('.work-item__cover');
+    if (info && cover) {
+      // start with subtle hidden state then reveal (uses the same CSS transitions)
+      info.style.opacity = '0';
+      info.style.transform = 'translateY(6px)';
+      cover.style.transform = 'scale(1.03)';
+      requestAnimationFrame(() => {
+        info.style.opacity = '';
+        info.style.transform = '';
+        cover.style.transform = '';
+      });
+    }
 
     // Reattach handlers
     card.addEventListener('click', () => expandItem(id), { once: true });
@@ -1148,6 +1242,7 @@
 
     // Build slides
     track.innerHTML = '';
+    dotsWrap.innerHTML = '';
     images.forEach((src, i) => {
       const slide = document.createElement('div');
       slide.className = 'carousel__slide';
@@ -1186,7 +1281,6 @@
       if (e.key === 'ArrowRight') next();
       if (e.key === 'ArrowLeft') prev();
     });
-    root.setAttribute('tabindex', '0'); // allow arrow keys when focused
 
     // Swipe (touch)
     root.addEventListener('touchstart', (e) => {
@@ -1194,17 +1288,14 @@
       isSwiping = true;
       startX = e.touches[0].clientX;
     }, { passive: true });
-
     root.addEventListener('touchmove', (e) => {
       if (!isSwiping || !e.touches || !e.touches[0]) return;
       const dx = e.touches[0].clientX - startX;
-      // Optionally, you could add visual drag feedback here.
       if (Math.abs(dx) > 50) {
         if (dx < 0) next(); else prev();
         isSwiping = false;
       }
     }, { passive: true });
-
     root.addEventListener('touchend', () => { isSwiping = false; });
 
     // Init
@@ -1246,30 +1337,6 @@
             "imgs/portfolio-previews/typezero.jpg"
           ],
           description: "Second inline fallback card."
-        },
-        {
-          id: "fallback-3",
-          title: "TypeZero",
-          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-          cover: "imgs/portfolio-previews/typezero2.jpg",
-          gallery: [
-            "imgs/portfolio-previews/typezero2.jpg",
-            "imgs/portfolio-previews/typezero1.jpg",
-            "imgs/portfolio-previews/typezero.jpg"
-          ],
-          description: "Third inline fallback."
-        },
-        {
-          id: "fallback-4",
-          title: "TypeZero",
-          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-          cover: "imgs/portfolio-previews/typezero.jpg",
-          gallery: [
-            "imgs/portfolio-previews/typezero.jpg",
-            "imgs/portfolio-previews/typezero1.jpg",
-            "imgs/portfolio-previews/typezero2.jpg"
-          ],
-          description: "Fourth inline fallback."
         }
       ];
       console.info(`[portfolio] Using fallback items: ${items.length}`);
@@ -1281,3 +1348,4 @@
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
+
