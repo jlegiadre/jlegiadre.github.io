@@ -530,7 +530,13 @@
 
 		/** PORTFOLIO STYLES **/
 		.work-wrapper { 
-			width: 100%; margin: 0 auto; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 5%; 
+			width: 100%; 
+			margin: 0 auto;
+			display: flex; 
+			flex-direction: row; 
+			flex-wrap: wrap; 
+			justify-content: space-evenly;
+			margin-top: 5%; 
 		}
 		.work-item { 
 			width: 80%; 
@@ -693,22 +699,6 @@
    PORTFOLIO ZONE (Dynamic Grid + Expanded View + Carousel)
    ================================ */
 
-/* If .below was clipping, keep this override */
-.below {
-  height: auto !important;
-  overflow: visible !important;
-  animation: none !important;
-}
-
-/* Container layout */
-.work-wrapper {
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  margin-top: 5%;
-}
 
 /* Card layout */
 .work-item {
@@ -764,10 +754,10 @@
 }
 
 /* Expanded state */
-.work-item--expanded {
+.work-wrapper .work-item.work-item--expanded {
   width: 100%;
   margin-bottom: 3%;
-  order: -1; /* bring expanded item to the top row and push others below */
+  order: -1;
 }
 .work-item--expanded .portfolio-info::before { width: 0; }
 
