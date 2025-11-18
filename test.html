@@ -696,82 +696,74 @@
 	</style>
 <style>
 /* ================================
-   PORTFOLIO ZONE — Grid-first (overview → expanded)
+   PORTFOLIO ZONE — anchored grow (FLIP-lite), image stays 100%
    ================================ */
 
 :root{
-  --pz-grow-dur: 420ms;                      /* card grow duration */
   --pz-ease: cubic-bezier(.22,.61,.36,1);
-  --detail-gap: 2rem;                        /* shared gap between media/meta */
+  --pz-grow-dur: 420ms;    /* container grow duration */
+  --pz-split-dur: 300ms;   /* meta pane reveal */
+  --detail-gap: 2rem;      /* space between media and meta */
 }
 
-/* Wrapper note: keep your existing .work-wrapper flex settings */
+/* Work wrapper: keep your existing flex/wrap rules */
 
-/* Card as flex children (use flex-basis for smooth grow) */
+/* Card as flex item (we’ll control width via JS + transform) */
 .work-item{
   position: relative;
   flex: 0 1 80%;
-  width: auto;                               /* flex-basis drives width */
+  width: auto;
   margin-bottom: 9%;
   cursor: pointer;
   outline: none;
-  transition:
-    flex-basis var(--pz-grow-dur) var(--pz-ease),
-    transform 200ms ease;
-  will-change: flex-basis, transform;
   isolation: isolate;
   contain: layout paint;
+  /* no width transition here; we animate transform (scaleX) for smooth anchoring */
 }
 .work-item:focus-visible{
   box-shadow: 0 0 0 3px #4F8ABA;
   border-radius: 6px;
 }
 
-/* Expanded card: 90% centered, bring to top row */
-.work-wrapper .work-item.work-item--expanded{
-  flex-basis: 90%;
-  margin-bottom: 3%;
-  order: -1;
+/* Ensure only the active one sits on its own row while growing */
+.work-item.is-growing{
+  order: -1;           /* jump to next row immediately */
+  flex-basis: 100%;    /* reserve the full row in the flex layout */
+}
+
+/* We animate the card visually via transform during grow */
+.work-item.is-growing,
+.work-item.is-grown {
+  will-change: transform;
+}
+
+/* Inner layout (always the same DOM) */
+.item-inner{
+  display: grid;
+  grid-template-columns: 1fr;      /* overview: single column */
+  gap: var(--detail-gap);
+  align-items: start;
   margin-inline: auto;
 }
 
-/* 🔑 No-shake: when any card is expanded, other cards immediately become full-row */
-.work-wrapper:has(.work-item.work-item--expanded) .work-item:not(.work-item--expanded){
-  flex-basis: 100%;
-  transition: none;
-}
-
-/* Inner layout: always media + meta in DOM */
-.item-inner{
-  display: grid;
-  grid-template-columns: 1fr;                /* overview = 1 column */
-  gap: var(--detail-gap);
-  align-items: start;
-  transition:
-    grid-template-columns 320ms var(--pz-ease) var(--pz-grow-dur),
-    transform 240ms var(--pz-ease) var(--pz-grow-dur),
-    opacity 1ms linear var(--pz-grow-dur);
-}
-
-/* Expanded = 2 columns (75% | 25%) */
-.work-item.work-item--expanded .item-inner{
+/* Expanded = split (75/25) */
+.work-item.is-split .item-inner{
   grid-template-columns: 3fr 1fr;
-  opacity: 1;
-  transform: translateY(0);
+  transition: grid-template-columns var(--pz-split-dur) var(--pz-ease);
 }
 
-/* Media */
-.item-media{ position: relative; }
-.item-media .cover{
+/* Left pane: main image / carousel */
+.work-item-main-img{ position: relative; }
+.work-item-main-img img{
+  display: block;
   width: 100%;
   height: auto;
-  display: block;
 }
 
-/* Carousel lives in media; show a single image look in overview naturally */
+/* Carousel scaffold (controls appear only when split) */
 .carousel{
   width: 100%;
-  aspect-ratio: 495 / 350;
+  aspect-ratio: 495/350;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
@@ -783,12 +775,13 @@
 .carousel__slide{ width: 100%; height: 100%; }
 .carousel__slide img{ width: 100%; height: 100%; object-fit: contain; }
 
-/* Controls hidden in overview; visible in expanded */
-.carousel__btn,
-.carousel__dots{ opacity: 0; pointer-events: none; transition: opacity 160ms ease; }
-.work-item.work-item--expanded .carousel__btn,
-.work-item.work-item--expanded .carousel__dots{ opacity: 1; pointer-events: auto; }
-
+.carousel__btn, .carousel__dots{
+  opacity: 0; pointer-events: none; transition: opacity 160ms var(--pz-ease);
+}
+.work-item.is-split .carousel__btn,
+.work-item.is-split .carousel__dots{
+  opacity: 1; pointer-events: auto;
+}
 .carousel__btn{
   position: absolute; top: 50%; transform: translateY(-50%);
   appearance: none; border: none; background: rgba(15,39,63,.6);
@@ -806,35 +799,13 @@
 }
 .carousel__dot[aria-current="true"]{ background: #0f273f; }
 
-/* Meta (title/role/desc/back) — 100% width in overview, 25% column in expanded */
-.item-meta{
+/* Right pane: meta */
+.portfolio-info{
   display: grid;
   gap: .75rem;
   align-content: start;
 }
-.item-meta .project-name{
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #3D729E;
-  margin: 0;
-  font-size: clamp(18px, 1.75vw, 22px);
-}
-.item-meta .project-role{
-  font-family: 'Bitter', serif;
-  font-style: italic;
-  color: #0f273f;
-  margin: 0 0 .5rem 0;
-  font-size: clamp(12px, 1.25vw, 14.66px);
-}
-.item-meta .project-desc{
-  font-family: 'Bitter', serif;
-  color: #0f273f;
-  line-height: 1.5;
-}
-
-/* Stroke line (overview look) */
-.item-meta::before{
+.portfolio-info::before{
   content: "";
   display: block;
   height: 2px;
@@ -842,25 +813,43 @@
   width: 50%;
 }
 
-/* Back button only in expanded */
-.item-meta .back{
+.project-name{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3D729E;
+  margin: 0;
+  font-size: clamp(18px, 1.75vw, 22px);
+}
+.project-role{
+  font-family: 'Bitter', serif;
+  font-style: italic;
+  color: #0f273f;
+  margin: 0 0 .5rem 0;
+  font-size: clamp(12px, 1.25vw, 14.66px);
+}
+/* Description hidden in overview; only show when split */
+.project-desc{ display: none; }
+.work-item.is-split .project-desc{ display: block; }
+
+.back{
   appearance: none; border: none; background: transparent; color: #0f273f;
   font-family: 'Montserrat', sans-serif; font-size: 14px;
   justify-self: start; padding: .25rem .5rem; border-radius: 6px; cursor: pointer;
-  opacity: 0; transform: translateY(6px);
-  transition: opacity 200ms var(--pz-ease) calc(var(--pz-grow-dur) + 140ms),
-             transform 200ms var(--pz-ease) calc(var(--pz-grow-dur) + 140ms);
+  opacity: 0; transform: translateY(6px); transition: opacity 200ms var(--pz-ease), transform 200ms var(--pz-ease);
 }
-.item-meta .back:focus-visible{ outline: 3px solid #4F8ABA; outline-offset: 2px; }
-.work-item.work-item--expanded .item-meta .back{ opacity: 1; transform: translateY(0); }
+.back:focus-visible{ outline: 3px solid #4F8ABA; outline-offset: 2px; }
+.work-item.is-split .back{ opacity: 1; transform: translateY(0); }
 
-/* Subtle reveal once expanded (optional) */
-.work-item .item-inner{ opacity: 1; }
-.work-item.work-item--expanded .item-inner{ opacity: 1; }
+/* Final expanded width appearance (after grow completes we keep 90%) */
+.work-item.is-grown{
+  margin-inline: auto; /* center by default; JS can tweak for special center-slide-left case */
+}
 
 /* Responsive */
 @media (max-width: 767px){
-  .item-inner{ grid-template-columns: 1fr !important; gap: var(--detail-gap); }
+  .work-item{ flex-basis: 100%; }
+  .work-item.is-split .item-inner{ grid-template-columns: 1fr; }
 }
 @media (min-width: 768px){
   .work-item{ flex-basis: 45%; margin-bottom: 3%; }
@@ -874,11 +863,11 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .work-item, .item-inner, .carousel__track, .carousel__btn, .carousel__dots, .item-meta .back{
-    transition: none !important;
-  }
+  .carousel__track, .back{ transition: none !important; }
 }
 </style>
+
+
 
 
 	<div class="page">
@@ -969,8 +958,8 @@
 (function () {
   const DATA_URL = 'assets/portfolio.json';
   const grid = document.getElementById('portfolioGrid');
-  let items = [];
-  let expandedId = null;
+
+  let expandedCard = null;
 
   function onEnterOrSpace(fn){
     return function(e){
@@ -981,21 +970,20 @@
     };
   }
 
-  function renderGrid(data){
+  function renderGrid(items){
     grid.innerHTML = '';
-    data.forEach((item)=>{
+    items.forEach((item)=>{
       const card = document.createElement('article');
       card.className = 'work-item';
       card.setAttribute('tabindex','0');
       card.setAttribute('role','button');
       card.setAttribute('aria-expanded','false');
-      card.dataset.id = item.id;
 
       const slides = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover];
 
       card.innerHTML = `
         <div class="item-inner">
-          <section class="item-media" aria-label="${item.title} media">
+          <div class="work-item-main-img">
             <div class="carousel" role="region" aria-roledescription="carousel" aria-label="${item.title} gallery" tabindex="0" data-carousel>
               <div class="carousel__track" data-track>
                 ${slides.map((src,i)=>`
@@ -1010,53 +998,143 @@
                 ${slides.map((_,i)=>`<button class="carousel__dot" type="button" aria-label="Go to slide ${i+1}" ${i===0?'aria-current="true"':''}></button>`).join('')}
               </div>
             </div>
-          </section>
+          </div>
 
-          <aside class="item-meta" aria-label="${item.title} details">
-            <h3 class="project-name">${item.title}</h3>
-            <p class="project-role">${item.role}</p>
+          <div class="portfolio-info">
+            <div class="project-name">${item.title}</div>
+            <div class="project-role">${item.role}</div>
             <div class="project-desc">${item.description || ''}</div>
             <button class="back" type="button" aria-label="Close ${item.title} details" data-action="close">← Back</button>
-          </aside>
+          </div>
         </div>
       `;
 
-      // Open from anywhere that isn't Back or inside meta controls
+      // open
       card.addEventListener('click',(e)=>{
         const isBack = e.target.closest('[data-action="close"]');
         if(isBack) return;
-        expandItem(item.id);
+        openCard(card);
       });
-      card.addEventListener('keydown', onEnterOrSpace(()=>expandItem(item.id)));
+      card.addEventListener('keydown', onEnterOrSpace(()=>openCard(card)));
 
-      // init carousel
       initCarousel(card.querySelector('[data-carousel]'));
-
       grid.appendChild(card);
     });
   }
 
-  function expandItem(id){
-    if(expandedId===id) return;
-    if(expandedId){
-      const prev = grid.querySelector(`.work-item[data-id="${expandedId}"]`);
-      if(prev){ prev.classList.remove('work-item--expanded'); prev.setAttribute('aria-expanded','false'); }
-    }
-    const card = grid.querySelector(`.work-item[data-id="${id}"]`);
-    if(!card) return;
-    expandedId = id;
-    card.classList.add('work-item--expanded');
-    card.setAttribute('aria-expanded','true');
-    card.scrollIntoView({ behavior:'smooth', block:'start' });
-    card.focus({ preventScroll:true });
+  // Detect row membership and relative position for anchor
+  function getRowInfo(card){
+    const cards = [...grid.querySelectorAll('.work-item')];
+    const epsilon = 4; // px tolerance for "same row"
+    // group by top values
+    const rows = [];
+    cards.forEach(c=>{
+      const r = c.getBoundingClientRect();
+      const top = Math.round(r.top);
+      let row = rows.find(row => Math.abs(row.top - top) <= epsilon);
+      if(!row){ row = { top, items: [] }; rows.push(row); }
+      row.items.push({ el: c, rect: r });
+    });
+    rows.sort((a,b)=>a.top-b.top);
+    // find the row containing card
+    let row = rows.find(r => r.items.some(x => x.el === card));
+    if(!row) return { rowItems: [], index: 0, count: 1, position: 'center-single' };
+
+    row.items.sort((a,b)=>a.rect.left-b.rect.left);
+    const index = row.items.findIndex(x => x.el === card);
+    const count = row.items.length;
+
+    // classify position
+    let position = 'center';
+    if(count === 1) position = 'center-single';
+    else if(index === 0) position = 'left';
+    else if(index === count-1) position = 'right';
+    else position = 'center';
+
+    return { rowItems: row.items.map(x=>x.el), index, count, position };
   }
 
-  function collapseItem(card){
-    if(!card) return;
-    card.classList.remove('work-item--expanded');
+  function openCard(card){
+    if(expandedCard === card) return;
+    if(expandedCard) closeCard(expandedCard);
+
+    const wrapper = grid; // .work-wrapper
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const startWidth = cardRect.width;
+    const targetWidth = Math.round(wrapper.clientWidth * 0.90);
+
+    // Anchor based on row position
+    const { count, position } = getRowInfo(card);
+    let origin = 'top center';
+    if(position === 'left') origin = 'top left';
+    if(position === 'right') origin = 'top right';
+    if(position === 'center-single' && count === 1) origin = 'top center';
+
+    // Phase: growing
+    card.classList.add('is-growing');
+    card.setAttribute('aria-expanded','true');
+    // lock target width (visual scale provides the motion)
+    card.classList.remove('is-grown','is-split');
+    card.style.width = targetWidth + 'px';
+    card.style.marginLeft = 'auto';
+    card.style.marginRight = 'auto';
+
+    // Prepare scale from current width → target width
+    const scaleX = startWidth / targetWidth;
+    card.style.transformOrigin = origin;
+    card.style.transform = `scaleX(${scaleX})`;
+    // force reflow
+    void card.offsetWidth;
+    // animate to final
+    card.style.transition = `transform var(--pz-grow-dur) var(--pz-ease)`;
+    card.style.transform = `scaleX(1)`;
+
+    const onGrowEnd = (ev) => {
+      if(ev.propertyName !== 'transform') return;
+      card.removeEventListener('transitionend', onGrowEnd);
+
+      // clean transform, keep width pinned visually by layout now
+      card.style.transition = '';
+      card.style.transform = '';
+      card.classList.add('is-grown');
+
+      // Special case: 3-up row, middle tile → align left after grow
+      if(position === 'center'){
+        // Heuristic: if wrapper currently has about 3 columns (>= 1024px and <= 1699px per your CSS)
+        const isThreeUp = window.innerWidth >= 1024 && window.innerWidth < 1700;
+        if(isThreeUp && count === 3){
+          // snap left by removing auto margins
+          card.style.marginLeft = '0';
+          card.style.marginRight = 'auto';
+        }
+      }
+
+      // Reveal meta (75/25 split)
+      card.classList.add('is-split');
+      expandedCard = card;
+    };
+
+    card.addEventListener('transitionend', onGrowEnd);
+  }
+
+  function closeCard(card){
+    // remove split immediately
+    card.classList.remove('is-split');
+    // reset alignment margins
+    card.style.marginLeft = '';
+    card.style.marginRight = '';
+
+    // We’ll visually snap back (no need to animate back scale to keep things simple and crisp)
+    card.classList.remove('is-grown');
+    card.classList.remove('is-growing');
+    card.style.width = '';
+    card.style.transform = '';
+    card.style.transition = '';
+    card.style.transformOrigin = '';
     card.setAttribute('aria-expanded','false');
-    expandedId = null;
-    card.focus({ preventScroll:true });
+
+    if(expandedCard === card) expandedCard = null;
   }
 
   // Back + Escape
@@ -1064,17 +1142,19 @@
     const btn = e.target.closest('[data-action="close"]');
     if(btn){
       const card = btn.closest('.work-item');
-      collapseItem(card);
+      closeCard(card);
     }
   });
   grid.addEventListener('keydown',(e)=>{
     if(e.key==='Escape' || e.keyCode===27){
-      const openCard = expandedId && grid.querySelector(`.work-item[data-id="${expandedId}"]`);
-      if(openCard){ e.preventDefault(); collapseItem(openCard); }
+      if(expandedCard){
+        e.preventDefault();
+        closeCard(expandedCard);
+      }
     }
   });
 
-  // Vanilla carousel
+  // Minimal carousel
   function initCarousel(root){
     if(!root) return;
     const track = root.querySelector('[data-track]');
@@ -1092,9 +1172,9 @@
     function next(){ goTo(index+1); }
     function prev(){ goTo(index-1); }
 
-    btnPrev.addEventListener('click', prev);
-    btnNext.addEventListener('click', next);
-    dotsWrap.addEventListener('click',(e)=>{
+    btnPrev?.addEventListener('click', prev);
+    btnNext?.addEventListener('click', next);
+    dotsWrap?.addEventListener('click',(e)=>{
       const idx = [...dotsWrap.children].indexOf(e.target);
       if(idx>-1) goTo(idx);
     });
@@ -1104,7 +1184,7 @@
       if(e.key==='ArrowLeft') prev();
     });
 
-    // swipe
+    // basic swipe
     let startX=0, swiping=false;
     root.addEventListener('touchstart',(e)=>{ if(!e.touches[0]) return; swiping=true; startX=e.touches[0].clientX; }, { passive:true });
     root.addEventListener('touchmove',(e)=>{
@@ -1117,17 +1197,18 @@
     goTo(0);
   }
 
-  // boot
+  // Boot
   async function init(){
     try{
       const res = await fetch(DATA_URL, { cache:'no-store' });
       if(!res.ok) throw new Error(`Fetch failed (${res.status})`);
       const json = await res.json();
       if(!Array.isArray(json)) throw new Error('portfolio.json is not an array');
-      items = json;
+      renderGrid(json);
     }catch(err){
       console.error('[portfolio] JSON load failed:', err);
-      items = [
+      // fallback items
+      renderGrid([
         {
           id:"fallback-1",
           title:"TypeZero",
@@ -1152,15 +1233,10 @@
           ],
           description:"Second inline fallback card."
         }
-      ];
+      ]);
     }
-    renderGrid(items);
   }
 
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
-
-
-
-
