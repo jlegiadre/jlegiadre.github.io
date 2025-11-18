@@ -696,107 +696,123 @@
 	</style>
 <style>
 /* ================================
-   PORTFOLIO ZONE — CSS-only animations
+   PORTFOLIO ZONE — Grid-first (overview → expanded)
    ================================ */
 
-:root {
-  --pz-dur: 420ms;
+:root{
+  --pz-grow-dur: 420ms;                      /* card grow duration */
   --pz-ease: cubic-bezier(.22,.61,.36,1);
-  --pz-stagger: 120ms;
+  --detail-gap: 2rem;                        /* shared gap between media/meta */
 }
 
-/* Cards (overview) */
-.work-item {
-  width: 80%;
+/* Wrapper note: keep your existing .work-wrapper flex settings */
+
+/* Card as flex children (use flex-basis for smooth grow) */
+.work-item{
+  position: relative;
+  flex: 0 1 80%;
+  width: auto;                               /* flex-basis drives width */
   margin-bottom: 9%;
   cursor: pointer;
   outline: none;
-  transition: width var(--pz-dur) var(--pz-ease), transform 200ms ease;
-  will-change: width, transform;
+  transition:
+    flex-basis var(--pz-grow-dur) var(--pz-ease),
+    transform 200ms ease;
+  will-change: flex-basis, transform;
+  isolation: isolate;
+  contain: layout paint;
 }
-.work-item:focus-visible {
+.work-item:focus-visible{
   box-shadow: 0 0 0 3px #4F8ABA;
   border-radius: 6px;
 }
 
-/* Make expanded beat media-query widths without !important */
-.work-wrapper .work-item.work-item--expanded {
-  width: 100%;
+/* Expanded card: 90% centered, bring to top row */
+.work-wrapper .work-item.work-item--expanded{
+  flex-basis: 90%;
   margin-bottom: 3%;
   order: -1;
+  margin-inline: auto;
 }
 
-/* Collapsed face (cover + info) */
-.card-face {
-  transition: opacity var(--pz-dur) var(--pz-ease), transform var(--pz-dur) var(--pz-ease);
-}
-.work-item__cover {
-  width: 100%;
-  display: block;
-  height: auto;
-  transition: transform var(--pz-dur) var(--pz-ease);
-}
-.portfolio-info {
-  width: 100%;
-  text-align: left;
-  padding: 2% 0% 4%;
-  transition: opacity var(--pz-dur) var(--pz-ease), transform var(--pz-dur) var(--pz-ease);
-}
-.portfolio-info::before {
-  content: "";
-  display: block;
-  position: relative;
-  top: 0;
-  right: 0;
-  height: 2px;
-  background: #dcb24c;
-  width: 50%;
-}
-.project-name {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1;
-  color: #3D729E;
-  font-size: clamp(18px, 3.75vw, 22px);
-  margin-top: 2%;
-}
-.project-role {
-  text-transform: capitalize;
-  font-family: 'Bitter', serif;
-  font-weight: 400;
-  font-style: italic;
-  color: #0f273f;
-  font-size: clamp(12px, 2.5vw, 14.66px);
-  letter-spacing: 2;
+/* 🔑 No-shake: when any card is expanded, other cards immediately become full-row */
+.work-wrapper:has(.work-item.work-item--expanded) .work-item:not(.work-item--expanded){
+  flex-basis: 100%;
+  transition: none;
 }
 
-/* Expanded panel (pre-built but initially hidden) */
-.work-detail {
+/* Inner layout: always media + meta in DOM */
+.item-inner{
   display: grid;
-  grid-template-columns: 3fr 1fr; /* 75/25 */
-  gap: 2rem;
+  grid-template-columns: 1fr;                /* overview = 1 column */
+  gap: var(--detail-gap);
   align-items: start;
-  background: #f3f1f1;
-  opacity: 0;
-  transform: translateY(12px);
-  pointer-events: none;
   transition:
-    opacity var(--pz-dur) var(--pz-ease) var(--pz-stagger),
-    transform var(--pz-dur) var(--pz-ease) var(--pz-stagger);
+    grid-template-columns 320ms var(--pz-ease) var(--pz-grow-dur),
+    transform 240ms var(--pz-ease) var(--pz-grow-dur),
+    opacity 1ms linear var(--pz-grow-dur);
 }
-.work-detail__media { position: relative; }
-.work-detail__meta {
+
+/* Expanded = 2 columns (75% | 25%) */
+.work-item.work-item--expanded .item-inner{
+  grid-template-columns: 3fr 1fr;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Media */
+.item-media{ position: relative; }
+.item-media .cover{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Carousel lives in media; show a single image look in overview naturally */
+.carousel{
+  width: 100%;
+  aspect-ratio: 495 / 350;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.carousel__track{
+  display: grid; grid-auto-flow: column; grid-auto-columns: 100%;
+  height: 100%; transform: translateX(0%); transition: transform 300ms var(--pz-ease);
+}
+.carousel__slide{ width: 100%; height: 100%; }
+.carousel__slide img{ width: 100%; height: 100%; object-fit: contain; }
+
+/* Controls hidden in overview; visible in expanded */
+.carousel__btn,
+.carousel__dots{ opacity: 0; pointer-events: none; transition: opacity 160ms ease; }
+.work-item.work-item--expanded .carousel__btn,
+.work-item.work-item--expanded .carousel__dots{ opacity: 1; pointer-events: auto; }
+
+.carousel__btn{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  appearance: none; border: none; background: rgba(15,39,63,.6);
+  color: #fff; padding: .35rem .55rem; border-radius: 8px; cursor: pointer;
+}
+.carousel__btn--prev{ left: 8px; } .carousel__btn--next{ right: 8px; }
+.carousel__btn:focus-visible{ outline: 3px solid #4F8ABA; outline-offset: 2px; }
+.carousel__dots{
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  display: flex; gap: 6px;
+}
+.carousel__dot{
+  width: 8px; height: 8px; border-radius: 999px; background: rgba(15,39,63,.35);
+  border: none; padding: 0; cursor: pointer;
+}
+.carousel__dot[aria-current="true"]{ background: #0f273f; }
+
+/* Meta (title/role/desc/back) — 100% width in overview, 25% column in expanded */
+.item-meta{
   display: grid;
-  gap: 0.75rem;
+  gap: .75rem;
   align-content: start;
-  opacity: 0;
-  transform: translateX(12px);
-  transition:
-    opacity var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 2),
-    transform var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 2);
 }
-.work-detail__title {
+.item-meta .project-name{
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -804,119 +820,61 @@
   margin: 0;
   font-size: clamp(18px, 1.75vw, 22px);
 }
-.work-detail__role {
+.item-meta .project-role{
   font-family: 'Bitter', serif;
   font-style: italic;
   color: #0f273f;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 .5rem 0;
   font-size: clamp(12px, 1.25vw, 14.66px);
 }
-.work-detail__desc {
+.item-meta .project-desc{
   font-family: 'Bitter', serif;
   color: #0f273f;
   line-height: 1.5;
 }
 
-/* Carousel */
-.carousel {
-  width: 100%;
-  aspect-ratio: 495 / 350; /* your size */
-  background: #e9edf2;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 2),
-    transform var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 2);
+/* Stroke line (overview look) */
+.item-meta::before{
+  content: "";
+  display: block;
+  height: 2px;
+  background: #dcb24c;
+  width: 50%;
 }
-.carousel__track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  height: 100%;
-  transform: translateX(0%);
-  transition: transform 300ms var(--pz-ease);
-}
-.carousel__slide { width: 100%; height: 100%; }
-.carousel__slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* no cropping */
-  background: #e9edf2;
-}
-.carousel__btn {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  appearance: none; border: none; background: rgba(15,39,63,0.6);
-  color: #fff; padding: 0.35rem 0.55rem; border-radius: 8px; cursor: pointer;
-}
-.carousel__btn--prev { left: 8px; } .carousel__btn--next { right: 8px; }
-.carousel__btn:focus-visible { outline: 3px solid #4F8ABA; outline-offset: 2px; }
-.carousel__dots {
-  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
-  display: flex; gap: 6px;
-}
-.carousel__dot {
-  width: 8px; height: 8px; border-radius: 999px;
-  background: rgba(15,39,63,0.35); border: none; padding: 0; cursor: pointer;
-}
-.carousel__dot[aria-current="true"] { background: #0f273f; }
 
-/* Close button */
-.work-detail__close {
+/* Back button only in expanded */
+.item-meta .back{
   appearance: none; border: none; background: transparent; color: #0f273f;
   font-family: 'Montserrat', sans-serif; font-size: 14px;
-  justify-self: start; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer;
-  opacity: 0; transform: translateY(8px);
-  transition:
-    opacity var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 3),
-    transform var(--pz-dur) var(--pz-ease) calc(var(--pz-stagger) * 3);
+  justify-self: start; padding: .25rem .5rem; border-radius: 6px; cursor: pointer;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 200ms var(--pz-ease) calc(var(--pz-grow-dur) + 140ms),
+             transform 200ms var(--pz-ease) calc(var(--pz-grow-dur) + 140ms);
 }
-.work-detail__close:focus-visible { outline: 3px solid #4F8ABA; outline-offset: 2px; }
+.item-meta .back:focus-visible{ outline: 3px solid #4F8ABA; outline-offset: 2px; }
+.work-item.work-item--expanded .item-meta .back{ opacity: 1; transform: translateY(0); }
 
-/* EXPANDED STATE — CSS-only sequencing */
-.work-item.work-item--expanded .card-face {
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-}
-.work-item.work-item--expanded .work-item__cover {
-  transform: scale(1.02);
-}
-.work-item.work-item--expanded .work-detail {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.work-item.work-item--expanded .carousel {
-  opacity: 1;
-  transform: translateY(0);
-}
-.work-item.work-item--expanded .work-detail__meta {
-  opacity: 1;
-  transform: translateX(0);
-}
-.work-item.work-item--expanded .work-detail__close {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* Subtle reveal once expanded (optional) */
+.work-item .item-inner{ opacity: 1; }
+.work-item.work-item--expanded .item-inner{ opacity: 1; }
 
 /* Responsive */
-@media (max-width: 767px) { .work-detail { grid-template-columns: 1fr; gap: 1rem; } }
-@media (min-width: 768px) { .work-item { width: 45%; margin-bottom: 3%; } }
-@media (min-width: 1024px) { .work-item { width: 28%; } }
-@media (min-width: 1700px) { .work-item { width: 23%; } }
+@media (max-width: 767px){
+  .item-inner{ grid-template-columns: 1fr !important; gap: var(--detail-gap); }
+}
+@media (min-width: 768px){
+  .work-item{ flex-basis: 45%; margin-bottom: 3%; }
+}
+@media (min-width: 1024px){
+  .work-item{ flex-basis: 28%; }
+}
+@media (min-width: 1700px){
+  .work-item{ flex-basis: 23%; }
+}
 
 /* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .work-item,
-  .card-face,
-  .work-item__cover,
-  .work-detail,
-  .work-detail__meta,
-  .carousel,
-  .work-detail__close {
+@media (prefers-reduced-motion: reduce){
+  .work-item, .item-inner, .carousel__track, .carousel__btn, .carousel__dots, .item-meta .back{
     transition: none !important;
   }
 }
@@ -1014,43 +972,33 @@
   let items = [];
   let expandedId = null;
 
-  function onEnterOrSpace(fn) {
-    return function (e) {
+  function onEnterOrSpace(fn){
+    return function(e){
       const code = e.code || e.key;
-      if (code === 'Enter' || code === 'Space' || e.keyCode === 13 || e.keyCode === 32) {
-        e.preventDefault();
-        fn(e);
+      if(code==='Enter' || code==='Space' || e.keyCode===13 || e.keyCode===32){
+        e.preventDefault(); fn(e);
       }
     };
   }
 
-  function renderGrid(data) {
+  function renderGrid(data){
     grid.innerHTML = '';
-    data.forEach((item) => {
+    data.forEach((item)=>{
       const card = document.createElement('article');
       card.className = 'work-item';
-      card.setAttribute('tabindex', '0');
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-expanded', 'false');
+      card.setAttribute('tabindex','0');
+      card.setAttribute('role','button');
+      card.setAttribute('aria-expanded','false');
       card.dataset.id = item.id;
 
-      // Build both views up-front (CSS handles visibility/animation)
       const slides = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover];
 
       card.innerHTML = `
-        <div class="card-face">
-          <img class="work-item__cover" src="${item.cover}" width="100%" alt="${item.title}" loading="lazy" decoding="async">
-          <div class="portfolio-info">
-            <div class="project-name">${item.title}</div>
-            <div class="project-role">${item.role}</div>
-          </div>
-        </div>
-
-        <div class="work-detail" id="detail-${item.id}">
-          <section class="work-detail__media" aria-label="${item.title} media">
+        <div class="item-inner">
+          <section class="item-media" aria-label="${item.title} media">
             <div class="carousel" role="region" aria-roledescription="carousel" aria-label="${item.title} gallery" tabindex="0" data-carousel>
               <div class="carousel__track" data-track>
-                ${slides.map((src, i) => `
+                ${slides.map((src,i)=>`
                   <div class="carousel__slide" role="group" aria-roledescription="slide" aria-label="${i+1} of ${slides.length}">
                     <img src="${src}" alt="" loading="lazy" decoding="async">
                   </div>
@@ -1059,85 +1007,76 @@
               <button class="carousel__btn carousel__btn--prev" data-prev aria-label="Previous image" type="button">‹</button>
               <button class="carousel__btn carousel__btn--next" data-next aria-label="Next image" type="button">›</button>
               <div class="carousel__dots" data-dots>
-                ${slides.map((_, i) => `<button class="carousel__dot" type="button" aria-label="Go to slide ${i+1}" ${i===0?'aria-current="true"':''}></button>`).join('')}
+                ${slides.map((_,i)=>`<button class="carousel__dot" type="button" aria-label="Go to slide ${i+1}" ${i===0?'aria-current="true"':''}></button>`).join('')}
               </div>
             </div>
           </section>
 
-          <aside class="work-detail__meta" aria-label="${item.title} details">
-            <h3 class="work-detail__title">${item.title}</h3>
-            <p class="work-detail__role">${item.role}</p>
-            <div class="work-detail__desc">${item.description || ''}</div>
-            <button class="work-detail__close" type="button" aria-label="Close ${item.title} details" data-action="close">← Back</button>
+          <aside class="item-meta" aria-label="${item.title} details">
+            <h3 class="project-name">${item.title}</h3>
+            <p class="project-role">${item.role}</p>
+            <div class="project-desc">${item.description || ''}</div>
+            <button class="back" type="button" aria-label="Close ${item.title} details" data-action="close">← Back</button>
           </aside>
         </div>
       `;
 
-      // Open handlers
-      card.addEventListener('click', (e) => {
-        const insideExpandedUI = e.target.closest('.work-detail');
+      // Open from anywhere that isn't Back or inside meta controls
+      card.addEventListener('click',(e)=>{
         const isBack = e.target.closest('[data-action="close"]');
-        if (isBack) return; // back handled globally below
-        if (insideExpandedUI) return; // clicks inside expanded shouldn't re-toggle
+        if(isBack) return;
         expandItem(item.id);
       });
-      card.addEventListener('keydown', onEnterOrSpace(() => expandItem(item.id)));
+      card.addEventListener('keydown', onEnterOrSpace(()=>expandItem(item.id)));
 
-      // Init carousel controls
+      // init carousel
       initCarousel(card.querySelector('[data-carousel]'));
 
       grid.appendChild(card);
     });
   }
 
-  function expandItem(id) {
-    if (expandedId === id) return;
-    // close currently open
-    if (expandedId) {
+  function expandItem(id){
+    if(expandedId===id) return;
+    if(expandedId){
       const prev = grid.querySelector(`.work-item[data-id="${expandedId}"]`);
-      if (prev) {
-        prev.classList.remove('work-item--expanded');
-        prev.setAttribute('aria-expanded', 'false');
-      }
+      if(prev){ prev.classList.remove('work-item--expanded'); prev.setAttribute('aria-expanded','false'); }
     }
     const card = grid.querySelector(`.work-item[data-id="${id}"]`);
-    if (!card) return;
+    if(!card) return;
     expandedId = id;
     card.classList.add('work-item--expanded');
-    card.setAttribute('aria-expanded', 'true');
-    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    card.focus({ preventScroll: true });
+    card.setAttribute('aria-expanded','true');
+    card.scrollIntoView({ behavior:'smooth', block:'start' });
+    card.focus({ preventScroll:true });
   }
 
-  function collapseItem(card) {
-    if (!card) return;
+  function collapseItem(card){
+    if(!card) return;
     card.classList.remove('work-item--expanded');
-    card.setAttribute('aria-expanded', 'false');
+    card.setAttribute('aria-expanded','false');
     expandedId = null;
-    card.focus({ preventScroll: true });
+    card.focus({ preventScroll:true });
   }
 
-  // Delegated Back + Escape
-  grid.addEventListener('click', (e) => {
+  // Back + Escape
+  grid.addEventListener('click',(e)=>{
     const btn = e.target.closest('[data-action="close"]');
-    if (btn) {
+    if(btn){
       const card = btn.closest('.work-item');
       collapseItem(card);
     }
   });
-  grid.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' || e.keyCode === 27) {
+  grid.addEventListener('keydown',(e)=>{
+    if(e.key==='Escape' || e.keyCode===27){
       const openCard = expandedId && grid.querySelector(`.work-item[data-id="${expandedId}"]`);
-      if (openCard) {
-        e.preventDefault();
-        collapseItem(openCard);
-      }
+      if(openCard){ e.preventDefault(); collapseItem(openCard); }
     }
   });
 
-  // Vanilla carousel (same as before, but now in-place)
-  function initCarousel(root) {
-    if (!root) return;
+  // Vanilla carousel
+  function initCarousel(root){
+    if(!root) return;
     const track = root.querySelector('[data-track]');
     const btnPrev = root.querySelector('[data-prev]');
     const btnNext = root.querySelector('[data-next]');
@@ -1145,75 +1084,73 @@
     const slides = [...track.children];
     let index = 0;
 
-    function update() {
-      track.style.transform = `translateX(-${index * 100}%)`;
-      [...dotsWrap.children].forEach((d, i) => d.setAttribute('aria-current', i === index ? 'true' : 'false'));
+    function update(){
+      track.style.transform = `translateX(-${index*100}%)`;
+      [...dotsWrap.children].forEach((d,i)=>d.setAttribute('aria-current', i===index ? 'true':'false'));
     }
-    function goTo(i) { index = Math.max(0, Math.min(slides.length - 1, i)); update(); }
-    function next() { goTo(index + 1); }
-    function prev() { goTo(index - 1); }
+    function goTo(i){ index = Math.max(0, Math.min(slides.length-1, i)); update(); }
+    function next(){ goTo(index+1); }
+    function prev(){ goTo(index-1); }
 
     btnPrev.addEventListener('click', prev);
     btnNext.addEventListener('click', next);
-    dotsWrap.addEventListener('click', (e) => {
+    dotsWrap.addEventListener('click',(e)=>{
       const idx = [...dotsWrap.children].indexOf(e.target);
-      if (idx > -1) goTo(idx);
+      if(idx>-1) goTo(idx);
     });
 
-    // keys when carousel focused
-    root.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
+    root.addEventListener('keydown',(e)=>{
+      if(e.key==='ArrowRight') next();
+      if(e.key==='ArrowLeft') prev();
     });
 
-    // simple swipe
-    let startX = 0, swiping = false;
-    root.addEventListener('touchstart', (e) => { if (!e.touches[0]) return; swiping = true; startX = e.touches[0].clientX; }, { passive: true });
-    root.addEventListener('touchmove', (e) => {
-      if (!swiping || !e.touches[0]) return;
-      const dx = e.touches[0].clientX - startX;
-      if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); swiping = false; }
-    }, { passive: true });
-    root.addEventListener('touchend', () => { swiping = false; });
+    // swipe
+    let startX=0, swiping=false;
+    root.addEventListener('touchstart',(e)=>{ if(!e.touches[0]) return; swiping=true; startX=e.touches[0].clientX; }, { passive:true });
+    root.addEventListener('touchmove',(e)=>{
+      if(!swiping||!e.touches[0]) return;
+      const dx=e.touches[0].clientX-startX;
+      if(Math.abs(dx)>50){ dx<0?next():prev(); swiping=false; }
+    }, { passive:true });
+    root.addEventListener('touchend',()=>{ swiping=false; });
 
     goTo(0);
   }
 
   // boot
-  async function init() {
-    try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`Fetch failed (${res.status}) for ${DATA_URL}`);
+  async function init(){
+    try{
+      const res = await fetch(DATA_URL, { cache:'no-store' });
+      if(!res.ok) throw new Error(`Fetch failed (${res.status})`);
       const json = await res.json();
-      if (!Array.isArray(json)) throw new Error('portfolio.json is not an array');
+      if(!Array.isArray(json)) throw new Error('portfolio.json is not an array');
       items = json;
-      console.info(`[portfolio] Loaded ${items.length} items from JSON.`);
-    } catch (err) {
-      console.error('[portfolio] Could not load JSON:', err);
+    }catch(err){
+      console.error('[portfolio] JSON load failed:', err);
       items = [
         {
-          id: "fallback-1",
-          title: "TypeZero",
-          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-          cover: "imgs/portfolio-previews/typezero.png",
-          gallery: [
+          id:"fallback-1",
+          title:"TypeZero",
+          role:"Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover:"imgs/portfolio-previews/typezero.png",
+          gallery:[
             "imgs/portfolio-previews/typezero.png",
             "imgs/portfolio-previews/typezero1.png",
             "imgs/portfolio-previews/typezero2.jpg"
           ],
-          description: "Inline fallback data — remove once JSON is connected."
+          description:"Inline fallback data — remove once JSON is connected."
         },
         {
-          id: "fallback-2",
-          title: "TypeZero",
-          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-          cover: "imgs/portfolio-previews/typezero1.png",
-          gallery: [
+          id:"fallback-2",
+          title:"TypeZero",
+          role:"Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover:"imgs/portfolio-previews/typezero1.png",
+          gallery:[
             "imgs/portfolio-previews/typezero1.png",
             "imgs/portfolio-previews/typezero2.jpg",
             "imgs/portfolio-previews/typezero.jpg"
           ],
-          description: "Second inline fallback card."
+          description:"Second inline fallback card."
         }
       ];
     }
@@ -1223,4 +1160,7 @@
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
+
+
+
 
