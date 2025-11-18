@@ -1,0 +1,61 @@
+[
+  {
+    "id": "typezero-01",
+    "title": "TypeZero",
+    "role": "Art Direction, Brand Identity, Package Design, Web Design & Development",
+    "cover": "imgs/portfolio-previews/typezero.png",
+    "gallery": [
+      "imgs/portfolio-previews/typezero.png",
+      "imgs/portfolio-previews/typezero1.png",
+      "imgs/portfolio-previews/typezero2.jpg"
+    ],
+    "description": "TypeZero is a branding + packaging + web build. In the expanded view, this area will show a short overview — we can add bullets, links, and a tech stack later.",
+    "links": {
+      "website": "",
+      "caseStudy": ""
+    },
+    "tags": ["branding", "web", "packaging"]
+  },
+  {
+    "id": "typezero-02",
+    "title": "TypeZero",
+    "role": "Art Direction, Brand Identity, Package Design, Web Design & Development",
+    "cover": "imgs/portfolio-previews/typezero1.png",
+    "gallery": [
+      "imgs/portfolio-previews/typezero1.png",
+      "imgs/portfolio-previews/typezero2.jpg",
+      "imgs/portfolio-previews/typezero.jpg"
+    ],
+    "description": "Second card using a different cover. Gallery images mirror your current folder structure.",
+    "links": {},
+    "tags": ["branding", "web"]
+  },
+  {
+    "id": "typezero-03",
+    "title": "TypeZero",
+    "role": "Art Direction, Brand Identity, Package Design, Web Design & Development",
+    "cover": "imgs/portfolio-previews/typezero2.jpg",
+    "gallery": [
+      "imgs/portfolio-previews/typezero2.jpg",
+      "imgs/portfolio-previews/typezero1.jpg",
+      "imgs/portfolio-previews/typezero.jpg"
+    ],
+    "description": "Placeholder description. Edit freely in JSON.",
+    "links": {},
+    "tags": ["web"]
+  },
+  {
+    "id": "typezero-04",
+    "title": "TypeZero",
+    "role": "Art Direction, Brand Identity, Package Design, Web Design & Development",
+    "cover": "imgs/portfolio-previews/typezero.jpg",
+    "gallery": [
+      "imgs/portfolio-previews/typezero.jpg",
+      "imgs/portfolio-previews/typezero1.jpg",
+      "imgs/portfolio-previews/typezero2.jpg"
+    ],
+    "description": "Another sample card pulled from JSON.",
+    "links": {},
+    "tags": []
+  }
+]
