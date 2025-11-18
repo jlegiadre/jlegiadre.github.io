@@ -689,172 +689,222 @@
 		}
 	</style>
 	<style>
-		/* ================================
-		   PORTFOLIO ZONE (Dynamic Grid + Expanded View)
-		   ================================ */
+/* ================================
+   PORTFOLIO ZONE (Dynamic Grid + Expanded View + Carousel)
+   ================================ */
 
-		/* Container layout */
-		.work-wrapper {
-		  width: 100%;
-		  margin: 0 auto;
-		  display: flex;
-		  flex-direction: row;
-		  flex-wrap: wrap;
-		  justify-content: space-evenly;
-		  margin-top: 5%;
-		}
+/* If .below was clipping, keep this override */
+.below {
+  height: auto !important;
+  overflow: visible !important;
+  animation: none !important;
+}
 
-		/* Card layout */
-		.work-item {
-		  width: 80%;
-		  margin-bottom: 9%;
-		  cursor: pointer;
-		  outline: none;
-		  transition: all 0.3s ease;
-		}
-		.work-item:focus-visible {
-		  box-shadow: 0 0 0 3px #4F8ABA;
-		  border-radius: 6px;
-		}
-		.work-item__cover {
-		  width: 100%;
-		  display: block;
-		  height: auto;
-		}
+/* Container layout */
+.work-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-top: 5%;
+}
 
-		/* Card text info */
-		.portfolio-info {
-		  width: 100%;
-		  text-align: left;
-		  padding: 2% 0% 4%;
-		}
-		.portfolio-info::before {
-		  content: "";
-		  display: block;
-		  position: relative;
-		  top: 0;
-		  right: 0;
-		  height: 2px;
-		  background: #dcb24c;
-		  width: 50%;
-		}
-		.project-name {
-		  font-family: 'Montserrat', sans-serif;
-		  font-weight: 600;
-		  text-transform: uppercase;
-		  letter-spacing: 1;
-		  color: #3D729E;
-		  font-size: clamp(18px, 3.75vw, 22px);
-		  margin-top: 2%;
-		}
-		.project-role {
-		  text-transform: capitalize;
-		  font-family: 'Bitter', serif;
-		  font-weight: 400;
-		  font-style: italic;
-		  color: #0f273f;
-		  font-size: clamp(12px, 2.5vw, 14.66px);
-		  letter-spacing: 2;
-		}
+/* Card layout */
+.work-item {
+  width: 80%;
+  margin-bottom: 9%;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s ease;
+}
+.work-item:focus-visible {
+  box-shadow: 0 0 0 3px #4F8ABA;
+  border-radius: 6px;
+}
+.work-item__cover {
+  width: 100%;
+  display: block;
+  height: auto;
+}
 
-		/* Expanded state (structure only; animations added later) */
-		.work-item--expanded {
-		  width: 100%;
-		  margin-bottom: 3%;
-		}
-		.work-item--expanded .portfolio-info::before { width: 0; }
+/* Card text info */
+.portfolio-info {
+  width: 100%;
+  text-align: left;
+  padding: 2% 0% 4%;
+}
+.portfolio-info::before {
+  content: "";
+  display: block;
+  position: relative;
+  top: 0;
+  right: 0;
+  height: 2px;
+  background: #dcb24c;
+  width: 50%;
+}
+.project-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1;
+  color: #3D729E;
+  font-size: clamp(18px, 3.75vw, 22px);
+  margin-top: 2%;
+}
+.project-role {
+  text-transform: capitalize;
+  font-family: 'Bitter', serif;
+  font-weight: 400;
+  font-style: italic;
+  color: #0f273f;
+  font-size: clamp(12px, 2.5vw, 14.66px);
+  letter-spacing: 2;
+}
 
-		/* Expanded view layout */
-		.work-detail {
-		  display: grid;
-		  grid-template-columns: 3fr 1fr; /* ~75% / 25% */
-		  gap: 2rem;
-		  align-items: start;
-		  background: #f3f1f1;
-		}
-		.work-detail__media {
-		  position: relative;
-		}
-		.work-detail__meta {
-		  display: grid;
-		  gap: 0.75rem;
-		  align-content: start;
-		}
-		.work-detail__title {
-		  font-family: 'Montserrat', sans-serif;
-		  font-weight: 700;
-		  text-transform: uppercase;
-		  color: #3D729E;
-		  margin: 0;
-		  font-size: clamp(18px, 1.75vw, 22px);
-		}
-		.work-detail__role {
-		  font-family: 'Bitter', serif;
-		  font-style: italic;
-		  color: #0f273f;
-		  margin: 0 0 0.5rem 0;
-		  font-size: clamp(12px, 1.25vw, 14.66px);
-		}
-		.work-detail__desc {
-		  font-family: 'Bitter', serif;
-		  color: #0f273f;
-		  line-height: 1.5;
-		}
+/* Expanded state */
+.work-item--expanded {
+  width: 100%;
+  margin-bottom: 3%;
+  order: -1; /* bring expanded item to the top row and push others below */
+}
+.work-item--expanded .portfolio-info::before { width: 0; }
 
-		/* Placeholder carousel container (static for now) */
-		.carousel {
-		  width: 100%;
-		  aspect-ratio: 16 / 9;
-		  background: #e9edf2;
-		  display: grid;
-		  place-items: center;
-		  border-radius: 8px;
-		  overflow: hidden;
-		}
-		.carousel img {
-		  width: 100%;
-		  height: 100%;
-		  object-fit: cover;
-		}
+/* Expanded layout: 75 / 25 split */
+.work-detail {
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* ~75% / 25% */
+  gap: 2rem;
+  align-items: start;
+  background: #f3f1f1;
+}
+.work-detail__media { position: relative; }
+.work-detail__meta {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+.work-detail__title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3D729E;
+  margin: 0;
+  font-size: clamp(18px, 1.75vw, 22px);
+}
+.work-detail__role {
+  font-family: 'Bitter', serif;
+  font-style: italic;
+  color: #0f273f;
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(12px, 1.25vw, 14.66px);
+}
+.work-detail__desc {
+  font-family: 'Bitter', serif;
+  color: #0f273f;
+  line-height: 1.5;
+}
 
-		/* Close button (for expanded view) */
-		.work-detail__close {
-		  appearance: none;
-		  border: none;
-		  background: transparent;
-		  color: #0f273f;
-		  font-family: 'Montserrat', sans-serif;
-		  font-size: 14px;
-		  justify-self: start;
-		  padding: 0.25rem 0.5rem;
-		  border-radius: 6px;
-		  cursor: pointer;
-		}
-		.work-detail__close:focus-visible {
-		  outline: 3px solid #4F8ABA;
-		  outline-offset: 2px;
-		}
+/* Carousel (vanilla) */
+.carousel {
+  width: 100%;
+  aspect-ratio: 495 / 350; /* matches your image size */
+  background: #e9edf2;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.carousel__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  height: 100%;
+  transform: translateX(0%);
+  transition: transform 300ms ease;
+}
+.carousel__slide {
+  width: 100%;
+  height: 100%;
+}
+.carousel__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* prevent cropping */
+  background: #e9edf2; /* subtle backdrop around contained images */
+}
 
-		/* Responsiveness */
-		@media (max-width: 767px) {
-		  .work-detail {
-			grid-template-columns: 1fr; /* stack 100%/100% on mobile */
-			gap: 1rem;
-		  }
-		}
-		@media (min-width: 768px) {
-		  .work-item {
-			width: 45%;
-			margin-bottom: 3%;
-		  }
-		}
-		@media (min-width: 1024px) {
-		  .work-item { width: 28%; }
-		}
-		@media (min-width: 1700px) {
-		  .work-item { width: 23%; }
-		}
-		</style>
+/* Carousel controls */
+.carousel__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  appearance: none;
+  border: none;
+  background: rgba(15, 39, 63, 0.6);
+  color: #fff;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.carousel__btn:focus-visible { outline: 3px solid #4F8ABA; outline-offset: 2px; }
+.carousel__btn--prev { left: 8px; }
+.carousel__btn--next { right: 8px; }
+
+/* Carousel dots */
+.carousel__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15, 39, 63, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.carousel__dot[aria-current="true"] {
+  background: #0f273f;
+}
+
+/* Close button */
+.work-detail__close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #0f273f;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  justify-self: start;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.work-detail__close:focus-visible {
+  outline: 3px solid #4F8ABA;
+  outline-offset: 2px;
+}
+
+/* Responsiveness */
+@media (max-width: 767px) {
+  .work-detail { grid-template-columns: 1fr; gap: 1rem; }
+}
+@media (min-width: 768px) {
+  .work-item { width: 45%; margin-bottom: 3%; }
+}
+@media (min-width: 1024px) {
+  .work-item { width: 28%; }
+}
+@media (min-width: 1700px) {
+  .work-item { width: 23%; }
+}
+</style>
 
 	<div class="page">
 		<button id="hamburger" class="hamburger--spin js-hamburger" aria-controls="mega-menu" aria-expanded="false" aria-label="Main menu">
@@ -941,178 +991,303 @@
 </html>
 
 <script>
-  (function () {
-    // Adjust this path to where portfolio.json *actually* lives relative to this HTML file
-    const DATA_URL = '/assets/portfolio.json';
+(function () {
+  // Adjust path to your JSON
+  const DATA_URL = 'assets/portfolio.json';
 
-    const grid = document.getElementById('portfolioGrid');
-    let items = [];
-    let expandedId = null;
+  const grid = document.getElementById('portfolioGrid');
+  let items = [];
+  let expandedId = null;
 
-    function onEnterOrSpace(fn) {
-      return function (e) {
-        const code = e.code || e.key;
-        if (code === 'Enter' || code === 'Space' || e.keyCode === 13 || e.keyCode === 32) {
-          e.preventDefault();
-          fn(e);
-        }
-      };
-    }
+  // ---- helpers ----
+  function onEnterOrSpace(fn) {
+    return function (e) {
+      const code = e.code || e.key;
+      if (code === 'Enter' || code === 'Space' || e.keyCode === 13 || e.keyCode === 32) {
+        e.preventDefault();
+        fn(e);
+      }
+    };
+  }
 
-    function renderGrid(data) {
-      grid.innerHTML = '';
-      data.forEach((item) => {
-        const card = document.createElement('article');
-        card.className = 'work-item';
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-expanded', 'false');
-        card.setAttribute('aria-controls', `detail-${item.id}`);
-        card.dataset.id = item.id;
-
-        card.innerHTML = `
-          <img class="work-item__cover" src="${item.cover}" width="100%" alt="${item.title}" loading="lazy" decoding="async">
-          <div class="portfolio-info">
-            <div class="project-name">${item.title}</div>
-            <div class="project-role">${item.role}</div>
-          </div>
-        `;
-
-        card.addEventListener('click', () => expandItem(item.id));
-        card.addEventListener('keydown', onEnterOrSpace(() => expandItem(item.id)));
-
-        grid.appendChild(card);
-      });
-    }
-
-    function expandItem(id) {
-      if (expandedId === id) return;
-
-      const prev = expandedId ? grid.querySelector(`.work-item[data-id="${expandedId}"]`) : null;
-      if (prev) collapseItem(prev);
-
-      const card = grid.querySelector(`.work-item[data-id="${id}"]`);
-      if (!card) return;
-
-      const data = items.find(i => i.id === id);
-      if (!data) return;
-
-      expandedId = id;
-
-      card.classList.add('work-item--expanded');
-      card.setAttribute('aria-expanded', 'true');
-
-      const detailId = `detail-${id}`;
-      const detail = document.createElement('div');
-      detail.className = 'work-detail';
-      detail.id = detailId;
-
-      const media = document.createElement('section');
-      media.className = 'work-detail__media';
-      media.setAttribute('aria-label', `${data.title} media`);
-      media.innerHTML = `
-        <div class="carousel" data-carousel="${id}">
-          <img src="${(data.gallery && data.gallery.length ? data.gallery[0] : data.cover)}" alt="${data.title}" loading="lazy" decoding="async">
-        </div>
-      `;
-
-      const meta = document.createElement('aside');
-      meta.className = 'work-detail__meta';
-      meta.setAttribute('aria-label', `${data.title} details`);
-      meta.innerHTML = `
-        <h3 class="work-detail__title">${data.title}</h3>
-        <p class="work-detail__role">${data.role}</p>
-        <div class="work-detail__desc">${data.description || ''}</div>
-        <button class="work-detail__close" type="button" aria-label="Close ${data.title} details">← Back</button>
-      `;
-
-      meta.querySelector('.work-detail__close').addEventListener('click', () => collapseItem(card));
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' || e.keyCode === 27) {
-          e.preventDefault();
-          collapseItem(card);
-        }
-      });
-
-      card.innerHTML = '';
-      card.appendChild(detail);
-      detail.appendChild(media);
-      detail.appendChild(meta);
-
-      card.focus({ preventScroll: false });
-    }
-
-    function collapseItem(card) {
-      const id = card.dataset.id;
-      expandedId = null;
-      card.classList.remove('work-item--expanded');
+  function renderGrid(data) {
+    grid.innerHTML = '';
+    data.forEach((item) => {
+      const card = document.createElement('article');
+      card.className = 'work-item';
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
       card.setAttribute('aria-expanded', 'false');
-
-      const data = items.find(i => i.id === id);
-      if (!data) return;
+      card.setAttribute('aria-controls', `detail-${item.id}`);
+      card.dataset.id = item.id;
 
       card.innerHTML = `
-        <img class="work-item__cover" src="${data.cover}" width="100%" alt="${data.title}" loading="lazy" decoding="async">
+        <img class="work-item__cover" src="${item.cover}" width="100%" alt="${item.title}" loading="lazy" decoding="async">
         <div class="portfolio-info">
-          <div class="project-name">${data.title}</div>
-          <div class="project-role">${data.role}</div>
+          <div class="project-name">${item.title}</div>
+          <div class="project-role">${item.role}</div>
         </div>
       `;
 
-      // Reattach handlers
-      card.addEventListener('click', () => expandItem(id), { once: true });
-      card.addEventListener('keydown', onEnterOrSpace(() => expandItem(id)), { once: true });
+      card.addEventListener('click', () => expandItem(item.id));
+      card.addEventListener('keydown', onEnterOrSpace(() => expandItem(item.id)));
+
+      grid.appendChild(card);
+    });
+  }
+
+  function expandItem(id) {
+    if (expandedId === id) return;
+
+    // collapse any open one
+    if (expandedId) {
+      const prev = grid.querySelector(`.work-item[data-id="${expandedId}"]`);
+      if (prev) collapseItem(prev, { restoreFocus: false });
+    }
+
+    const card = grid.querySelector(`.work-item[data-id="${id}"]`);
+    if (!card) return;
+    const data = items.find(i => i.id === id);
+    if (!data) return;
+
+    expandedId = id;
+    card.classList.add('work-item--expanded');
+    card.setAttribute('aria-expanded', 'true');
+
+    // Build expanded view
+    const detailId = `detail-${id}`;
+    const detail = document.createElement('div');
+    detail.className = 'work-detail';
+    detail.id = detailId;
+
+    // MEDIA (left)
+    const media = document.createElement('section');
+    media.className = 'work-detail__media';
+    media.setAttribute('aria-label', `${data.title} media`);
+
+    // Build carousel
+    const slides = (Array.isArray(data.gallery) && data.gallery.length ? data.gallery : [data.cover]);
+    const carouselId = `carousel-${id}`;
+    media.innerHTML = `
+      <div class="carousel" id="${carouselId}" role="region" aria-roledescription="carousel" aria-label="${data.title} gallery">
+        <div class="carousel__track" data-track></div>
+        <button class="carousel__btn carousel__btn--prev" data-prev aria-label="Previous image" type="button">‹</button>
+        <button class="carousel__btn carousel__btn--next" data-next aria-label="Next image" type="button">›</button>
+        <div class="carousel__dots" data-dots></div>
+      </div>
+    `;
+
+    // META (right)
+    const meta = document.createElement('aside');
+    meta.className = 'work-detail__meta';
+    meta.setAttribute('aria-label', `${data.title} details`);
+    meta.innerHTML = `
+      <h3 class="work-detail__title">${data.title}</h3>
+      <p class="work-detail__role">${data.role}</p>
+      <div class="work-detail__desc">${data.description || ''}</div>
+      <button class="work-detail__close" type="button" aria-label="Close ${data.title} details" data-action="close">← Back</button>
+    `;
+
+    // Replace card content with expanded layout
+    card.innerHTML = '';
+    card.appendChild(detail);
+    detail.appendChild(media);
+    detail.appendChild(meta);
+
+    // Init carousel now that DOM exists
+    initCarousel(document.getElementById(carouselId), slides);
+
+    // Move focus
+    card.focus({ preventScroll: false });
+  }
+
+  function collapseItem(card, opts = { restoreFocus: true }) {
+    const id = card.dataset.id;
+    const data = items.find(i => i.id === id);
+    if (!data) return;
+
+    expandedId = null;
+    card.classList.remove('work-item--expanded');
+    card.setAttribute('aria-expanded', 'false');
+
+    // Rebuild compact view
+    card.innerHTML = `
+      <img class="work-item__cover" src="${data.cover}" width="100%" alt="${data.title}" loading="lazy" decoding="async">
+      <div class="portfolio-info">
+        <div class="project-name">${data.title}</div>
+        <div class="project-role">${data.role}</div>
+      </div>
+    `;
+
+    // Reattach handlers
+    card.addEventListener('click', () => expandItem(id), { once: true });
+    card.addEventListener('keydown', onEnterOrSpace(() => expandItem(id)), { once: true });
+
+    if (opts.restoreFocus) {
       card.focus({ preventScroll: false });
     }
+  }
 
-    async function init() {
-      try {
-        const res = await fetch(DATA_URL, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`Fetch failed (${res.status}) for ${DATA_URL}`);
-        const json = await res.json();
-
-        if (!Array.isArray(json)) {
-          throw new Error('portfolio.json is not an array');
-        }
-
-        items = json;
-        console.info(`[portfolio] Loaded ${items.length} items from JSON.`);
-      } catch (err) {
-        console.error('[portfolio] Could not load JSON:', err);
-
-        // Dev fallback (so the UI is never empty). Remove in production.
-        items = [
-          {
-            id: "fallback-1",
-            title: "TypeZero",
-            role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-            cover: "imgs/portfolio-previews/typezero.png",
-            gallery: [
-              "imgs/portfolio-previews/typezero.png",
-              "imgs/portfolio-previews/typezero1.png",
-              "imgs/portfolio-previews/typezero2.jpg"
-            ],
-            description: "Inline fallback data — remove once JSON is connected."
-          },
-          {
-            id: "fallback-2",
-            title: "TypeZero",
-            role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
-            cover: "imgs/portfolio-previews/typezero1.png",
-            gallery: [
-              "imgs/portfolio-previews/typezero1.png",
-              "imgs/portfolio-previews/typezero2.jpg",
-              "imgs/portfolio-previews/typezero.jpg"
-            ],
-            description: "Second inline fallback card."
-          }
-        ];
-        console.info(`[portfolio] Using fallback items: ${items.length}`);
+  // Global delegation: Back button + Escape key to close
+  grid.addEventListener('click', (e) => {
+    const closeBtn = e.target.closest('[data-action="close"]');
+    if (closeBtn) {
+      const card = closeBtn.closest('.work-item');
+      if (card) collapseItem(card);
+    }
+  });
+  grid.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      const openCard = expandedId && grid.querySelector(`.work-item[data-id="${expandedId}"]`);
+      if (openCard) {
+        e.preventDefault();
+        collapseItem(openCard);
       }
+    }
+  });
 
-      renderGrid(items);
+  // ---- Carousel (vanilla) ----
+  function initCarousel(root, images) {
+    const track = root.querySelector('[data-track]');
+    const btnPrev = root.querySelector('[data-prev]');
+    const btnNext = root.querySelector('[data-next]');
+    const dotsWrap = root.querySelector('[data-dots]');
+    let index = 0;
+    let startX = 0;
+    let isSwiping = false;
+
+    // Build slides
+    track.innerHTML = '';
+    images.forEach((src, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'carousel__slide';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', `${i + 1} of ${images.length}`);
+      slide.innerHTML = `<img src="${src}" alt="" loading="lazy" decoding="async">`;
+      track.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.className = 'carousel__dot';
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+
+    function update() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+      [...dotsWrap.children].forEach((d, i) => {
+        d.setAttribute('aria-current', i === index ? 'true' : 'false');
+      });
+    }
+    function goTo(i) {
+      index = Math.max(0, Math.min(images.length - 1, i));
+      update();
+    }
+    function next() { goTo(index + 1); }
+    function prev() { goTo(index - 1); }
+
+    btnPrev.addEventListener('click', prev);
+    btnNext.addEventListener('click', next);
+
+    // Keyboard
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    });
+    root.setAttribute('tabindex', '0'); // allow arrow keys when focused
+
+    // Swipe (touch)
+    root.addEventListener('touchstart', (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      isSwiping = true;
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    root.addEventListener('touchmove', (e) => {
+      if (!isSwiping || !e.touches || !e.touches[0]) return;
+      const dx = e.touches[0].clientX - startX;
+      // Optionally, you could add visual drag feedback here.
+      if (Math.abs(dx) > 50) {
+        if (dx < 0) next(); else prev();
+        isSwiping = false;
+      }
+    }, { passive: true });
+
+    root.addEventListener('touchend', () => { isSwiping = false; });
+
+    // Init
+    goTo(0);
+  }
+
+  // ---- boot ----
+  async function init() {
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Fetch failed (${res.status}) for ${DATA_URL}`);
+      const json = await res.json();
+      if (!Array.isArray(json)) throw new Error('portfolio.json is not an array');
+      items = json;
+      console.info(`[portfolio] Loaded ${items.length} items from JSON.`);
+    } catch (err) {
+      console.error('[portfolio] Could not load JSON:', err);
+      items = [
+        {
+          id: "fallback-1",
+          title: "TypeZero",
+          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover: "imgs/portfolio-previews/typezero.png",
+          gallery: [
+            "imgs/portfolio-previews/typezero.png",
+            "imgs/portfolio-previews/typezero1.png",
+            "imgs/portfolio-previews/typezero2.jpg"
+          ],
+          description: "Inline fallback data — remove once JSON is connected."
+        },
+        {
+          id: "fallback-2",
+          title: "TypeZero",
+          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover: "imgs/portfolio-previews/typezero1.png",
+          gallery: [
+            "imgs/portfolio-previews/typezero1.png",
+            "imgs/portfolio-previews/typezero2.jpg",
+            "imgs/portfolio-previews/typezero.jpg"
+          ],
+          description: "Second inline fallback card."
+        },
+        {
+          id: "fallback-3",
+          title: "TypeZero",
+          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover: "imgs/portfolio-previews/typezero2.jpg",
+          gallery: [
+            "imgs/portfolio-previews/typezero2.jpg",
+            "imgs/portfolio-previews/typezero1.jpg",
+            "imgs/portfolio-previews/typezero.jpg"
+          ],
+          description: "Third inline fallback."
+        },
+        {
+          id: "fallback-4",
+          title: "TypeZero",
+          role: "Art Direction, Brand Identity, Package Design, Web Design & Development",
+          cover: "imgs/portfolio-previews/typezero.jpg",
+          gallery: [
+            "imgs/portfolio-previews/typezero.jpg",
+            "imgs/portfolio-previews/typezero1.jpg",
+            "imgs/portfolio-previews/typezero2.jpg"
+          ],
+          description: "Fourth inline fallback."
+        }
+      ];
+      console.info(`[portfolio] Using fallback items: ${items.length}`);
     }
 
-    document.addEventListener('DOMContentLoaded', init);
-  })();
+    renderGrid(items);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
 </script>
