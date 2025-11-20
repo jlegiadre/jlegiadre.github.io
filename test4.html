@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Expandable Flex Grid — 75/25 Split (JSON + Carousel)</title>
+
+<style>
+  :root{
+    --gap: 20px;
+    --overlay-dim: rgba(0,0,0,.10);
+    --shadow: 0 8px 24px rgba(0,0,0,.18);
+
+    /* Tiles (exit stagger) */
+    --stagger-shift: 175px;
+    --stagger-dur: .58s;
+    --stagger-step: .05s;
+    --stagger-ease: ease;
+
+    /* Panels (stage) */
+    --stage-delay: calc(var(--stagger-dur) + (var(--stagger-step) * 2)); /* img + title + role */
+    --stage-in-dur: .5s;
+    --stage-out-dur: .45s;
+    --stage-ease: ease;
+    --right-gap: .15s;
+    --panel-bg: #1c1e22;
+    --panel-fg: #e9edf3;
+    --stage-shadow: none; /* set a shadow if desired */
+
+    /* Tile re-entry */
+    --tile-in-dur: .35s;
+    --tile-in-ease: cubic-bezier(.16,.84,.44,1);
+    --tile-base-delay: calc(var(--tile-in-dur) - .15s); /* matches prior (dur - 150ms) */
+    --tile-entry-offset: 10px;
+
+    /* Interaction */
+    --hover-lift: -2px;
+    --hover-shadow: var(--shadow);
+    --focus-outline: 2px solid #000;
+    --focus-offset: 3px;
+
+    /* Buffers (for JS to read if desired) */
+    --stage-out-buffer: .02s; /* ~20ms */
+  }
+
+  /* Base */
+  html, body { height: 100%; background: #f3f1f1; }
+  html { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: inherit; }
+  body { margin:0; color:#111; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+
+  /* ===== BOX / GRID ===== */
+  .container { width: 100%; }
+  .box {
+    position: relative;  /* anchor stage overlay */
+    width: 80%;
+    margin: 40px auto;
+  }
+
+  .box__row { display:flex; flex-wrap:wrap; gap:var(--gap); padding:var(--gap); transition: visibility .001s linear; }
+  .box__row.is-hidden { visibility: hidden; }
+
+  .box__row-cell {
+    position:relative;
+    background: var(--tile-bg, #ffffff);  /* ensure a color exists so it can fade */
+    overflow:hidden; cursor:pointer;
+    transition:
+      transform .2s ease,
+      box-shadow .25s ease,
+      opacity .25s ease,
+      background-color var(--stagger-dur) var(--stagger-ease); /* allow bg to fade on open */
+    outline:none; flex:1 1 100%;
+  }
+  .box__row-cell:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
+  .box__row-cell:hover { transform: translateY(var(--hover-lift)); box-shadow: var(--hover-shadow); }
+
+  @media (min-width:700px){ .box__row-cell{ flex-basis: calc(50% - var(--gap)/2); } }
+  @media (min-width:1024px){ .box__row-cell{ flex-basis: calc(25% - (var(--gap)*3/4)); } }
+
+  .tile__img { display:block; width:100%; height:auto; aspect-ratio:495/350; object-fit:cover; }
+  .tile__meta { background:var(--tile-meta-bg); padding:12px 14px 14px; }
+  .tile__title { margin:0 0 6px; font-weight:700; font-size:clamp(14px,2.5vw,18px); letter-spacing:.2px; }
+  .tile__role  { margin:0; font-size:clamp(12px,2vw,14px); color:#333; }
+
+  /* Hover-dim others */
+  .box__row.is-hover .box__row-cell::after { content:""; position:absolute; inset:0; background:var(--overlay-dim); }
+  .box__row.is-hover .box__row-cell.is-hovered::after { opacity:0; background:transparent; }
+
+  /* Fade all except source on click */
+  .box__row.is-fading .box__row-cell { opacity:0; pointer-events:none; }
+  .box__row.is-fading .box__row-cell.is-source { opacity:1; pointer-events:auto; }
+
+  /* ===== Stagger-out on source tile ===== */
+  .stagger-out .tile__img,
+  .stagger-out .tile__title,
+  .stagger-out .tile__role {
+    will-change: transform, opacity;
+    transition: transform var(--stagger-dur) var(--stagger-ease), opacity var(--stagger-dur) var(--stagger-ease);
+  }
+  .stagger-out.run .tile__img   { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay:0s; }
+  .stagger-out.run .tile__title { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: var(--stagger-step); }
+  .stagger-out.run .tile__role  { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step) * 2); }
+
+  /* Fade the source tile’s background & remove hover shadow during stagger */
+  .box__row-cell.stagger-out {
+    transition:
+      transform .2s ease,
+      box-shadow var(--stagger-dur) var(--stagger-ease),
+      opacity .25s ease,
+      background-color var(--stagger-dur) var(--stagger-ease);
+  }
+  .box__row-cell.stagger-out:hover { box-shadow: none; transform: none; } /* kill hover while animating */
+  .box__row-cell.stagger-out.run {
+    box-shadow: none;                 /* shadow fades away */
+    background-color: transparent;    /* bg fades with same duration */
+  }
+  /* Also guard via parent state for safety */
+  .box__row.is-fading .box__row-cell.is-source:hover { box-shadow: none; transform: none; }
+
+  /* ===== CSS re-entry animation ===== */
+  @keyframes tileIn {
+    from { opacity: 0; transform: translateY(var(--tile-entry-offset)); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .box__row.is-revealing .box__row-cell {
+    will-change: opacity, transform;
+    animation: tileIn var(--tile-in-dur) var(--tile-in-ease) both;
+    animation-delay: calc(var(--i, 0) * var(--tile-base-delay));
+  }
+
+  /* ===== STAGE OVERLAY (side-by-side 75/25) ===== */
+  .stage {
+    position: absolute;           /* sits ON TOP of the tiles */
+    top: var(--gap);
+    left: var(--gap);
+    right: var(--gap);
+    /* height comes from the left panel’s aspect-ratio */
+    display: none;                /* show when .is-open */
+    z-index: 10;
+    grid-template-columns: 3fr 1fr;  /* 75 / 25 split */
+    gap: 0;
+    align-items: stretch;         /* right matches left height */
+    overflow: hidden;
+    border-radius: 10px;
+    pointer-events: none;         /* only panels receive events */
+  }
+  .stage.is-open { display: grid; box-shadow: var(--stage-shadow); }
+
+  /* LEFT: now a carousel container */
+  .stage__left {
+    pointer-events: auto;
+    background: #f3f1f1; /* fallback color */
+    aspect-ratio: 495 / 350;  /* locks height from column width */
+    transform: translateX(-101%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Carousel core */
+  .carousel {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .carousel__track {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    overflow: hidden;
+    will-change: transform;
+    transform: translateX(0%); /* updated inline by JS as percentages */
+    transition: transform .35s var(--tile-in-ease);
+  }
+  .carousel__slide {
+    width: 100%;
+    height: 100%;
+    background: #f3f1f1 center/contain no-repeat;
+  }
+  .carousel__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* no crop */
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Carousel controls */
+  .carousel__btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(28,30,34,.65);
+    color: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .carousel__btn[disabled] { opacity:.35; cursor: default; }
+  .carousel__btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .carousel__btn--prev { left: 10px; }
+  .carousel__btn--next { right: 10px; }
+
+  /* Dots */
+  .carousel__dots {
+    position: absolute;
+    left: 0; right: 0; bottom: 10px;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    pointer-events: auto;
+  }
+  .carousel__dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.45);
+    border: 1px solid rgba(255,255,255,.75);
+  }
+  .carousel__dot[aria-current="true"] { background: #fff; }
+
+  /* RIGHT: fills remaining width, same height as left via grid */
+  .stage__right {
+    pointer-events: auto;
+    position: relative;
+    background: var(--panel-bg);
+    color: var(--panel-fg);
+    padding: 18px 18px 24px 18px;
+    transform: translateX(101%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  /* Slide-in animations triggered when .is-open is added */
+  .stage.is-open .stage__left {
+    animation: slideInLeft var(--stage-in-dur) var(--stage-ease) forwards;
+    animation-delay: var(--stage-delay);
+  }
+  .stage.is-open .stage__right {
+    animation: slideInRight var(--stage-in-dur) var(--stage-ease) forwards;
+    animation-delay: calc(var(--stage-delay) + var(--right-gap));
+  }
+  @keyframes slideInLeft  { from { transform: translateX(-101%); } to { transform: translateX(0); } }
+  @keyframes slideInRight { from { transform: translateX(101%);  } to { transform: translateX(0); } }
+
+  /* ===== EXIT animations ===== */
+  .stage.is-closing .stage__left  { animation: slideOutLeft  var(--stage-out-dur) var(--stage-ease) forwards; }
+  .stage.is-closing .stage__right { animation: slideOutRight var(--stage-out-dur) var(--stage-ease) forwards; }
+  .stage.is-closing .stage__close { opacity: 0; pointer-events:none; transition: opacity .2s ease; }
+
+  @keyframes slideOutLeft  { from { transform: translateX(0); } to { transform: translateX(-101%); } }
+  @keyframes slideOutRight { from { transform: translateX(0); } to { transform: translateX(101%); } }
+
+  .panel__title { margin:0 0 8px; font:700 22px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; letter-spacing:.2px; }
+  .panel__role  { margin:0 0 10px; font:400 14px/1.45 system-ui; color:#cfd5dd; }
+  .panel__desc  { margin:0; font:400 14px/1.6 system-ui; color:#d8dde3; }
+
+  .panel__links { margin: 12px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
+  .panel__link {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 10px; border-radius: 999px; background:#2a2d32; color:#e9edf3; text-decoration:none; font-size:13px;
+  }
+  .panel__tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
+  .panel__tag {
+    font-size:12px; padding:4px 8px; background:#2a2d32; border-radius:999px; color:#cfd5dd;
+  }
+
+  /* ===== Close button (injected AFTER slide-in) ===== */
+  .stage__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+  .stage__close .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
+  .stage__close .label {
+    display: block;
+    font-size: .8em;
+    line-height: 36px;
+    text-transform: uppercase;
+    color: #fff;
+    transition: all .3s ease-in;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stage__close .inner::before,
+  .stage__close .inner::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 200%;
+    height: 1px;
+    background: #FFC107;
+    transition: all .3s ease-in;
+  }
+  .stage__close .inner::before { top: 50%;  transform: rotate(45deg); }
+  .stage__close .inner::after  { bottom: 50%; transform: rotate(-45deg); }
+  .stage__close:hover .label { opacity: 1; }
+  .stage__close:hover .inner::before,
+  .stage__close:hover .inner::after { transform: rotate(0); }
+  .stage__close:hover .inner::before { top: 0; }
+  .stage__close:hover .inner::after  { bottom: 0; }
+
+  .stage__close:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stagger-out .tile__img, .stagger-out .tile__title, .stagger-out .tile__role { transition: none !important; }
+    .stage.is-open .stage__left,
+    .stage.is-open .stage__right,
+    .stage.is-closing .stage__left,
+    .stage.is-closing .stage__right {
+      animation: none !important;
+      transform: translateX(0) !important;
+    }
+    .box__row.is-revealing .box__row-cell {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .carousel__track { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="box" id="box">
+    <!-- Dynamic tiles will be injected here -->
+    <div class="box__row" id="grid" role="list" aria-live="polite"></div>
+
+    <!-- Stage overlay: left 75% (carousel); right 25% (text panel) -->
+    <div class="stage" id="stage" aria-live="polite">
+      <section class="stage__left" id="stageLeft" aria-hidden="true"></section>
+
+      <aside class="stage__right" id="stageRight" role="dialog" aria-modal="true" aria-label="Project details">
+        <h2 class="panel__title" id="panelTitle">Title</h2>
+        <p class="panel__role" id="panelRole"></p>
+        <p class="panel__desc" id="panelDesc"></p>
+        <div class="panel__links" id="panelLinks" hidden></div>
+        <div class="panel__tags" id="panelTags" hidden></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var DATA_URL = '/assets/portfolio.json'; // your provided path
+
+  var grid        = document.getElementById('grid');
+  var stage       = document.getElementById('stage');
+  var stageLeft   = document.getElementById('stageLeft');
+  var stageRight  = document.getElementById('stageRight');
+  var panelTitle  = document.getElementById('panelTitle');
+  var panelRole   = document.getElementById('panelRole');
+  var panelDesc   = document.getElementById('panelDesc');
+  var panelLinks  = document.getElementById('panelLinks');
+  var panelTags   = document.getElementById('panelTags');
+
+  var tiles = [];            // live Node list (updated after render)
+  var items = [];            // JSON items
+  var lastSourceTile = null;
+  var animating = false;
+
+  /* Utility: CSS var → ms */
+  function cssMs(name, fallback){
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if(!raw) return fallback;
+    if(raw.endsWith('ms')) return parseFloat(raw);
+    if(raw.endsWith('s'))  return parseFloat(raw)*1000;
+    var n = parseFloat(raw);
+    return isNaN(n) ? fallback : n;
+  }
+  function readTimings(){
+    return {
+      staggerDur:   cssMs('--stagger-dur',  580),
+      staggerStep:  cssMs('--stagger-step',  50),
+      stageIn:      cssMs('--stage-in-dur',  500),
+      stageOut:     cssMs('--stage-out-dur', 450),
+      rightGap:     cssMs('--right-gap',     150),
+      tileInDur:    cssMs('--tile-in-dur',   350)
+    };
+  }
+
+  /* Fetch & render tiles from JSON */
+  async function loadData(){
+    try {
+      const res = await fetch(DATA_URL, { cache:'no-store' });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      items = await res.json();
+    } catch (e) {
+      console.warn('Falling back: could not fetch /assets/portfolio.json', e);
+      items = []; // keep empty if fetch fails
+    }
+    renderTiles(items);
+  }
+
+  function renderTiles(list){
+    // Clear grid
+    grid.innerHTML = '';
+
+    // Build DOM for each item
+    list.forEach(function(item, i){
+      var art = document.createElement('article');
+      art.className = 'box__row-cell';
+      art.setAttribute('role','listitem');
+      art.setAttribute('tabindex','0');
+      art.dataset.index = i; // reference into items[]
+      art.style.setProperty('--i', i);
+
+      // cover image
+      var img = document.createElement('img');
+      img.className = 'tile__img';
+      img.src = item.cover || (item.gallery && item.gallery[0]) || '';
+      img.alt = (item.title || 'Project') + ' preview';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+
+      // meta
+      var meta = document.createElement('div');
+      meta.className = 'tile__meta';
+
+      var h3 = document.createElement('h3');
+      h3.className = 'tile__title';
+      h3.textContent = item.title || 'Untitled';
+
+      var p = document.createElement('p');
+      p.className = 'tile__role';
+      p.textContent = item.role || '';
+
+      meta.appendChild(h3); meta.appendChild(p);
+      art.appendChild(img); art.appendChild(meta);
+
+      grid.appendChild(art);
+    });
+
+    // Refresh tiles Node list & bind events
+    tiles = Array.prototype.slice.call(grid.querySelectorAll('.box__row-cell'));
+
+    // Hover dim
+    grid.addEventListener('mouseover', onHoverOver);
+    grid.addEventListener('mouseout', onHoverOut);
+
+    // Open triggers
+    tiles.forEach(function(tile){
+      tile.addEventListener('click', function(){ openFrom(tile); });
+      tile.addEventListener('keydown', function(e){
+        var k = e.key || e.code;
+        if (k === 'Enter' || k === ' ' || k === 'Spacebar' || e.keyCode === 13 || e.keyCode === 32) {
+          e.preventDefault(); openFrom(tile);
+        }
+      });
+    });
+  }
+
+  /* Hover dim handlers */
+  function onHoverOver(e){
+    var t = e.target.closest('.box__row-cell');
+    if (!t || !grid.contains(t)) return;
+    grid.classList.add('is-hover');
+    tiles.forEach(function(x){ x.classList.toggle('is-hovered', x===t); });
+  }
+  function onHoverOut(e){
+    if (!grid.contains(e.relatedTarget)) {
+      grid.classList.remove('is-hover');
+      tiles.forEach(function(x){ x.classList.remove('is-hovered'); });
+    }
+  }
+
+  /* Close button helpers (inject/remove to avoid jitter during slide-in) */
+  function injectCloseButton(){
+    if (document.getElementById('stageClose')) return;
+    var btn = document.createElement('button');
+    btn.className = 'stage__close';
+    btn.id = 'stageClose';
+    btn.type = 'button';
+    btn.setAttribute('aria-label','Close details');
+    btn.innerHTML = '<span class="inner"><span class="label">Back</span></span>';
+    stageRight.appendChild(btn);
+
+    btn.addEventListener('click', closeStage);
+    btn.addEventListener('keydown', function(e){
+      var k = e.key || e.code;
+      if (k === 'Enter' || k === ' ' || k === 'Spacebar' || e.keyCode === 13 || e.keyCode === 32) {
+        e.preventDefault(); closeStage();
+      }
+    });
+    return btn;
+  }
+  function removeCloseButton(){
+    var btn = document.getElementById('stageClose');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+  }
+
+  /* Build carousel markup into stageLeft */
+  function mountCarousel(images){
+    stageLeft.innerHTML = ''; // clear previous
+    var wrapper = document.createElement('div');
+    wrapper.className = 'carousel';
+    wrapper.setAttribute('role','region');
+    wrapper.setAttribute('aria-label','Project media');
+
+    var track = document.createElement('div');
+    track.className = 'carousel__track';
+    track.setAttribute('role','group');
+
+    // slides
+    (images && images.length ? images : ['']).forEach(function(src, idx){
+      var slide = document.createElement('div');
+      slide.className = 'carousel__slide';
+      slide.setAttribute('role','img');
+      slide.setAttribute('aria-label','Image '+(idx+1)+' of '+(images.length));
+      if (src) {
+        var img = document.createElement('img');
+        img.className = 'carousel__img';
+        img.src = src;
+        img.alt = '';
+        img.decoding = 'async';
+        img.loading = 'eager'; // first frame feels snappier
+        slide.appendChild(img);
+      }
+      track.appendChild(slide);
+    });
+
+    // controls
+    var btnPrev = document.createElement('button');
+    btnPrev.className = 'carousel__btn carousel__btn--prev';
+    btnPrev.type = 'button'; btnPrev.setAttribute('aria-label','Previous image');
+    btnPrev.innerHTML = '&#9664;';
+
+    var btnNext = document.createElement('button');
+    btnNext.className = 'carousel__btn carousel__btn--next';
+    btnNext.type = 'button'; btnNext.setAttribute('aria-label','Next image');
+    btnNext.innerHTML = '&#9654;';
+
+    // dots
+    var dots = document.createElement('div');
+    dots.className = 'carousel__dots';
+    dots.setAttribute('role','tablist');
+    var dotBtns = [];
+
+    (images || []).forEach(function(_, i){
+      var d = document.createElement('button');
+      d.className = 'carousel__dot';
+      d.type = 'button';
+      d.setAttribute('role','tab');
+      d.setAttribute('aria-label','Go to image '+(i+1));
+      dots.appendChild(d);
+      dotBtns.push(d);
+    });
+
+    wrapper.appendChild(track);
+    if ((images||[]).length > 1) {
+      wrapper.appendChild(btnPrev);
+      wrapper.appendChild(btnNext);
+      wrapper.appendChild(dots);
+    }
+    stageLeft.appendChild(wrapper);
+
+    var ix = 0, total = (images||[]).length || 1;
+    function update(){
+      var x = (-ix * 100) + '%';
+      track.style.transform = 'translateX('+x+')';
+      dotBtns.forEach(function(d,i){
+        if (i===ix) d.setAttribute('aria-current','true'); else d.removeAttribute('aria-current');
+      });
+      btnPrev.disabled = (ix===0);
+      btnNext.disabled = (ix===total-1);
+    }
+    function go(n){ ix = Math.max(0, Math.min(total-1, n)); update(); }
+    function prev(){ go(ix-1); }
+    function next(){ go(ix+1); }
+
+    // events
+    if ((images||[]).length > 1) {
+      btnPrev.addEventListener('click', prev);
+      btnNext.addEventListener('click', next);
+      dotBtns.forEach(function(d,i){ d.addEventListener('click', function(){ go(i); });});
+      // keyboard on left panel: arrows switch slides
+      stageLeft.addEventListener('keydown', function(e){
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        if (e.key === 'ArrowRight'){ e.preventDefault(); next(); }
+      });
+    }
+    update();
+  }
+
+  /* Helper: hide the grid only (no tile cleanup) */
+  function hideGridOnly(){
+    grid.classList.add('is-hidden');
+    grid.classList.remove('is-fading');
+  }
+
+  /* OPEN: tiles stagger out → stage slides in → inject close button */
+  function openFrom(tile){
+    if (animating) return;
+    animating = true;
+    lastSourceTile = tile;
+
+    // remove old close button to avoid jitters
+    removeCloseButton();
+
+    // Source item from data
+    var idx = parseInt(tile.dataset.index, 10) || 0;
+    var item = items[idx] || {};
+
+    // Fade others & stagger out the clicked tile
+    grid.classList.add('is-fading');
+    tile.classList.add('is-source','stagger-out');
+    tile.offsetHeight;  // reflow so .run applies
+    tile.classList.add('run');
+
+    // Populate stage (carousel + right panel content)
+    var gallery = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover || ''];
+    mountCarousel(gallery);
+
+    panelTitle.textContent = item.title || 'Project';
+    panelRole.textContent  = item.role || '';
+    panelDesc.textContent  = item.description || '';
+
+    // links
+    panelLinks.innerHTML = '';
+    var linkCount = 0;
+    if (item.links && (item.links.website || item.links.caseStudy)) {
+      if (item.links.website) {
+        panelLinks.appendChild(linkEl('Website', item.links.website));
+        linkCount++;
+      }
+      if (item.links.caseStudy) {
+        panelLinks.appendChild(linkEl('Case Study', item.links.caseStudy));
+        linkCount++;
+      }
+    }
+    panelLinks.hidden = linkCount === 0;
+
+    // tags
+    panelTags.innerHTML = '';
+    if (Array.isArray(item.tags) && item.tags.length) {
+      item.tags.forEach(function(t){
+        var span = document.createElement('span');
+        span.className = 'panel__tag';
+        span.textContent = t;
+        panelTags.appendChild(span);
+      });
+      panelTags.hidden = false;
+    } else {
+      panelTags.hidden = true;
+    }
+
+    // Kick off panel slide-ins
+    stage.classList.add('is-open');
+
+    // CSS-synced grid hide (NO tile cleanup here)
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      requestAnimationFrame(hideGridOnly);
+    } else {
+      var onLeftStart = function(e){
+        if (e.target !== stageLeft) return;
+        if (e.animationName && e.animationName !== 'slideInLeft') return;
+        stageLeft.removeEventListener('animationstart', onLeftStart);
+        hideGridOnly();
+      };
+      stageLeft.addEventListener('animationstart', onLeftStart);
+    }
+
+    // After RIGHT panel finishes its slide-in:
+    // 1) inject the close button
+    // 2) THEN clean tile classes (avoids reflow during panel motion)
+    var onRightIn = function(e){
+      if (e.target !== stageRight) return;
+      if (e.animationName && e.animationName !== 'slideInRight') return;
+      stageRight.removeEventListener('animationend', onRightIn);
+
+      var btn = injectCloseButton();
+      if (btn) btn.focus();
+
+      tiles.forEach(function(t){ t.classList.remove('stagger-out','run','is-source'); });
+
+      animating = false;
+    };
+    stageRight.addEventListener('animationend', onRightIn);
+  }
+
+  function linkEl(label, href){
+    var a = document.createElement('a');
+    a.className = 'panel__link';
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = label;
+    return a;
+  }
+
+  /* CLOSE: slide panels out → CSS re-entry cascade */
+  function closeStage(){
+    if (animating || !stage.classList.contains('is-open')) return;
+    animating = true;
+
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Trigger slide-out animations; CSS also fades/disables the close button
+    stage.classList.add('is-closing');
+
+    // After panels finished sliding out…
+    var tcfg = readTimings();
+    setTimeout(function(){
+      // Hide overlay & remove button to keep next open clean
+      stage.classList.remove('is-open','is-closing');
+      removeCloseButton();
+
+      // Unhide the grid and start CSS-driven reveal
+      grid.classList.remove('is-hidden');
+
+      if (prefersReduced) {
+        grid.classList.remove('is-revealing');
+        if (lastSourceTile) lastSourceTile.focus();
+        animating = false;
+        return;
+      }
+
+      // Start CSS cascade
+      grid.classList.add('is-revealing');
+
+      // Wait for all tiles to finish their tileIn animation, then cleanup
+      var remaining = tiles.length;
+      function onAnimEnd(e){
+        if (!e || !e.target || !e.target.classList.contains('box__row-cell')) return;
+        if (e.animationName !== 'tileIn') return;
+        remaining--;
+        if (remaining <= 0) {
+          grid.removeEventListener('animationend', onAnimEnd, true);
+          grid.classList.remove('is-revealing');
+          if (lastSourceTile) lastSourceTile.focus();
+          animating = false;
+        }
+      }
+      grid.addEventListener('animationend', onAnimEnd, true);
+    }, tcfg.stageOut + 20); // small buffer after CSS animation
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && stage.classList.contains('is-open')) closeStage();
+  });
+
+  // Kick off
+  loadData();
+})();
+</script>
+
+</body>
+</html>
