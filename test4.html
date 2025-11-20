@@ -7,9 +7,10 @@
 
 <style>
   :root{
-    --gap: 20px;
+    --gap: 40px;
     --overlay-dim: rgba(0,0,0,.10);
     --shadow: 0 8px 24px rgba(0,0,0,.18);
+	  --tile-bg: #f3f1f1;
 
     /* Tiles (exit stagger) */
     --stagger-shift: 175px;
@@ -51,9 +52,9 @@
 
   /* ===== BOX / GRID ===== */
   .container { width: 100%; }
-  .box { position: relative; width: 80%; margin: 40px auto; }
+  .box { position: relative; width: 95%; margin: 40px auto; }
 
-  .box__row { display:flex; flex-wrap:wrap; gap:var(--gap); padding:var(--gap); transition: visibility .001s linear; }
+  .box__row { display:flex; flex-wrap:wrap; gap:var(--gap); transition: visibility .001s linear; }
   .box__row.is-hidden { visibility: hidden; }
 
   .box__row-cell {
@@ -70,15 +71,16 @@
   .box__row-cell:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
   .box__row-cell:hover { transform: translateY(var(--hover-lift)); box-shadow: var(--hover-shadow); }
 
-  @media (min-width:700px){ .box__row-cell{ flex-basis: calc(50% - var(--gap)/2); } }
-  @media (min-width:1024px){ .box__row-cell{ flex-basis: calc(25% - (var(--gap)*3/4)); } }
+  @media (min-width:700px){ .box__row-cell{ flex-basis: calc(50% - var(--gap)); } }
+  @media (min-width:1024px){ .box__row-cell{ flex-basis: calc(25% - var(--gap)); } }
+  @media (min-width:1400px){ .box__row-cell{ flex-basis: calc(33% - var(--gap)); } }
 
   .tile__img { display:block; width:100%; height:auto; aspect-ratio:495/350; object-fit:cover; }
   .tile__meta { 
 	  background:var(--tile-meta-bg); 
 	  padding:12px 14px 14px; 
 		text-align: left; 
-		padding: 2% 0% 4%; 
+		padding: 2% 5% 4%; 
 	}
 	.tile__meta::before { 
 		content: ""; 
@@ -96,10 +98,10 @@
 	font-family: 'Montserrat', sans-serif; 
 	font-weight: 600; 
 	text-transform: uppercase; 
-	letter-spacing: 1; 
+	letter-spacing: 1px; 
 	color: #3D729E; 
 	font-size: clamp(18px, 3.75vw, 22px); 
-	margin-top: 2%; 
+	margin: 2% 0 1%; 
   }
   .tile__role  {	  
 	text-transform: capitalize; 
@@ -108,7 +110,8 @@
 	font-style: italic; 
 	color: #0f273f; 
 	font-size: clamp(12px, 2.5vw, 14.66px); 
-	letter-spacing: 2; 
+	letter-spacing: 2px; 
+	  margin: 0;
  }
 
   /* Hover-dim others */
@@ -129,6 +132,15 @@
   .stagger-out.run .tile__img   { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay:0s; }
   .stagger-out.run .tile__title { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: var(--stagger-step); }
   .stagger-out.run .tile__role  { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step) * 2); }
+.stagger-out .tile__meta::before {
+  will-change: transform, opacity;
+  transition: transform var(--stagger-dur) var(--stagger-ease), opacity var(--stagger-dur) var(--stagger-ease);
+}
+.stagger-out.run .tile__meta::before {
+  transform: translateX(var(--stagger-shift));
+  opacity: 0;
+  transition-delay: calc(var(--stagger-step) * 3); /* after img(0), title(1), role(2) */
+}
 
   .box__row-cell.stagger-out {
     transition:
@@ -201,7 +213,7 @@
 
   .sc__toggle {
     background: transparent; border: 1px solid rgba(15,39,63,1);
-    color: #fff; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer;
+    color: #0f273f; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer;
   }
   .sc__toggle::before { content: '❚❚'; margin-right: 6px; font-size: 12px; }
   .sc__toggle[aria-pressed="false"]::before { content: '►'; }
@@ -255,7 +267,7 @@
     border: 0; background: transparent; cursor: pointer; padding: 0;
   }
   .stage__close .inner { position: relative; width: 100%; height: 100%; text-align: center; }
-  .stage__close .label { display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #fff; transition: all .3s ease-in; opacity: 0; pointer-events: none; }
+  .stage__close .label { display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #f3f1f1; transition: all .3s ease-in; opacity: 0; pointer-events: none; }
   .stage__close .inner::before, .stage__close .inner::after {
     content: ''; position: absolute; right: 0; width: 200%; height: 1px; background: #FFC107; transition: all .3s ease-in;
   }
@@ -630,8 +642,20 @@
     tile.offsetHeight;
     tile.classList.add('run');
 
+    // ===== NEW: include the tile__meta::before line as a 4th stagger part =====
+    // We can't select the ::before pseudo-element via JS, so we count it implicitly
+    // when computing the total stagger (so the stage waits for it too).
+    var tcfg = readTimings();
+    var hasMeta = !!tile.querySelector('.tile__meta');
+    var parts = 3 + (hasMeta ? 1 : 0); // img, title, role, (+ before line)
+    var totalStagger = tcfg.staggerDur + tcfg.staggerStep * (parts - 1);
+
+    // Make the stage slide-in wait for the full stagger (incl. the ::before line)
+    stage.style.setProperty('--stage-delay', (totalStagger / 1000).toFixed(3) + 's');
+
+    // Build left carousel + right content
     var gallery = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover || ''];
-    mountSC(gallery); // << use SC carousel
+    mountSC(gallery);
 
     panelTitle.textContent = item.title || 'Project';
     panelRole.textContent  = item.role || '';
@@ -743,6 +767,7 @@
   loadData();
 })();
 </script>
+
 
 </body>
 </html>
