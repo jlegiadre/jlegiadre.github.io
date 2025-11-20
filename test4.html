@@ -71,9 +71,24 @@
   .box__row-cell:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
   .box__row-cell:hover { transform: translateY(var(--hover-lift)); box-shadow: var(--hover-shadow); }
 
-  @media (min-width:700px){ .box__row-cell{ flex-basis: calc(50% - var(--gap)); } }
-  @media (min-width:1024px){ .box__row-cell{ flex-basis: calc(33% - var(--gap)); } }
-  @media (min-width:1400px){ .box__row-cell{ flex-basis: calc(25% - var(--gap)); } }
+  @media (min-width:700px){ 
+	  .box__row-cell{ 
+		  flex-basis: calc(50% - var(--gap)); 
+		  max-width: calc(50% - var(--gap)); 
+	  } 
+	}
+  @media (min-width:1024px){ 
+	  .box__row-cell{ 
+		  flex-basis: calc(33% - var(--gap)); 
+		  max-width: calc(33% - var(--gap)); 
+	  } 
+	}
+  @media (min-width:1400px){ 
+	  .box__row-cell{ 
+		  flex-basis: calc(25% - var(--gap)); 
+		  max-width: calc(25% - var(--gap)); 
+	  } 
+	}
 
   .tile__img { display:block; width:100%; height:auto; aspect-ratio:495/350; object-fit:cover; }
   .tile__meta { 
@@ -124,21 +139,21 @@
 
   /* ===== Stagger-out on source tile ===== */
   .stagger-out .tile__img,
+  .stagger-out .tile__meta::before,
   .stagger-out .tile__title,
-  .stagger-out .tile__role,
-  .stagger-out .tile__meta::before {
+  .stagger-out .tile__role {
     will-change: transform, opacity;
     transition: transform var(--stagger-dur) var(--stagger-ease), opacity var(--stagger-dur) var(--stagger-ease);
   }
-  .stagger-out.run .tile__meta::before { 
-	  transform: translateX(var(--stagger-shift)); 
-	  opacity:0; 
-	  transition-delay:0s; 
-	}
   .stagger-out.run .tile__img   { 
 	  transform: translateX(var(--stagger-shift));
 	  opacity:0; 
-	  transition-delay: var(--stagger-step);
+	  transition-delay:0s; 
+	}
+  .stagger-out.run .tile__meta::before { 
+	  transform: translateX(var(--stagger-shift)); 
+	  opacity:0; 
+	  transition-delay: calc(var(--stagger-step)); 
 	}
   .stagger-out.run .tile__title { 
 	  transform: translateX(var(--stagger-shift)); 
