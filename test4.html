@@ -10,7 +10,7 @@
     --gap: 40px;
     --overlay-dim: rgba(0,0,0,0);
     --shadow: 0 8px 24px rgba(0,0,0,.18);
-	  --tile-bg: #f3f1f1;
+    --tile-bg: #f3f1f1;
 
     /* Tiles (exit stagger) */
     --stagger-shift: 175px;
@@ -40,8 +40,10 @@
     --focus-outline: 2px solid #000;
     --focus-offset: 3px;
 
-    /* Buffers (for JS to read if desired) */
-    --stage-out-buffer: .02s; /* ~20ms */
+    /* Overlay behavior */
+    --stage-edge: 16px;                  /* visible edge margin */
+    --stage-max-h: calc(100vh - 32px);   /* 2 * edge */
+    --stack-break: 900px;                /* stack panels ≤ 900px */
   }
 
   /* Base */
@@ -67,67 +69,33 @@
       opacity .25s ease,
       background-color var(--stagger-dur) var(--stagger-ease);
     outline:none; flex:1 1 100%;
+    max-width: 100%;
   }
   .box__row-cell:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
   .box__row-cell:hover { transform: translateY(var(--hover-lift)); box-shadow: var(--hover-shadow); }
 
-  @media (min-width:700px){ 
-	  .box__row-cell{ 
-		  flex-basis: calc(50% - var(--gap)); 
-		  max-width: calc(50% - var(--gap)); 
-	  } 
-	}
-  @media (min-width:1024px){ 
-	  .box__row-cell{ 
-		  flex-basis: calc(33% - var(--gap)); 
-		  max-width: calc(33% - var(--gap)); 
-	  } 
-	}
-  @media (min-width:1400px){ 
-	  .box__row-cell{ 
-		  flex-basis: calc(25% - var(--gap)); 
-		  max-width: calc(25% - var(--gap)); 
-	  } 
-	}
+  @media (min-width:700px){
+    .box__row-cell{ flex-basis: calc(50% - var(--gap)); max-width: calc(50% - var(--gap)); }
+  }
+  @media (min-width:1024px){
+    .box__row-cell{ flex-basis: calc(33% - var(--gap)); max-width: calc(33% - var(--gap)); }
+  }
+  @media (min-width:1400px){
+    .box__row-cell{ flex-basis: calc(25% - var(--gap)); max-width: calc(25% - var(--gap)); }
+  }
 
   .tile__img { display:block; width:100%; height:auto; aspect-ratio:495/350; object-fit:cover; }
-  .tile__meta { 
-	  background:var(--tile-meta-bg); 
-	  padding:12px 14px 14px; 
-		text-align: left; 
-		padding: 2% 5% 4%; 
-	}
-	.tile__meta::before { 
-		content: ""; 
-		display: block; 
-		position: relative; 
-		top: 0; 
-		right: 0; 
-		height: 2px; 
-		background: #dcb24c; 
-		width: 50%;
-	}
-	
-	
+  .tile__meta { background:var(--tile-meta-bg); text-align:left; padding: 2% 5% 4%; }
+  .tile__meta::before { content:""; display:block; position:relative; top:0; right:0; height:2px; background:#dcb24c; width:50%; }
+
   .tile__title {
-	font-family: 'Montserrat', sans-serif; 
-	font-weight: 600; 
-	text-transform: uppercase; 
-	letter-spacing: 1px; 
-	color: #3D729E; 
-	font-size: clamp(18px, 3.75vw, 22px); 
-	margin: 2% 0 1%; 
+    font-family:'Montserrat',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1px;
+    color:#3D729E; font-size:clamp(18px, 3.75vw, 22px); margin: 2% 0 1%;
   }
-  .tile__role  {	  
-	text-transform: capitalize; 
-	font-family: 'Bitter', serif; 
-	font-weight: 400; 
-	font-style: italic; 
-	color: #0f273f; 
-	font-size: clamp(12px, 2.5vw, 14.66px); 
-	letter-spacing: 2px; 
-	  margin: 0;
- }
+  .tile__role{
+    text-transform:capitalize; font-family:'Bitter',serif; font-weight:400; font-style:italic;
+    color:#0f273f; font-size:clamp(12px, 2.5vw, 14.66px); letter-spacing:2px; margin:0;
+  }
 
   /* Hover-dim others */
   .box__row.is-hover .box__row-cell::after { content:""; position:absolute; inset:0; background:var(--overlay-dim); }
@@ -145,26 +113,10 @@
     will-change: transform, opacity;
     transition: transform var(--stagger-dur) var(--stagger-ease), opacity var(--stagger-dur) var(--stagger-ease);
   }
-  .stagger-out.run .tile__img   { 
-	  transform: translateX(var(--stagger-shift));
-	  opacity:0; 
-	  transition-delay:0s; 
-	}
-  .stagger-out.run .tile__meta::before { 
-	  transform: translateX(var(--stagger-shift)); 
-	  opacity:0; 
-	  transition-delay: calc(var(--stagger-step)); 
-	}
-  .stagger-out.run .tile__title { 
-	  transform: translateX(var(--stagger-shift)); 
-	  opacity:0; 
-	  transition-delay: calc(var(--stagger-step) * 2); 
-	}
-  .stagger-out.run .tile__role  { 
-	  transform: translateX(var(--stagger-shift)); 
-	  opacity:0; 
-	  transition-delay: calc(var(--stagger-step) * 3); 
-	}
+  .stagger-out.run .tile__img   { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay:0s; }
+  .stagger-out.run .tile__meta::before { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step)); }
+  .stagger-out.run .tile__title { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step) * 2); }
+  .stagger-out.run .tile__role  { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step) * 3); }
 
   .box__row-cell.stagger-out {
     transition:
@@ -188,7 +140,7 @@
     animation-delay: calc(var(--i, 0) * var(--tile-base-delay));
   }
 
-  /* ===== STAGE OVERLAY (side-by-side 75/25) ===== */
+  /* ===== STAGE OVERLAY ===== */
   .stage {
     position: absolute;
     top: var(--gap);
@@ -196,24 +148,31 @@
     right: var(--gap);
     display: none;
     z-index: 10;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 3fr 1fr; /* desktop 75/25 */
     gap: 0;
     align-items: stretch;
     overflow: hidden;
     pointer-events: none;
   }
   .stage.is-open { display: grid; box-shadow: var(--stage-shadow); }
-
+  /* Fixed mode: clamp to viewport, always visible */
+  .stage.is-open.is-fixed {
+    position: fixed;
+    inset: auto; /* we’ll set top/left/right via inline styles */
+    max-height: var(--stage-max-h);
+    pointer-events: none;
+  }
   /* LEFT: SC carousel lives here */
   .stage__left {
     pointer-events: auto;
     aspect-ratio: 495 / 350;
-    transform: translateX(-101%);
+    transform: translateX(-101%); /* desktop entry */
     position: relative;
     overflow: hidden;
+    background: #fff;
   }
 
-  /* ====== SC CAROUSEL STYLES (ported) ====== */
+  /* ===== SC CAROUSEL (unchanged mechanics) ===== */
   .sc { position: relative; width: 100%; height: 100%; }
   .sc__viewport { position: relative; overflow: hidden; touch-action: pan-y; background-color: #fff; height: 100%; }
   .sc__track { display: flex; transition: transform .4s ease; will-change: transform; user-select: none; cursor: grab; height: 100%; transform: translateX(0%); }
@@ -241,15 +200,6 @@
   .sc__toggle::before { content: '❚❚'; margin-right: 6px; font-size: 12px; }
   .sc__toggle[aria-pressed="false"]::before { content: '►'; }
 
-  @media screen and (max-width: 760px) {
-    .sc__nav { width: 24px; }
-    .sc__controls { padding: 5px 7px; min-height: 42px; position: relative; }
-    .sc__dot { background: rgba(0,0,0,.45); }
-    .sc__dot[aria-selected="true"] { background: #000; }
-    .sc__toggle { border: 1px solid rgba(0,0,0,.35); color: #000; }
-    .sc__viewport { background-color: #fff; }
-  }
-
   /* RIGHT PANEL */
   .stage__right {
     pointer-events: auto;
@@ -257,13 +207,15 @@
     background: var(--panel-bg);
     color: var(--panel-fg);
     padding: 18px 18px 24px 18px;
-    transform: translateX(101%);
+    transform: translateX(101%); /* desktop entry */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    overflow: auto;                        /* allow scroll if content long */
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* Slide-in/out */
+  /* Desktop slide-in/out */
   .stage.is-open .stage__left  { animation: slideInLeft  var(--stage-in-dur) var(--stage-ease) forwards;  animation-delay: var(--stage-delay); }
   .stage.is-open .stage__right { animation: slideInRight var(--stage-in-dur) var(--stage-ease) forwards;  animation-delay: calc(var(--stage-delay) + var(--right-gap)); }
   @keyframes slideInLeft  { from { transform: translateX(-101%); } to { transform: translateX(0); } }
@@ -275,62 +227,34 @@
   @keyframes slideOutLeft  { from { transform: translateX(0); } to { transform: translateX(-101%); } }
   @keyframes slideOutRight { from { transform: translateX(0); } to { transform: translateX(101%); } }
 
-	
-  .panel__title { 
-	  margin:0 0 8px; 
-	font-family: 'Montserrat', sans-serif; 
-	font-weight: 600; 
-	font-size: clamp(18px, 3.75vw, 22px); 
-	text-transform: uppercase; 
-	letter-spacing: 1px; 
-	color: #f3f1f1; 
-	}
-  .panel__role  { 
-	  margin:0 0 10px; 
-	text-transform: capitalize; 
-	font-family: 'Bitter', serif; 
-	font-weight: 400; 
-	font-style: italic; 
-	font-size: clamp(12px, 2.5vw, 14.66px); 
-	letter-spacing: 2px; 
-	  color:#f3f1f1; 
-	}
-  .panel__desc  { 
-	  margin:0; 
-	  font:400 14px/1.6 system-ui; 
-	  color:#f3f1f1; 
-	}
+  /* Mobile/tablet stacked layout ≤ 900px */
+  @media (max-width: 900px){
+    .stage { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+    .stage__left, .stage__right { transform: translateY(-101%); } /* initial off-top */
+    /* Replace desktop side slides with top-down drops */
+    .stage.is-open .stage__left  { animation: dropIn  var(--stage-in-dur) var(--stage-ease) forwards; animation-delay: var(--stage-delay); }
+    .stage.is-open .stage__right { animation: dropIn  var(--stage-in-dur) var(--stage-ease) forwards; animation-delay: calc(var(--stage-delay) + var(--right-gap)); }
+    .stage.is-closing .stage__left  { animation: dropOut var(--stage-out-dur) var(--stage-ease) forwards; }
+    .stage.is-closing .stage__right { animation: dropOut var(--stage-out-dur) var(--stage-ease) forwards; }
+  }
+  @keyframes dropIn  { from { transform: translateY(-101%); } to { transform: translateY(0); } }
+  @keyframes dropOut { from { transform: translateY(0); }      to { transform: translateY(-101%); } }
 
-  .panel__links { 
-	  margin: 12px 0 0; 
-	  display: flex; 
-	  gap: 10px; 
-	  flex-wrap: wrap; 
-	}
-  .panel__link { 
-	  display:inline-flex; 
-	  align-items:center; 
-	  gap:6px; 
-	  padding:6px 10px; 
-	  border-radius: 999px; 
-	  background:#2a2d32; 
-	  color:#f3f1f1; 
-	  text-decoration:none; 
-	  font-size:13px; 
-	}
-  .panel__tags { 
-	  margin: 12px 0 0; 
-	  display:flex; 
-	  flex-wrap:wrap; 
-	  gap:6px; 
-	}
-  .panel__tag { 
-	  font-size:12px; 
-	  padding:4px 8px;
-	  background:#dcb24c; 
-	  border-radius:999px;
-	  color:#0f273f; 
-	}
+  /* Typography in panel */
+  .panel__title {
+    margin:0 0 8px; font-family:'Montserrat',sans-serif; font-weight:600;
+    font-size:clamp(18px, 3.75vw, 22px); text-transform:uppercase; letter-spacing:1px; color:#f3f1f1;
+  }
+  .panel__role  {
+    margin:0 0 10px; text-transform:capitalize; font-family:'Bitter',serif; font-weight:400; font-style:italic;
+    font-size:clamp(12px,2.5vw,14.66px); letter-spacing:2px; color:#f3f1f1;
+  }
+  .panel__desc  { margin:0; font:400 14px/1.6 system-ui; color:#f3f1f1; }
+
+  .panel__links { margin: 12px 0 0; display:flex; gap:10px; flex-wrap:wrap; }
+  .panel__link  { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#2a2d32; color:#f3f1f1; text-decoration:none; font-size:13px; }
+  .panel__tags  { margin:12px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
+  .panel__tag   { font-size:12px; padding:4px 8px; background:#dcb24c; border-radius:999px; color:#0f273f; }
 
   /* Close button */
   .stage__close {
@@ -338,16 +262,14 @@
     border: 0; background: transparent; cursor: pointer; padding: 0;
   }
   .stage__close .inner { position: relative; width: 100%; height: 100%; text-align: center; }
-  .stage__close .label { display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #f3f1f1; transition: all .3s ease-in; opacity: 0; pointer-events: none; }
-  .stage__close .inner::before, .stage__close .inner::after {
-    content: ''; position: absolute; right: 0; width: 200%; height: 1px; background: #FFC107; transition: all .3s ease-in;
-  }
-  .stage__close .inner::before { top: 50%;  transform: rotate(45deg); }
-  .stage__close .inner::after  { bottom: 50%; transform: rotate(-45deg); }
-  .stage__close:hover .label { opacity: 1; }
+  .stage__close .label { display:block; font-size:.8em; line-height:36px; text-transform:uppercase; color:#f3f1f1; transition: all .3s ease-in; opacity:0; pointer-events:none; }
+  .stage__close .inner::before, .stage__close .inner::after { content:''; position:absolute; right:0; width:200%; height:1px; background:#FFC107; transition: all .3s ease-in; }
+  .stage__close .inner::before { top:50%;  transform:rotate(45deg); }
+  .stage__close .inner::after  { bottom:50%; transform:rotate(-45deg); }
+  .stage__close:hover .label { opacity:1; }
   .stage__close:hover .inner::before, .stage__close:hover .inner::after { transform: rotate(0); }
-  .stage__close:hover .inner::before { top: 0; }
-  .stage__close:hover .inner::after  { bottom: 0; }
+  .stage__close:hover .inner::before { top:0; }
+  .stage__close:hover .inner::after  { bottom:0; }
   .stage__close:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -383,28 +305,37 @@
 
 <script>
 (function(){
-  var DATA_URL = '/assets/portfolio.json'; // your JSON path
+  var DATA_URL = '/assets/portfolio.json'; // JSON path
 
-  var grid        = document.getElementById('grid');
-  var stage       = document.getElementById('stage');
-  var stageLeft   = document.getElementById('stageLeft');
-  var stageRight  = document.getElementById('stageRight');
-  var panelTitle  = document.getElementById('panelTitle');
-  var panelRole   = document.getElementById('panelRole');
-  var panelDesc   = document.getElementById('panelDesc');
-  var panelLinks  = document.getElementById('panelLinks');
-  var panelTags   = document.getElementById('panelTags');
+  var box        = document.getElementById('box');
+  var grid       = document.getElementById('grid');
+  var stage      = document.getElementById('stage');
+  var stageLeft  = document.getElementById('stageLeft');
+  var stageRight = document.getElementById('stageRight');
+  var panelTitle = document.getElementById('panelTitle');
+  var panelRole  = document.getElementById('panelRole');
+  var panelDesc  = document.getElementById('panelDesc');
+  var panelLinks = document.getElementById('panelLinks');
+  var panelTags  = document.getElementById('panelTags');
 
   var tiles = [];
   var items = [];
   var lastSourceTile = null;
   var animating = false;
+  var repositionHandlersBound = false;
 
+  /* CSS var readers */
   function cssMs(name, fallback){
     var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     if(!raw) return fallback;
     if(raw.endsWith('ms')) return parseFloat(raw);
     if(raw.endsWith('s'))  return parseFloat(raw)*1000;
+    var n = parseFloat(raw);
+    return isNaN(n) ? fallback : n;
+  }
+  function cssPx(name, fallback){
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if(!raw) return fallback;
     var n = parseFloat(raw);
     return isNaN(n) ? fallback : n;
   }
@@ -419,7 +350,7 @@
     };
   }
 
-  // Load JSON -> render tiles
+  /* Load JSON -> render tiles */
   async function loadData(){
     try {
       const res = await fetch(DATA_URL, { cache:'no-store' });
@@ -510,7 +441,7 @@
     if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
   }
 
-  /* ===== Mount SC Carousel into stageLeft ===== */
+  /* ===== SC Carousel ===== */
   function mountSC(images){
     stageLeft.innerHTML = '';
 
@@ -524,7 +455,6 @@
     var track = document.createElement('div');
     track.className = 'sc__track';
 
-    // Slides
     var arr = (images && images.length) ? images : [''];
     arr.forEach(function(src, i){
       var slide = document.createElement('div');
@@ -538,7 +468,7 @@
       if (src) {
         var img = document.createElement('img');
         img.src = src;
-        img.alt = ''; // decorative; title appears on right panel
+        img.alt = '';
         img.decoding = 'async';
         img.loading = 'eager';
         media.appendChild(img);
@@ -549,7 +479,6 @@
 
     viewport.appendChild(track);
 
-    // Controls
     var btnPrev = document.createElement('button');
     btnPrev.className = 'sc__nav sc__nav--prev';
     btnPrev.type = 'button';
@@ -587,7 +516,6 @@
     root.appendChild(viewport);
     stageLeft.appendChild(root);
 
-    // ----- Behavior (ported) -----
     var slides = Array.prototype.slice.call(track.querySelectorAll('.sc__slide'));
     var dots = [];
     slides.forEach(function(_, i){
@@ -606,7 +534,6 @@
       slide.setAttribute('aria-label', (i+1) + ' of ' + slides.length);
     });
 
-    // Config/state
     var autoplayDefault = true;
     var interval = 5000;
     var index = 0;
@@ -640,7 +567,6 @@
       if (playing) start(); else stop();
     });
 
-    // Drag (touch + mouse)
     var dragging = false, startX = 0, lastX = 0, dragged = false;
     var thresholdPx = 40;
     function trackWidth(){ return stageLeft.clientWidth; }
@@ -679,18 +605,52 @@
     track.addEventListener('pointercancel', endDrag);
     track.addEventListener('pointerleave', function(){ if (dragging) endDrag(); });
 
-    // Prevent click-through on links after drag (future-proof)
     track.addEventListener('click', function(e){
       if (dragged && e.target.closest('.sc__slide a')) {
         e.preventDefault(); e.stopPropagation(); dragged = false;
       }
     }, true);
 
-    // init
     toggleBtn.setAttribute('aria-pressed', String(playing));
     toggleBtn.setAttribute('aria-label', playing ? 'Pause autoplay' : 'Play slideshow');
     render(0);
     if (playing) start();
+  }
+
+  /* ==== Stage positioning & clamping ==== */
+  function updateStagePosition(){
+    if (!stage.classList.contains('is-open')) return;
+    var edge = cssPx('--stage-edge', 16);
+
+    var r = box.getBoundingClientRect();
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+
+    // anchor to the visible top-left of the .box (clamped by edge)
+    var left = Math.max(edge, Math.min(r.left, vw - edge));
+    var top  = Math.max(edge, Math.min(r.top,  vh - edge));
+
+    // width that stays on-screen and within the box’s width
+    var maxWidthByViewport = vw - left - edge;
+    var width = Math.min(r.width, Math.max(0, maxWidthByViewport));
+
+    stage.style.left = left + 'px';
+    stage.style.top  = top  + 'px';
+    stage.style.right = edge + 'px';  // keep a right margin
+    stage.style.width = width + 'px';
+  }
+
+  function bindRepositionHandlers(){
+    if (repositionHandlersBound) return;
+    repositionHandlersBound = true;
+    window.addEventListener('scroll', updateStagePosition, { passive:true });
+    window.addEventListener('resize', updateStagePosition);
+  }
+  function unbindRepositionHandlers(){
+    if (!repositionHandlersBound) return;
+    repositionHandlersBound = false;
+    window.removeEventListener('scroll', updateStagePosition);
+    window.removeEventListener('resize', updateStagePosition);
   }
 
   function hideGridOnly(){
@@ -713,18 +673,12 @@
     tile.offsetHeight;
     tile.classList.add('run');
 
-    // ===== NEW: include the tile__meta::before line as a 4th stagger part =====
-    // We can't select the ::before pseudo-element via JS, so we count it implicitly
-    // when computing the total stagger (so the stage waits for it too).
+    // Count 4 stagger parts (img, line, title, role)
     var tcfg = readTimings();
-    var hasMeta = !!tile.querySelector('.tile__meta');
-    var parts = 3 + (hasMeta ? 1 : 0); // img, title, role, (+ before line)
+    var parts = 4;
     var totalStagger = tcfg.staggerDur + tcfg.staggerStep * (parts - 1);
-
-    // Make the stage slide-in wait for the full stagger (incl. the ::before line)
     stage.style.setProperty('--stage-delay', (totalStagger / 1000).toFixed(3) + 's');
 
-    // Build left carousel + right content
     var gallery = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover || ''];
     mountSC(gallery);
 
@@ -753,7 +707,10 @@
       panelTags.hidden = true;
     }
 
-    stage.classList.add('is-open');
+    // Open and switch to fixed mode before animations so it’s always on-screen
+    stage.classList.add('is-open','is-fixed');
+    updateStagePosition();
+    bindRepositionHandlers();
 
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
@@ -761,7 +718,7 @@
     } else {
       var onLeftStart = function(e){
         if (e.target !== stageLeft) return;
-        if (e.animationName && e.animationName !== 'slideInLeft') return;
+        // desktop uses slideInLeft, mobile uses dropIn — both start the same frame
         stageLeft.removeEventListener('animationstart', onLeftStart);
         hideGridOnly();
       };
@@ -770,7 +727,8 @@
 
     var onRightIn = function(e){
       if (e.target !== stageRight) return;
-      if (e.animationName && e.animationName !== 'slideInRight') return;
+      // Accept both desktop and mobile animation names
+      if (e.animationName && !/slideInRight|dropIn/.test(e.animationName)) return;
       stageRight.removeEventListener('animationend', onRightIn);
 
       var btn = injectCloseButton();
@@ -795,17 +753,20 @@
     if (animating || !stage.classList.contains('is-open')) return;
     animating = true;
 
-    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     stage.classList.add('is-closing');
 
     var tcfg = readTimings();
     setTimeout(function(){
-      stage.classList.remove('is-open','is-closing');
+      // tear down fixed mode + listeners
+      unbindRepositionHandlers();
+      stage.classList.remove('is-open','is-closing','is-fixed');
+      stage.style.left = stage.style.top = stage.style.right = stage.style.width = '';
+
       removeCloseButton();
 
       grid.classList.remove('is-hidden');
 
+      var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) {
         grid.classList.remove('is-revealing');
         if (lastSourceTile) lastSourceTile.focus();
@@ -838,7 +799,6 @@
   loadData();
 })();
 </script>
-
 
 </body>
 </html>
