@@ -25,12 +25,12 @@
     --right-gap: .15s;
     --panel-bg: #1c1e22;
     --panel-fg: #e9edf3;
-    --stage-shadow: none; /* set a shadow if desired */
+    --stage-shadow: none;
 
     /* Tile re-entry */
     --tile-in-dur: .35s;
     --tile-in-ease: cubic-bezier(.16,.84,.44,1);
-    --tile-base-delay: calc(var(--tile-in-dur) - .15s); /* matches prior (dur - 150ms) */
+    --tile-base-delay: calc(var(--tile-in-dur) - .15s);
     --tile-entry-offset: 10px;
 
     /* Interaction */
@@ -62,13 +62,13 @@
 
   .box__row-cell {
     position:relative;
-    background: var(--tile-bg, #ffffff);  /* ensure a color exists so it can fade */
+    background: var(--tile-bg, #ffffff);
     overflow:hidden; cursor:pointer;
     transition:
       transform .2s ease,
       box-shadow .25s ease,
       opacity .25s ease,
-      background-color var(--stagger-dur) var(--stagger-ease); /* allow bg to fade on open */
+      background-color var(--stagger-dur) var(--stagger-ease);
     outline:none; flex:1 1 100%;
   }
   .box__row-cell:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
@@ -109,12 +109,11 @@
       opacity .25s ease,
       background-color var(--stagger-dur) var(--stagger-ease);
   }
-  .box__row-cell.stagger-out:hover { box-shadow: none; transform: none; } /* kill hover while animating */
+  .box__row-cell.stagger-out:hover { box-shadow: none; transform: none; }
   .box__row-cell.stagger-out.run {
-    box-shadow: none;                 /* shadow fades away */
-    background-color: transparent;    /* bg fades with same duration */
+    box-shadow: none;
+    background-color: transparent;
   }
-  /* Also guard via parent state for safety */
   .box__row.is-fading .box__row-cell.is-source:hover { box-shadow: none; transform: none; }
 
   /* ===== CSS re-entry animation ===== */
@@ -130,27 +129,26 @@
 
   /* ===== STAGE OVERLAY (side-by-side 75/25) ===== */
   .stage {
-    position: absolute;           /* sits ON TOP of the tiles */
+    position: absolute;
     top: var(--gap);
     left: var(--gap);
     right: var(--gap);
-    /* height comes from the left panel’s aspect-ratio */
-    display: none;                /* show when .is-open */
+    display: none;
     z-index: 10;
-    grid-template-columns: 3fr 1fr;  /* 75 / 25 split */
+    grid-template-columns: 3fr 1fr;
     gap: 0;
-    align-items: stretch;         /* right matches left height */
+    align-items: stretch;
     overflow: hidden;
     border-radius: 10px;
-    pointer-events: none;         /* only panels receive events */
+    pointer-events: none;
   }
   .stage.is-open { display: grid; box-shadow: var(--stage-shadow); }
 
-  /* LEFT: now a carousel container */
+  /* LEFT: carousel container */
   .stage__left {
     pointer-events: auto;
-    background: #f3f1f1; /* fallback color */
-    aspect-ratio: 495 / 350;  /* locks height from column width */
+    background: #f3f1f1;
+    aspect-ratio: 495 / 350;
     transform: translateX(-101%);
     position: relative;
     overflow: hidden;
@@ -162,26 +160,28 @@
     height: 100%;
     position: relative;
   }
+
+  /* ✅ FLEX-BASED TRACK (fixes blank slides) */
   .carousel__track {
     width: 100%;
     height: 100%;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 100%;
+    display: flex;                 /* was grid */
     overflow: hidden;
     will-change: transform;
-    transform: translateX(0%); /* updated inline by JS as percentages */
+    transform: translateX(0%);     /* updated inline by JS as percentages */
     transition: transform .35s var(--tile-in-ease);
   }
   .carousel__slide {
-    width: 100%;
+    flex: 0 0 100%;                /* one full-width panel per slide */
     height: 100%;
-    background: #f3f1f1 center/contain no-repeat;
+    display: grid;                 /* center if ever needed */
+    place-items: center;
+    background: #f3f1f1;
   }
   .carousel__img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* no crop */
+    object-fit: contain;           /* no crop */
     display: block;
     user-select: none;
     -webkit-user-drag: none;
@@ -204,7 +204,6 @@
   }
   .carousel__btn[disabled] { opacity:.35; cursor: default; }
   .carousel__btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-
   .carousel__btn--prev { left: 10px; }
   .carousel__btn--next { right: 10px; }
 
@@ -225,7 +224,7 @@
   }
   .carousel__dot[aria-current="true"] { background: #fff; }
 
-  /* RIGHT: fills remaining width, same height as left via grid */
+  /* RIGHT: panel */
   .stage__right {
     pointer-events: auto;
     position: relative;
@@ -238,7 +237,7 @@
     justify-content: flex-start;
   }
 
-  /* Slide-in animations triggered when .is-open is added */
+  /* Slide-in */
   .stage.is-open .stage__left {
     animation: slideInLeft var(--stage-in-dur) var(--stage-ease) forwards;
     animation-delay: var(--stage-delay);
@@ -250,7 +249,7 @@
   @keyframes slideInLeft  { from { transform: translateX(-101%); } to { transform: translateX(0); } }
   @keyframes slideInRight { from { transform: translateX(101%);  } to { transform: translateX(0); } }
 
-  /* ===== EXIT animations ===== */
+  /* Exit */
   .stage.is-closing .stage__left  { animation: slideOutLeft  var(--stage-out-dur) var(--stage-ease) forwards; }
   .stage.is-closing .stage__right { animation: slideOutRight var(--stage-out-dur) var(--stage-ease) forwards; }
   .stage.is-closing .stage__close { opacity: 0; pointer-events:none; transition: opacity .2s ease; }
@@ -272,7 +271,7 @@
     font-size:12px; padding:4px 8px; background:#2a2d32; border-radius:999px; color:#cfd5dd;
   }
 
-  /* ===== Close button (injected AFTER slide-in) ===== */
+  /* Close button */
   .stage__close {
     position: absolute;
     top: 10px;
@@ -284,31 +283,14 @@
     cursor: pointer;
     padding: 0;
   }
-  .stage__close .inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-  }
+  .stage__close .inner { position: relative; width: 100%; height: 100%; text-align: center; }
   .stage__close .label {
-    display: block;
-    font-size: .8em;
-    line-height: 36px;
-    text-transform: uppercase;
-    color: #fff;
-    transition: all .3s ease-in;
-    opacity: 0;
-    pointer-events: none;
+    display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #fff;
+    transition: all .3s ease-in; opacity: 0; pointer-events: none;
   }
   .stage__close .inner::before,
   .stage__close .inner::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    width: 200%;
-    height: 1px;
-    background: #FFC107;
-    transition: all .3s ease-in;
+    content: ''; position: absolute; right: 0; width: 200%; height: 1px; background: #FFC107; transition: all .3s ease-in;
   }
   .stage__close .inner::before { top: 50%;  transform: rotate(45deg); }
   .stage__close .inner::after  { bottom: 50%; transform: rotate(-45deg); }
@@ -342,10 +324,9 @@
 
 <div class="container">
   <div class="box" id="box">
-    <!-- Dynamic tiles will be injected here -->
     <div class="box__row" id="grid" role="list" aria-live="polite"></div>
 
-    <!-- Stage overlay: left 75% (carousel); right 25% (text panel) -->
+    <!-- Stage overlay -->
     <div class="stage" id="stage" aria-live="polite">
       <section class="stage__left" id="stageLeft" aria-hidden="true"></section>
 
@@ -362,7 +343,7 @@
 
 <script>
 (function(){
-  var DATA_URL = '/assets/portfolio.json'; // your provided path
+  var DATA_URL = '/assets/portfolio.json';
 
   var grid        = document.getElementById('grid');
   var stage       = document.getElementById('stage');
@@ -374,12 +355,11 @@
   var panelLinks  = document.getElementById('panelLinks');
   var panelTags   = document.getElementById('panelTags');
 
-  var tiles = [];            // live Node list (updated after render)
-  var items = [];            // JSON items
+  var tiles = [];
+  var items = [];
   var lastSourceTile = null;
   var animating = false;
 
-  /* Utility: CSS var → ms */
   function cssMs(name, fallback){
     var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     if(!raw) return fallback;
@@ -399,33 +379,28 @@
     };
   }
 
-  /* Fetch & render tiles from JSON */
   async function loadData(){
     try {
       const res = await fetch(DATA_URL, { cache:'no-store' });
       if (!res.ok) throw new Error('HTTP '+res.status);
       items = await res.json();
     } catch (e) {
-      console.warn('Falling back: could not fetch /assets/portfolio.json', e);
-      items = []; // keep empty if fetch fails
+      console.warn('Could not fetch /assets/portfolio.json', e);
+      items = [];
     }
     renderTiles(items);
   }
 
   function renderTiles(list){
-    // Clear grid
     grid.innerHTML = '';
-
-    // Build DOM for each item
     list.forEach(function(item, i){
       var art = document.createElement('article');
       art.className = 'box__row-cell';
       art.setAttribute('role','listitem');
       art.setAttribute('tabindex','0');
-      art.dataset.index = i; // reference into items[]
+      art.dataset.index = i;
       art.style.setProperty('--i', i);
 
-      // cover image
       var img = document.createElement('img');
       img.className = 'tile__img';
       img.src = item.cover || (item.gallery && item.gallery[0]) || '';
@@ -433,7 +408,6 @@
       img.loading = 'lazy';
       img.decoding = 'async';
 
-      // meta
       var meta = document.createElement('div');
       meta.className = 'tile__meta';
 
@@ -451,14 +425,11 @@
       grid.appendChild(art);
     });
 
-    // Refresh tiles Node list & bind events
     tiles = Array.prototype.slice.call(grid.querySelectorAll('.box__row-cell'));
 
-    // Hover dim
     grid.addEventListener('mouseover', onHoverOver);
     grid.addEventListener('mouseout', onHoverOut);
 
-    // Open triggers
     tiles.forEach(function(tile){
       tile.addEventListener('click', function(){ openFrom(tile); });
       tile.addEventListener('keydown', function(e){
@@ -470,7 +441,6 @@
     });
   }
 
-  /* Hover dim handlers */
   function onHoverOver(e){
     var t = e.target.closest('.box__row-cell');
     if (!t || !grid.contains(t)) return;
@@ -484,7 +454,6 @@
     }
   }
 
-  /* Close button helpers (inject/remove to avoid jitter during slide-in) */
   function injectCloseButton(){
     if (document.getElementById('stageClose')) return;
     var btn = document.createElement('button');
@@ -509,9 +478,9 @@
     if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
   }
 
-  /* Build carousel markup into stageLeft */
+  /* FLEX carousel mount (unchanged API) */
   function mountCarousel(images){
-    stageLeft.innerHTML = ''; // clear previous
+    stageLeft.innerHTML = '';
     var wrapper = document.createElement('div');
     wrapper.className = 'carousel';
     wrapper.setAttribute('role','region');
@@ -521,25 +490,23 @@
     track.className = 'carousel__track';
     track.setAttribute('role','group');
 
-    // slides
     (images && images.length ? images : ['']).forEach(function(src, idx){
       var slide = document.createElement('div');
       slide.className = 'carousel__slide';
       slide.setAttribute('role','img');
-      slide.setAttribute('aria-label','Image '+(idx+1)+' of '+(images.length));
+      slide.setAttribute('aria-label','Image '+(idx+1)+' of '+(images.length || 1));
       if (src) {
         var img = document.createElement('img');
         img.className = 'carousel__img';
         img.src = src;
         img.alt = '';
         img.decoding = 'async';
-        img.loading = 'eager'; // first frame feels snappier
+        img.loading = 'eager';
         slide.appendChild(img);
       }
       track.appendChild(slide);
     });
 
-    // controls
     var btnPrev = document.createElement('button');
     btnPrev.className = 'carousel__btn carousel__btn--prev';
     btnPrev.type = 'button'; btnPrev.setAttribute('aria-label','Previous image');
@@ -550,7 +517,6 @@
     btnNext.type = 'button'; btnNext.setAttribute('aria-label','Next image');
     btnNext.innerHTML = '&#9654;';
 
-    // dots
     var dots = document.createElement('div');
     dots.className = 'carousel__dots';
     dots.setAttribute('role','tablist');
@@ -576,24 +542,23 @@
 
     var ix = 0, total = (images||[]).length || 1;
     function update(){
-      var x = (-ix * 100) + '%';
-      track.style.transform = 'translateX('+x+')';
+      track.style.transform = 'translateX(' + (-ix * 100) + '%)';
       dotBtns.forEach(function(d,i){
         if (i===ix) d.setAttribute('aria-current','true'); else d.removeAttribute('aria-current');
       });
-      btnPrev.disabled = (ix===0);
-      btnNext.disabled = (ix===total-1);
+      if ((images||[]).length > 1) {
+        btnPrev.disabled = (ix===0);
+        btnNext.disabled = (ix===total-1);
+      }
     }
     function go(n){ ix = Math.max(0, Math.min(total-1, n)); update(); }
     function prev(){ go(ix-1); }
     function next(){ go(ix+1); }
 
-    // events
     if ((images||[]).length > 1) {
       btnPrev.addEventListener('click', prev);
       btnNext.addEventListener('click', next);
       dotBtns.forEach(function(d,i){ d.addEventListener('click', function(){ go(i); });});
-      // keyboard on left panel: arrows switch slides
       stageLeft.addEventListener('keydown', function(e){
         if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
         if (e.key === 'ArrowRight'){ e.preventDefault(); next(); }
@@ -602,32 +567,26 @@
     update();
   }
 
-  /* Helper: hide the grid only (no tile cleanup) */
   function hideGridOnly(){
     grid.classList.add('is-hidden');
     grid.classList.remove('is-fading');
   }
 
-  /* OPEN: tiles stagger out → stage slides in → inject close button */
   function openFrom(tile){
     if (animating) return;
     animating = true;
     lastSourceTile = tile;
 
-    // remove old close button to avoid jitters
     removeCloseButton();
 
-    // Source item from data
     var idx = parseInt(tile.dataset.index, 10) || 0;
     var item = items[idx] || {};
 
-    // Fade others & stagger out the clicked tile
     grid.classList.add('is-fading');
     tile.classList.add('is-source','stagger-out');
-    tile.offsetHeight;  // reflow so .run applies
+    tile.offsetHeight;
     tile.classList.add('run');
 
-    // Populate stage (carousel + right panel content)
     var gallery = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover || ''];
     mountCarousel(gallery);
 
@@ -635,22 +594,14 @@
     panelRole.textContent  = item.role || '';
     panelDesc.textContent  = item.description || '';
 
-    // links
     panelLinks.innerHTML = '';
     var linkCount = 0;
     if (item.links && (item.links.website || item.links.caseStudy)) {
-      if (item.links.website) {
-        panelLinks.appendChild(linkEl('Website', item.links.website));
-        linkCount++;
-      }
-      if (item.links.caseStudy) {
-        panelLinks.appendChild(linkEl('Case Study', item.links.caseStudy));
-        linkCount++;
-      }
+      if (item.links.website) { panelLinks.appendChild(linkEl('Website', item.links.website)); linkCount++; }
+      if (item.links.caseStudy) { panelLinks.appendChild(linkEl('Case Study', item.links.caseStudy)); linkCount++; }
     }
     panelLinks.hidden = linkCount === 0;
 
-    // tags
     panelTags.innerHTML = '';
     if (Array.isArray(item.tags) && item.tags.length) {
       item.tags.forEach(function(t){
@@ -664,10 +615,8 @@
       panelTags.hidden = true;
     }
 
-    // Kick off panel slide-ins
     stage.classList.add('is-open');
 
-    // CSS-synced grid hide (NO tile cleanup here)
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
       requestAnimationFrame(hideGridOnly);
@@ -681,9 +630,6 @@
       stageLeft.addEventListener('animationstart', onLeftStart);
     }
 
-    // After RIGHT panel finishes its slide-in:
-    // 1) inject the close button
-    // 2) THEN clean tile classes (avoids reflow during panel motion)
     var onRightIn = function(e){
       if (e.target !== stageRight) return;
       if (e.animationName && e.animationName !== 'slideInRight') return;
@@ -702,31 +648,24 @@
   function linkEl(label, href){
     var a = document.createElement('a');
     a.className = 'panel__link';
-    a.href = href;
-    a.target = '_blank';
-    a.rel = 'noopener';
+    a.href = href; a.target = '_blank'; a.rel = 'noopener';
     a.textContent = label;
     return a;
   }
 
-  /* CLOSE: slide panels out → CSS re-entry cascade */
   function closeStage(){
     if (animating || !stage.classList.contains('is-open')) return;
     animating = true;
 
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Trigger slide-out animations; CSS also fades/disables the close button
     stage.classList.add('is-closing');
 
-    // After panels finished sliding out…
     var tcfg = readTimings();
     setTimeout(function(){
-      // Hide overlay & remove button to keep next open clean
       stage.classList.remove('is-open','is-closing');
       removeCloseButton();
 
-      // Unhide the grid and start CSS-driven reveal
       grid.classList.remove('is-hidden');
 
       if (prefersReduced) {
@@ -736,10 +675,8 @@
         return;
       }
 
-      // Start CSS cascade
       grid.classList.add('is-revealing');
 
-      // Wait for all tiles to finish their tileIn animation, then cleanup
       var remaining = tiles.length;
       function onAnimEnd(e){
         if (!e || !e.target || !e.target.classList.contains('box__row-cell')) return;
@@ -753,14 +690,13 @@
         }
       }
       grid.addEventListener('animationend', onAnimEnd, true);
-    }, tcfg.stageOut + 20); // small buffer after CSS animation
+    }, tcfg.stageOut + 20);
   }
 
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape' && stage.classList.contains('is-open')) closeStage();
   });
 
-  // Kick off
   loadData();
 })();
 </script>
