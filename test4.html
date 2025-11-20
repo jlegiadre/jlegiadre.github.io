@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Expandable Flex Grid — 75/25 Split (JSON + Carousel)</title>
+<title>Expandable Flex Grid — 75/25 Split (JSON + SC Carousel)</title>
 
 <style>
   :root{
@@ -51,11 +51,7 @@
 
   /* ===== BOX / GRID ===== */
   .container { width: 100%; }
-  .box {
-    position: relative;  /* anchor stage overlay */
-    width: 80%;
-    margin: 40px auto;
-  }
+  .box { position: relative; width: 80%; margin: 40px auto; }
 
   .box__row { display:flex; flex-wrap:wrap; gap:var(--gap); padding:var(--gap); transition: visibility .001s linear; }
   .box__row.is-hidden { visibility: hidden; }
@@ -101,7 +97,6 @@
   .stagger-out.run .tile__title { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: var(--stagger-step); }
   .stagger-out.run .tile__role  { transform: translateX(var(--stagger-shift)); opacity:0; transition-delay: calc(var(--stagger-step) * 2); }
 
-  /* Fade the source tile’s background & remove hover shadow during stagger */
   .box__row-cell.stagger-out {
     transition:
       transform .2s ease,
@@ -110,10 +105,7 @@
       background-color var(--stagger-dur) var(--stagger-ease);
   }
   .box__row-cell.stagger-out:hover { box-shadow: none; transform: none; }
-  .box__row-cell.stagger-out.run {
-    box-shadow: none;
-    background-color: transparent;
-  }
+  .box__row-cell.stagger-out.run { box-shadow: none; background-color: transparent; }
   .box__row.is-fading .box__row-cell.is-source:hover { box-shadow: none; transform: none; }
 
   /* ===== CSS re-entry animation ===== */
@@ -144,87 +136,54 @@
   }
   .stage.is-open { display: grid; box-shadow: var(--stage-shadow); }
 
-  /* LEFT: carousel container */
+  /* LEFT: SC carousel lives here */
   .stage__left {
     pointer-events: auto;
-    background: #f3f1f1;
+    background: #000;               /* SC style default */
     aspect-ratio: 495 / 350;
     transform: translateX(-101%);
     position: relative;
     overflow: hidden;
   }
 
-  /* Carousel core */
-  .carousel {
-    width: 100%;
-    height: 100%;
-    position: relative;
+  /* ====== SC CAROUSEL STYLES (ported) ====== */
+  .sc { position: relative; width: 100%; height: 100%; }
+  .sc__viewport { position: relative; overflow: hidden; touch-action: pan-y; background-color: #000; height: 100%; }
+  .sc__track { display: flex; transition: transform .4s ease; will-change: transform; user-select: none; cursor: grab; height: 100%; transform: translateX(0%); }
+  .sc__track.is-dragging { cursor: grabbing; }
+  .sc__slide { min-width: 100%; height: 100%; display: grid; place-items: center; }
+  .sc__media { display: block; width: 100%; height: 100%; }
+  .sc img { -webkit-user-drag: none; user-select: none; max-width: 100%; max-height: 100%; object-fit: contain; }
+
+  .sc__nav {
+    position: absolute; top: 0; bottom: 0; width: 48px; border: 0;
+    color: #fff; font-size: 28px; line-height: 1; cursor: pointer; background: transparent;
+  }
+  .sc__nav--prev { left: 0; }
+  .sc__nav--next { right: 0; }
+
+  .sc__controls { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px; min-height: 56px; color: #fff; display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .sc__dots { display: inline-flex; gap: 8px; }
+  .sc__dot { width: 8px; height: 8px; border-radius: 999px; border: 0; padding: 0; background: rgba(255,255,255,.45); cursor: pointer; }
+  .sc__dot[aria-selected="true"] { background: #fff; transform: scale(1.2); }
+
+  .sc__toggle {
+    background: transparent; border: 1px solid rgba(255,255,255,.35);
+    color: #fff; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer;
+  }
+  .sc__toggle::before { content: '❚❚'; margin-right: 6px; font-size: 12px; }
+  .sc__toggle[aria-pressed="false"]::before { content: '►'; }
+
+  @media screen and (max-width: 760px) {
+    .sc__nav { width: 24px; }
+    .sc__controls { padding: 5px 7px; min-height: 42px; position: relative; }
+    .sc__dot { background: rgba(0,0,0,.45); }
+    .sc__dot[aria-selected="true"] { background: #000; }
+    .sc__toggle { border: 1px solid rgba(0,0,0,.35); color: #000; }
+    .sc__viewport { background-color: #fff; }
   }
 
-  /* ✅ FLEX-BASED TRACK (fixes blank slides) */
-  .carousel__track {
-    width: 100%;
-    height: 100%;
-    display: flex;                 /* was grid */
-    overflow: hidden;
-    will-change: transform;
-    transform: translateX(0%);     /* updated inline by JS as percentages */
-    transition: transform .35s var(--tile-in-ease);
-  }
-  .carousel__slide {
-    flex: 0 0 100%;                /* one full-width panel per slide */
-    height: 100%;
-    display: grid;                 /* center if ever needed */
-    place-items: center;
-    background: #f3f1f1;
-  }
-  .carousel__img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;           /* no crop */
-    display: block;
-    user-select: none;
-    -webkit-user-drag: none;
-  }
-
-  /* Carousel controls */
-  .carousel__btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 38px;
-    height: 38px;
-    border: 0;
-    border-radius: 999px;
-    background: rgba(28,30,34,.65);
-    color: #fff;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-  }
-  .carousel__btn[disabled] { opacity:.35; cursor: default; }
-  .carousel__btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .carousel__btn--prev { left: 10px; }
-  .carousel__btn--next { right: 10px; }
-
-  /* Dots */
-  .carousel__dots {
-    position: absolute;
-    left: 0; right: 0; bottom: 10px;
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    pointer-events: auto;
-  }
-  .carousel__dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.45);
-    border: 1px solid rgba(255,255,255,.75);
-  }
-  .carousel__dot[aria-current="true"] { background: #fff; }
-
-  /* RIGHT: panel */
+  /* RIGHT PANEL */
   .stage__right {
     pointer-events: auto;
     position: relative;
@@ -237,23 +196,15 @@
     justify-content: flex-start;
   }
 
-  /* Slide-in */
-  .stage.is-open .stage__left {
-    animation: slideInLeft var(--stage-in-dur) var(--stage-ease) forwards;
-    animation-delay: var(--stage-delay);
-  }
-  .stage.is-open .stage__right {
-    animation: slideInRight var(--stage-in-dur) var(--stage-ease) forwards;
-    animation-delay: calc(var(--stage-delay) + var(--right-gap));
-  }
+  /* Slide-in/out */
+  .stage.is-open .stage__left  { animation: slideInLeft  var(--stage-in-dur) var(--stage-ease) forwards;  animation-delay: var(--stage-delay); }
+  .stage.is-open .stage__right { animation: slideInRight var(--stage-in-dur) var(--stage-ease) forwards;  animation-delay: calc(var(--stage-delay) + var(--right-gap)); }
   @keyframes slideInLeft  { from { transform: translateX(-101%); } to { transform: translateX(0); } }
   @keyframes slideInRight { from { transform: translateX(101%);  } to { transform: translateX(0); } }
 
-  /* Exit */
   .stage.is-closing .stage__left  { animation: slideOutLeft  var(--stage-out-dur) var(--stage-ease) forwards; }
   .stage.is-closing .stage__right { animation: slideOutRight var(--stage-out-dur) var(--stage-ease) forwards; }
   .stage.is-closing .stage__close { opacity: 0; pointer-events:none; transition: opacity .2s ease; }
-
   @keyframes slideOutLeft  { from { transform: translateX(0); } to { transform: translateX(-101%); } }
   @keyframes slideOutRight { from { transform: translateX(0); } to { transform: translateX(101%); } }
 
@@ -262,61 +213,35 @@
   .panel__desc  { margin:0; font:400 14px/1.6 system-ui; color:#d8dde3; }
 
   .panel__links { margin: 12px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
-  .panel__link {
-    display:inline-flex; align-items:center; gap:6px;
-    padding:6px 10px; border-radius: 999px; background:#2a2d32; color:#e9edf3; text-decoration:none; font-size:13px;
-  }
+  .panel__link { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius: 999px; background:#2a2d32; color:#e9edf3; text-decoration:none; font-size:13px; }
   .panel__tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
-  .panel__tag {
-    font-size:12px; padding:4px 8px; background:#2a2d32; border-radius:999px; color:#cfd5dd;
-  }
+  .panel__tag { font-size:12px; padding:4px 8px; background:#2a2d32; border-radius:999px; color:#cfd5dd; }
 
   /* Close button */
   .stage__close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    padding: 0;
+    position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
+    border: 0; background: transparent; cursor: pointer; padding: 0;
   }
   .stage__close .inner { position: relative; width: 100%; height: 100%; text-align: center; }
-  .stage__close .label {
-    display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #fff;
-    transition: all .3s ease-in; opacity: 0; pointer-events: none;
-  }
-  .stage__close .inner::before,
-  .stage__close .inner::after {
+  .stage__close .label { display: block; font-size: .8em; line-height: 36px; text-transform: uppercase; color: #fff; transition: all .3s ease-in; opacity: 0; pointer-events: none; }
+  .stage__close .inner::before, .stage__close .inner::after {
     content: ''; position: absolute; right: 0; width: 200%; height: 1px; background: #FFC107; transition: all .3s ease-in;
   }
   .stage__close .inner::before { top: 50%;  transform: rotate(45deg); }
   .stage__close .inner::after  { bottom: 50%; transform: rotate(-45deg); }
   .stage__close:hover .label { opacity: 1; }
-  .stage__close:hover .inner::before,
-  .stage__close:hover .inner::after { transform: rotate(0); }
+  .stage__close:hover .inner::before, .stage__close:hover .inner::after { transform: rotate(0); }
   .stage__close:hover .inner::before { top: 0; }
   .stage__close:hover .inner::after  { bottom: 0; }
-
   .stage__close:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
   @media (prefers-reduced-motion: reduce) {
     .stagger-out .tile__img, .stagger-out .tile__title, .stagger-out .tile__role { transition: none !important; }
-    .stage.is-open .stage__left,
-    .stage.is-open .stage__right,
-    .stage.is-closing .stage__left,
-    .stage.is-closing .stage__right {
-      animation: none !important;
-      transform: translateX(0) !important;
+    .stage.is-open .stage__left, .stage.is-open .stage__right, .stage.is-closing .stage__left, .stage.is-closing .stage__right {
+      animation: none !important; transform: translateX(0) !important;
     }
-    .box__row.is-revealing .box__row-cell {
-      animation: none !important;
-      opacity: 1 !important;
-      transform: none !important;
-    }
-    .carousel__track { transition: none !important; }
+    .box__row.is-revealing .box__row-cell { animation: none !important; opacity: 1 !important; transform: none !important; }
+    .sc__track { transition: none !important; }
   }
 </style>
 </head>
@@ -324,12 +249,12 @@
 
 <div class="container">
   <div class="box" id="box">
+    <!-- Grid populated from JSON -->
     <div class="box__row" id="grid" role="list" aria-live="polite"></div>
 
     <!-- Stage overlay -->
     <div class="stage" id="stage" aria-live="polite">
       <section class="stage__left" id="stageLeft" aria-hidden="true"></section>
-
       <aside class="stage__right" id="stageRight" role="dialog" aria-modal="true" aria-label="Project details">
         <h2 class="panel__title" id="panelTitle">Title</h2>
         <p class="panel__role" id="panelRole"></p>
@@ -343,7 +268,7 @@
 
 <script>
 (function(){
-  var DATA_URL = '/assets/portfolio.json';
+  var DATA_URL = '/assets/portfolio.json'; // your JSON path
 
   var grid        = document.getElementById('grid');
   var stage       = document.getElementById('stage');
@@ -379,6 +304,7 @@
     };
   }
 
+  // Load JSON -> render tiles
   async function loadData(){
     try {
       const res = await fetch(DATA_URL, { cache:'no-store' });
@@ -408,25 +334,16 @@
       img.loading = 'lazy';
       img.decoding = 'async';
 
-      var meta = document.createElement('div');
-      meta.className = 'tile__meta';
-
-      var h3 = document.createElement('h3');
-      h3.className = 'tile__title';
-      h3.textContent = item.title || 'Untitled';
-
-      var p = document.createElement('p');
-      p.className = 'tile__role';
-      p.textContent = item.role || '';
+      var meta = document.createElement('div'); meta.className = 'tile__meta';
+      var h3 = document.createElement('h3'); h3.className = 'tile__title'; h3.textContent = item.title || 'Untitled';
+      var p = document.createElement('p');  p.className = 'tile__role';   p.textContent = item.role || '';
 
       meta.appendChild(h3); meta.appendChild(p);
       art.appendChild(img); art.appendChild(meta);
-
       grid.appendChild(art);
     });
 
     tiles = Array.prototype.slice.call(grid.querySelectorAll('.box__row-cell'));
-
     grid.addEventListener('mouseover', onHoverOver);
     grid.addEventListener('mouseout', onHoverOut);
 
@@ -478,93 +395,187 @@
     if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
   }
 
-  /* FLEX carousel mount (unchanged API) */
-  function mountCarousel(images){
+  /* ===== Mount SC Carousel into stageLeft ===== */
+  function mountSC(images){
     stageLeft.innerHTML = '';
-    var wrapper = document.createElement('div');
-    wrapper.className = 'carousel';
-    wrapper.setAttribute('role','region');
-    wrapper.setAttribute('aria-label','Project media');
+
+    var root = document.createElement('div');
+    root.className = 'sc';
+    root.setAttribute('aria-roledescription','carousel');
+
+    var viewport = document.createElement('div');
+    viewport.className = 'sc__viewport';
 
     var track = document.createElement('div');
-    track.className = 'carousel__track';
-    track.setAttribute('role','group');
+    track.className = 'sc__track';
 
-    (images && images.length ? images : ['']).forEach(function(src, idx){
+    // Slides
+    var arr = (images && images.length) ? images : [''];
+    arr.forEach(function(src, i){
       var slide = document.createElement('div');
-      slide.className = 'carousel__slide';
-      slide.setAttribute('role','img');
-      slide.setAttribute('aria-label','Image '+(idx+1)+' of '+(images.length || 1));
+      slide.className = 'sc__slide';
+      slide.setAttribute('aria-roledescription','slide');
+      slide.setAttribute('aria-label', (i+1) + ' of ' + arr.length);
+
+      var media = document.createElement('div');
+      media.className = 'sc__media';
+
       if (src) {
         var img = document.createElement('img');
-        img.className = 'carousel__img';
         img.src = src;
-        img.alt = '';
+        img.alt = ''; // decorative; title appears on right panel
         img.decoding = 'async';
         img.loading = 'eager';
-        slide.appendChild(img);
+        media.appendChild(img);
       }
+      slide.appendChild(media);
       track.appendChild(slide);
     });
 
+    viewport.appendChild(track);
+
+    // Controls
     var btnPrev = document.createElement('button');
-    btnPrev.className = 'carousel__btn carousel__btn--prev';
-    btnPrev.type = 'button'; btnPrev.setAttribute('aria-label','Previous image');
-    btnPrev.innerHTML = '&#9664;';
+    btnPrev.className = 'sc__nav sc__nav--prev';
+    btnPrev.type = 'button';
+    btnPrev.setAttribute('aria-label','Previous slide');
+    btnPrev.textContent = '‹';
 
     var btnNext = document.createElement('button');
-    btnNext.className = 'carousel__btn carousel__btn--next';
-    btnNext.type = 'button'; btnNext.setAttribute('aria-label','Next image');
-    btnNext.innerHTML = '&#9654;';
+    btnNext.className = 'sc__nav sc__nav--next';
+    btnNext.type = 'button';
+    btnNext.setAttribute('aria-label','Next slide');
+    btnNext.textContent = '›';
 
-    var dots = document.createElement('div');
-    dots.className = 'carousel__dots';
-    dots.setAttribute('role','tablist');
-    var dotBtns = [];
+    var controls = document.createElement('div');
+    controls.className = 'sc__controls';
+    controls.setAttribute('aria-live','polite');
 
-    (images || []).forEach(function(_, i){
+    var toggleBtn = document.createElement('button');
+    toggleBtn.className = 'sc__toggle';
+    toggleBtn.type = 'button';
+    toggleBtn.setAttribute('aria-pressed','true');
+    toggleBtn.setAttribute('aria-label','Pause autoplay');
+    toggleBtn.textContent = 'Pause';
+
+    var dotsWrap = document.createElement('div');
+    dotsWrap.className = 'sc__dots';
+    dotsWrap.setAttribute('role','tablist');
+    dotsWrap.setAttribute('aria-label','Slide selectors');
+
+    controls.appendChild(toggleBtn);
+    controls.appendChild(dotsWrap);
+
+    viewport.appendChild(btnPrev);
+    viewport.appendChild(btnNext);
+    viewport.appendChild(controls);
+    root.appendChild(viewport);
+    stageLeft.appendChild(root);
+
+    // ----- Behavior (ported) -----
+    var slides = Array.prototype.slice.call(track.querySelectorAll('.sc__slide'));
+    var dots = [];
+    slides.forEach(function(_, i){
       var d = document.createElement('button');
-      d.className = 'carousel__dot';
+      d.className = 'sc__dot';
       d.type = 'button';
       d.setAttribute('role','tab');
-      d.setAttribute('aria-label','Go to image '+(i+1));
-      dots.appendChild(d);
-      dotBtns.push(d);
+      d.setAttribute('aria-label','Go to slide ' + (i+1));
+      d.addEventListener('click', function(){ goTo(i, true); });
+      dotsWrap.appendChild(d);
+      dots.push(d);
     });
 
-    wrapper.appendChild(track);
-    if ((images||[]).length > 1) {
-      wrapper.appendChild(btnPrev);
-      wrapper.appendChild(btnNext);
-      wrapper.appendChild(dots);
-    }
-    stageLeft.appendChild(wrapper);
+    slides.forEach(function(slide, i){
+      slide.id = 'sc-slide-' + (i+1);
+      slide.setAttribute('aria-label', (i+1) + ' of ' + slides.length);
+    });
 
-    var ix = 0, total = (images||[]).length || 1;
-    function update(){
-      track.style.transform = 'translateX(' + (-ix * 100) + '%)';
-      dotBtns.forEach(function(d,i){
-        if (i===ix) d.setAttribute('aria-current','true'); else d.removeAttribute('aria-current');
-      });
-      if ((images||[]).length > 1) {
-        btnPrev.disabled = (ix===0);
-        btnNext.disabled = (ix===total-1);
+    // Config/state
+    var autoplayDefault = true;
+    var interval = 5000;
+    var index = 0;
+    var timer = null;
+    var playing = autoplayDefault;
+
+    function render(offsetPct){
+      var base = -index * 100;
+      track.style.transform = 'translateX(' + (base + (offsetPct || 0)) + '%)';
+      dots.forEach(function(d, i){ d.setAttribute('aria-selected', i===index ? 'true' : 'false'); });
+    }
+    function goTo(i, user){
+      if (i < 0) i = slides.length - 1;
+      if (i >= slides.length) i = 0;
+      index = i;
+      track.style.transition = 'transform .4s ease';
+      render(0);
+      if (user && playing) { stop(); start(); }
+    }
+    function start(){ stop(); timer = setInterval(function(){ goTo(index + 1, false); }, interval); }
+    function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+
+    btnPrev.addEventListener('click', function(){ goTo(index - 1, true); });
+    btnNext.addEventListener('click', function(){ goTo(index + 1, true); });
+
+    toggleBtn.addEventListener('click', function(){
+      playing = !playing;
+      toggleBtn.setAttribute('aria-pressed', String(playing));
+      toggleBtn.setAttribute('aria-label', playing ? 'Pause autoplay' : 'Play slideshow');
+      toggleBtn.textContent = playing ? 'Pause' : 'Play';
+      if (playing) start(); else stop();
+    });
+
+    // Drag (touch + mouse)
+    var dragging = false, startX = 0, lastX = 0, dragged = false;
+    var thresholdPx = 40;
+    function trackWidth(){ return stageLeft.clientWidth; }
+
+    track.addEventListener('pointerdown', function(e){
+      if (e.button !== 0) return;
+      dragging = true; dragged = false;
+      startX = lastX = e.clientX;
+      track.style.transition = 'none';
+      track.classList.add('is-dragging');
+      if (playing) stop();
+    });
+    track.addEventListener('pointermove', function(e){
+      if (!dragging) return;
+      lastX = e.clientX;
+      var dx = lastX - startX;
+      var pct = (dx / trackWidth()) * 100;
+      render(pct);
+    }, { passive: true });
+    function endDrag(){
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('is-dragging');
+      var dx = lastX - startX;
+      if (Math.abs(dx) > thresholdPx) {
+        dragged = true;
+        if (dx < 0) goTo(index + 1, true); else goTo(index - 1, true);
+      } else {
+        track.style.transition = 'transform .2s ease';
+        render(0);
       }
+      if (playing) start();
+      startX = lastX = 0;
     }
-    function go(n){ ix = Math.max(0, Math.min(total-1, n)); update(); }
-    function prev(){ go(ix-1); }
-    function next(){ go(ix+1); }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerleave', function(){ if (dragging) endDrag(); });
 
-    if ((images||[]).length > 1) {
-      btnPrev.addEventListener('click', prev);
-      btnNext.addEventListener('click', next);
-      dotBtns.forEach(function(d,i){ d.addEventListener('click', function(){ go(i); });});
-      stageLeft.addEventListener('keydown', function(e){
-        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-        if (e.key === 'ArrowRight'){ e.preventDefault(); next(); }
-      });
-    }
-    update();
+    // Prevent click-through on links after drag (future-proof)
+    track.addEventListener('click', function(e){
+      if (dragged && e.target.closest('.sc__slide a')) {
+        e.preventDefault(); e.stopPropagation(); dragged = false;
+      }
+    }, true);
+
+    // init
+    toggleBtn.setAttribute('aria-pressed', String(playing));
+    toggleBtn.setAttribute('aria-label', playing ? 'Pause autoplay' : 'Play slideshow');
+    render(0);
+    if (playing) start();
   }
 
   function hideGridOnly(){
@@ -588,7 +599,7 @@
     tile.classList.add('run');
 
     var gallery = Array.isArray(item.gallery) && item.gallery.length ? item.gallery : [item.cover || ''];
-    mountCarousel(gallery);
+    mountSC(gallery); // << use SC carousel
 
     panelTitle.textContent = item.title || 'Project';
     panelRole.textContent  = item.role || '';
@@ -597,7 +608,7 @@
     panelLinks.innerHTML = '';
     var linkCount = 0;
     if (item.links && (item.links.website || item.links.caseStudy)) {
-      if (item.links.website) { panelLinks.appendChild(linkEl('Website', item.links.website)); linkCount++; }
+      if (item.links.website)   { panelLinks.appendChild(linkEl('Website', item.links.website)); linkCount++; }
       if (item.links.caseStudy) { panelLinks.appendChild(linkEl('Case Study', item.links.caseStudy)); linkCount++; }
     }
     panelLinks.hidden = linkCount === 0;
